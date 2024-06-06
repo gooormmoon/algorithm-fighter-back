@@ -1,0 +1,82 @@
+version: '3'
+services:
+  algofi-mysql:
+    build: ./algofi-mysql
+    image: algofi-mysql:5.0.0-compose
+    ports:
+      - 3306:3306
+    volumes:
+      - mydata:/var/lib/mysql/data
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 256M
+    restart: always
+
+  algofi-core:
+    build: ./algofi-core
+    image: algofi-core:5.0.0-compose
+    ports:
+      - 8080:8080
+    environment:
+      - DB_URL=algofi-mysql
+    depends_on:
+      - algofi-mysql
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 512M
+    restart: on-failure
+
+  algofi-compile-c:
+    build: ./algofi-compile-c
+    image: algofi-compile-c:5.0.0-compose
+    ports:
+      - 9001:9001
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 64M
+    restart: on-failure
+
+  algofi-compile-java:
+    build: ./algofi-compile-java
+    image: algofi-compile-java:5.0.0-compose
+    ports:
+      - 9002:9002
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 64M
+    restart: on-failure
+
+  algofi-compile-javascript:
+    build: ./algofi-compile-javascript
+    image: algofi-compile-javascript:5.0.0-compose
+    ports:
+      - 9003:9003
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 64M
+    restart: on-failure
+
+  algofi-compile-python:
+    build: ./algofi-compile-python
+    image: algofi-compile-python:5.0.0-compose
+    ports:
+      - 9004:9004
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 64M
+    restart: on-failure
+
+volumes:
+  mydata:
