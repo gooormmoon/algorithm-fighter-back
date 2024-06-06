@@ -1,4 +1,4 @@
-name: Postgres Build and Push
+name: CompilePython Build and Push
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: Backend Build and Push
+name: Core Build and Push
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: Postgres Build and Push
+name: CompileJava Build and Push
 
 on:
   push:
