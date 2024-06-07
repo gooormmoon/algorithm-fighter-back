@@ -1,45 +1,35 @@
-name: Auto Assign Reviewer
+name: Auto assign
 
 on:
   pull_request:
     types: [opened]
 
 jobs:
-  assign-reviewer:
+  auto_add:
+    name: Auto add reviewer and assignee
     runs-on: ubuntu-latest
-
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      AUTHOR: ${{ github.event.pull_request.sender.login }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Install jq
-        run: sudo apt-get install -y jq
-
-      - name: Assign PR author
-        run: |
-          AUTHOR=$(jq -r .pull_request.user.login $GITHUB_EVENT_PATH)
-          gh pr edit ${{ github.event.pull_request.number }} --add-assignee @$AUTHOR
-
-          # Define the reviewer based on the author
-          case $AUTHOR in
-            hanni66)
-              REVIEWER=immyeong
-              ;;
-            immyeong)
-              REVIEWER=Berygna
-              ;;
-            Berygna)
-              REVIEWER=sshinylee
-              ;;
-            sshinylee)
-              REVIEWER=cherry-go-round
-              ;;
-            cherry-go-round)
-              REVIEWER=hanni66
-              ;;
+      - run: |
+          case "$AUTHOR" in
+              hanni66)
+                  reviewer="cherry-go-round"
+                  ;;
+              cherry-go-round)
+                  reviewer="sshinylee"
+                  ;;
+              sshinylee)
+                  reviewer="Berygna"
+                  ;;
+              Berygna)
+                  reviewer="immyeong"
+                  ;;
+              immyeong)
+                  reviewer="hanni66"
+                  ;;
           esac
-
-          # Assign the reviewer
-          gh pr review-request ${{ github.event.pull_request.number }} --add @$REVIEWER
-        env:
-          GITHUB_TOKEN: ${{ secrets.REVIEW_TOKEN }}
+          gh pr edit ${{ github.event.pull_request.number }} --add-assignee "$AUTHOR" --add-reviewer "$reviewer"
+                   
+    
