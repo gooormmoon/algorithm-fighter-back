@@ -4,13 +4,14 @@ on:
   pull_request:
     types: [opened]
 
+permissions:
+  pull-requests: write
+  repository-projects: read
+
 jobs:
   auto_add:
     name: Auto add reviewer and assignee
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      AUTHOR: ${{ github.event.pull_request.sender.login }}
     steps:
       - run: |
           case "$AUTHOR" in
@@ -30,6 +31,9 @@ jobs:
                   reviewer="hanni66"
                   ;;
           esac
-          gh pr edit ${{ github.event.pull_request.number }} --add-assignee "$AUTHOR" --add-reviewer "$reviewer"
-                   
-    
+          gh pr edit ${{ github.event.pull_request.number }} --add-assignee "$AUTHOR" --add-reviewer "$reviewer" --repo "$GITHUB_REPOSITORY"
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      AUTHOR: ${{ github.event.sender.login }}
+      OWNER: ${{ github.repository_owner }}
+      REPO: ${{ github.event.repository.name }}
