@@ -33,7 +33,9 @@ CREATE TABLE file(
         path VARCHAR(255),
         language VARCHAR(20),
         file_storage_id INT NOT NULL,
-        FOREIGN KEY(file_storage_id) REFERENCES filestorage(file_storage_id)
+        parent_id INT NULL,
+        FOREIGN KEY(file_storage_id) REFERENCES filestorage(file_storage_id),
+        FOREIGN KEY(parent_id) REFERENCES file(file_id)
 );
 
 CREATE TABLE algorithmproblem(
