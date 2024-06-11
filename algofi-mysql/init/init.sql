@@ -30,7 +30,7 @@ CREATE TABLE plants (
 CREATE TABLE user_plants (
                              user_plant_id INT AUTO_INCREMENT PRIMARY KEY,
                              user_id INT NOT NULL,
-                             plant_id INT NOT NULL,
+                             plant_id INT,
                              plant_nickname VARCHAR(50) NOT NULL,
                              FOREIGN KEY (user_id) REFERENCES users(user_id),
                              FOREIGN KEY (plant_id) REFERENCES plants(plant_id) ON DELETE SET NULL,
