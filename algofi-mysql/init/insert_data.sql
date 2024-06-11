@@ -2,11 +2,14 @@
 INSERT INTO member(name, nickname, login_id, password, role, profile_image_url, description, alert)
 VALUES ('testname', 'immm', 'test', 'test!', '역할', 'https://avatars.githubusercontent.com/u/62759872?s=400&v=4', '게임 고수', '알람1');
 
+INSERT INTO member(name, nickname, login_id, password, role, profile_image_url, description, alert)
+VALUES ('testname2', 'immm2', 'test2', 'test!', '역할', 'https://avatars.githubusercontent.com/u/62759872?s=400&v=4', '게임 하수', '알람1');
+
 -- insert filestorage
 INSERT INTO filestorage(name, member_id) VALUES ('fileStorage1', '1');
 
 -- insert file
-INSERT INTO file(content, name, type, path, language, file_storage_id) VALUES ('import java.util.*;
+INSERT INTO file(content, name, type, path, language, file_storage_id, parent_id) VALUES ('import java.util.*;
 
     class Group{
         int totalCandy,cnt;
@@ -83,7 +86,7 @@ INSERT INTO file(content, name, type, path, language, file_storage_id) VALUES ('
             int dp[][] = new int[2][k+1];
 
             for (Group group : groups) {
-                for(int i=0; i<=k; i++)', '할로윈의양아치.java', 'win', 'path...', 'java', '1');
+                for(int i=0; i<=k; i++)', '할로윈의양아치.java', 'file', '/storage', 'java', 1, NULL);
 
 -- insert algorithmproblem
 INSERT INTO algorithmproblem(title, level ,content, recommend_time) VALUES ('할로윈의 양아치','3','### 문제
