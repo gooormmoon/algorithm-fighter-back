@@ -4,9 +4,7 @@ on:
   pull_request:
     types: [opened]
 
-permissions:
-  pull-requests: write
-  repository-projects: read
+permissions: write-all
 
 jobs:
   auto_add:
