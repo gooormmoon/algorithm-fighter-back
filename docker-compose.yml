@@ -6,7 +6,8 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - mydata:/var/lib/mysql/data
+      - mydata:/var/lib/mysql
+      - ./algofi-mysql/init:/docker-entrypoint-initdb.d
     deploy:
       resources:
         limits:
