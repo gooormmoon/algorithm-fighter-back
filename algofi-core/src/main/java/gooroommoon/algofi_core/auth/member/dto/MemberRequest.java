@@ -19,6 +19,8 @@ public class MemberRequest {
 
     @Getter
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
+    @AllArgsConstructor
     public static class RegisterRequest {
         @NotEmpty(message = "아이디는 필수 항목입니다.")
         private String id;
