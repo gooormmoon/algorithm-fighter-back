@@ -2,19 +2,16 @@ package gooroommoon.algofi_core.auth.member;
 
 import gooroommoon.algofi_core.auth.member.dto.MemberRequest;
 import gooroommoon.algofi_core.auth.member.dto.MemberResponse;
+import gooroommoon.algofi_core.auth.member.dto.TokenResponse;
 import gooroommoon.algofi_core.auth.util.JwtUtil;
 import gooroommoon.algofi_core.dto.ExceptionResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
-import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,9 +32,9 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @Valid MemberRequest.LoginRequest loginRequest) {
+    public ResponseEntity<TokenResponse> login(@RequestBody @Valid MemberRequest.LoginRequest loginRequest) {
         Member member = memberService.authenticate(loginRequest.getId(), loginRequest.getPassword());
-        return ResponseEntity.ok().body("{\"access_token\": %s}".formatted(jwtUtil.createToken(member.getLoginId())));
+        return ResponseEntity.ok().body(new TokenResponse(jwtUtil.createToken(member.getLoginId())));
     }
 
     @GetMapping("")
@@ -61,7 +58,7 @@ public class MemberController {
     @DeleteMapping("")
     public ResponseEntity<String> deleteMember(Authentication auth) {
         memberService.deleteMemberByLoginId(auth.getName());
-        return ResponseEntity.ok().body("");
+        return ResponseEntity.ok().build();
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
