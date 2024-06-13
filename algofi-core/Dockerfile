@@ -19,7 +19,7 @@ RUN gradle clean build --no-daemon
 ##########################################################
 
 # 런타임 이미지 지정
-FROM amazoncorretto:17
+FROM eclipse-temurin:17-jdk
 
 # 애플리케이션을 실행할 작업 디렉토리를 생성
 WORKDIR /app
