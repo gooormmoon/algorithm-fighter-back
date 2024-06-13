@@ -1,4 +1,4 @@
-name: CompileC Build and Push
+name: Compile Build and Push
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - develop
       # develop 브랜치에 push될 때 워크플로우가 실행됩니다.
     paths:
-      - 'algofi-compile-c/**'
+      - 'algofi-compile/**'
 
 jobs:
   build-and-push:
@@ -33,11 +33,11 @@ jobs:
     - name: Build and Push
       uses: docker/build-push-action@v2
       with:
-        context: ./algofi-compile-c
+        context: ./algofi-compile
         # Dockerfile이 있는 위치입니다.
-        file: ./algofi-compile-c/Dockerfile
+        file: ./algofi-compile/Dockerfile
         # Dockerfile의 경로입니다.
         push: true  
         # 이미지를 레지스트리에 푸시합니다.
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/algofi-compile-c:${{ github.sha }}
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/algofi-compile:${{ github.sha }}
         platforms: linux/amd64,linux/arm64,windows/amd64
