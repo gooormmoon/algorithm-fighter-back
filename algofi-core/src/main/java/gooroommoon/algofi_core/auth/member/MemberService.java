@@ -2,11 +2,14 @@ package gooroommoon.algofi_core.auth.member;
 
 import gooroommoon.algofi_core.auth.member.dto.MemberRequest;
 import gooroommoon.algofi_core.auth.member.dto.MemberResponse;
+import gooroommoon.algofi_core.auth.member.dto.TokenResponse;
+import gooroommoon.algofi_core.auth.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -14,16 +17,25 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final MemberUserDetailService memberUserDetailService;
+    private final JwtUtil jwtUtil;
 
     public MemberResponse register(MemberRequest.RegisterRequest registerRequest) {
         Member member = Member.builder()
                 .loginId(registerRequest.getId())
                 .password(registerRequest.getPassword())
                 .name(registerRequest.getName())
-                .nickname(registerRequest.getNickname())
                 .profileImageUrl(registerRequest.getProfileImageUrl())
                 .description(registerRequest.getDescription())
+                .loginDate(LocalDateTime.now())
+                .role(MemberRole.USER)
                 .build();
+
+        if(registerRequest.getNickname() == null)
+            member.setNickname("user%s".formatted(Math.random()*100));
+        else
+            member.setNickname(registerRequest.getNickname());
+
         try {
             memberRepository.save(member);
         } catch (DataIntegrityViolationException exception) {
@@ -32,25 +44,32 @@ public class MemberService {
         return fromMember(member);
     }
 
-    public Member authenticate(String loginId, String password) {
-        Member member = memberRepository.findByLoginId(loginId);
-        if(member != null && member.getPassword().equals(password))
-            return member;
-        else
+    public TokenResponse authenticate(String loginId, String password) {
+        MemberUserDetails memberDetails = (MemberUserDetails) memberUserDetailService.loadUserByUsername(loginId);
+
+        if(memberDetails.getPassword().equals(password)) {
+            memberDetails.getMember().setLoginDate(LocalDateTime.now());
+            memberRepository.save(memberDetails.getMember());
+
+            return new TokenResponse(jwtUtil.createToken(memberDetails.getUsername()));
+        }
+        else {
             throw new UsernameNotFoundException("아이디나 비밀번호가 틀립니다.");
+        }
     }
 
     public MemberResponse getMemberResponseByLoginId(String loginId) {
-        Member member = memberRepository.findByLoginId(loginId);
-        if(member != null)
-            return fromMember(member);
+        Optional<Member> optionalMember = memberRepository.findByLoginId(loginId);
+        if(optionalMember.isPresent())
+            return fromMember(optionalMember.get());
         else
             throw new UsernameNotFoundException("존재하지 않는 아이디입니다.");
     }
 
     public void updateMemberPasswordByLoginId(String loginId, String password) {
-        Member member = memberRepository.findByLoginId(loginId);
-        if(member != null) {
+        Optional<Member> optionalMember = memberRepository.findByLoginId(loginId);
+        if(optionalMember.isPresent()) {
+            Member member = optionalMember.get();
             member.setPassword(password);
             memberRepository.save(member);
         }
@@ -59,10 +78,12 @@ public class MemberService {
     }
 
     public MemberResponse updateMemberInfoByLoginId(String loginId, MemberRequest memberRequest) {
-        Member member = memberRepository.findByLoginId(loginId);
+        Optional<Member> optionalMember = memberRepository.findByLoginId(loginId);
 
 
-        if(member != null) {
+        if(optionalMember.isPresent()) {
+            Member member = optionalMember.get();
+
             Optional.ofNullable(memberRequest.getName()).ifPresent(member::setName);
             Optional.ofNullable(memberRequest.getNickname()).ifPresent(member::setNickname);
             Optional.ofNullable(memberRequest.getDescription()).ifPresent(member::setDescription);
@@ -75,12 +96,13 @@ public class MemberService {
             throw new UsernameNotFoundException("존재하지 않는 아이디입니다.");
     }
 
-    public void deleteMemberByLoginId(String loginId) {
-        Member member = memberRepository.findByLoginId(loginId);
-        if(member != null)
-            memberRepository.deleteById(member.getId());
-        else
-            throw new UsernameNotFoundException("존재하지 않는 아이디입니다.");
+    public void deleteMemberByLoginIdAndPassword(String loginId, String password) {
+        Optional<Member> optionalMember = memberRepository.findByLoginId(loginId);
+        if(optionalMember.isPresent() && optionalMember.get().getPassword().equals(password)) {
+            memberRepository.delete(optionalMember.get());
+        } else {
+            throw new UsernameNotFoundException("아이디나 비밀번호가 틀립니다.");
+        }
     }
 
     private MemberResponse fromMember(Member member) {
@@ -94,17 +116,4 @@ public class MemberService {
                 .loginDate(member.getLoginDate())
                 .build();
     }
-
-    private Member toMember(MemberRequest memberRequest) {
-        return Member.builder()
-                .name(memberRequest.getName())
-                .nickname(memberRequest.getNickname())
-                .loginId(memberRequest.getId())
-                .password(memberRequest.getPassword())
-                .role(MemberRole.USER)
-                .profileImageUrl(memberRequest.getProfileImageUrl())
-                .description(memberRequest.getDescription())
-                .build();
-    }
-
 }

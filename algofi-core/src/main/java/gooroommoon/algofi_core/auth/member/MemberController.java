@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
-    private final JwtUtil jwtUtil;
 
     @PostMapping("/register")
     public ResponseEntity<MemberResponse> register(@RequestBody @Valid MemberRequest.RegisterRequest registerRequest) {
@@ -33,8 +32,7 @@ public class MemberController {
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@RequestBody @Valid MemberRequest.LoginRequest loginRequest) {
-        Member member = memberService.authenticate(loginRequest.getId(), loginRequest.getPassword());
-        return ResponseEntity.ok().body(new TokenResponse(jwtUtil.createToken(member.getLoginId())));
+        return ResponseEntity.ok().body(memberService.authenticate(loginRequest.getId(), loginRequest.getPassword()));
     }
 
     @GetMapping("")
@@ -44,7 +42,7 @@ public class MemberController {
     }
 
     @PutMapping("/change-password")
-    public ResponseEntity<String> changePassword(Authentication auth, @RequestBody @Valid MemberRequest.changePasswordRequest changePasswordRequest) {
+    public ResponseEntity<String> changePassword(Authentication auth, @RequestBody @Valid MemberRequest.ChangePasswordRequest changePasswordRequest) {
         memberService.updateMemberPasswordByLoginId(auth.getName(), changePasswordRequest.getPassword());
         return ResponseEntity.ok().build();
     }
@@ -56,8 +54,8 @@ public class MemberController {
     }
 
     @DeleteMapping("")
-    public ResponseEntity<String> deleteMember(Authentication auth) {
-        memberService.deleteMemberByLoginId(auth.getName());
+    public ResponseEntity<String> deleteMember(Authentication auth, @RequestBody @Valid MemberRequest.LoginRequest deleteRequest) {
+        memberService.deleteMemberByLoginIdAndPassword(auth.getName(), deleteRequest.getPassword());
         return ResponseEntity.ok().build();
     }
 
