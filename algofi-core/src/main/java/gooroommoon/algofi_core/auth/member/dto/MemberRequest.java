@@ -36,6 +36,8 @@ public class MemberRequest {
 
     @Getter
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
+    @AllArgsConstructor
     public static class LoginRequest {
         @NotEmpty(message = "아이디는 필수 항목입니다.")
         private String id;
@@ -45,7 +47,9 @@ public class MemberRequest {
 
     @Getter
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class changePasswordRequest {
+    @Builder
+    @AllArgsConstructor
+    public static class ChangePasswordRequest {
         @NotEmpty(message = "비밀번호는 필수 항목입니다.")
         private String password;
     }
