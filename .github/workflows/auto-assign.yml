@@ -33,7 +33,7 @@ jobs:
           esac
           gh pr edit ${{ github.event.pull_request.number }} --add-assignee "$AUTHOR" --add-reviewer "$reviewer" --repo "$GITHUB_REPOSITORY"
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.PR_ASSIGN_KEY }}
       AUTHOR: ${{ github.event.sender.login }}
       OWNER: ${{ github.repository_owner }}
       REPO: ${{ github.event.repository.name }}
