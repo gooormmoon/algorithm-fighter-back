@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>대화방</title>
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var gameCode = /*[[${gameCode}]]*/ '';
+        var sock = new SockJS("/ws/api");
+
+        sock.onopen = function () {
+            sock.send(JSON.stringify({gameCode: gameCode, type: "JOIN"}));
+        }
+
+        sock.onmessage = function (e) {
+            var content = JSON.parse(e.data);
+            var message = content.message;
+            var type = content.type;
+            var chatLog = document.getElementById("chatLog");
+            if (type == "SEND") {
+                chatLog.innerHTML = chatLog.innerHTML + "<p>" + message + "</p>";
+            }
+        }
+
+        sock.onclose = function () {
+            console.log('WebSocket connection closed.');
+        }
+
+        sock.onerror = function (error) {
+            console.error('WebSocket error:', error);
+        }
+
+        function send() {
+            var textarea = document.getElementById("textarea");
+            var myMessage = textarea.value;
+            sock.send(JSON.stringify({gameCode: gameCode, type: "SEND", message: myMessage}));
+        }
+        /*]]>*/
+    </script>
+</head>
+<body>
+<h1>게임 방 : [[${gameCode}]]번 방</h1>
+---------------------------------------------------
+<div class="chatArea">
+    <h1>웹 소켓 통신 확인용 채팅기능</h1>
+    <div id="chatLog"></div>
+    <textarea id="textarea"></textarea>
+    <input type="button" value="전송" onclick="send()">
+</div>
+
+</body>
+</html>
