@@ -156,6 +156,18 @@ public class MemberControllerIntegrateTests {
         assertEquals("user", member.getBody().getId());
     }
 
+    @Test
+    @DisplayName("다른 회원 조회")
+    void getMemberInfoTest() {
+        registerMember();
+        HttpHeaders headers = new HttpHeaders();
+
+        HttpEntity<Objects> request = new HttpEntity<>(null, headers);
+        ResponseEntity<MemberResponse> response = testRestTemplate.exchange("/api/members/user", HttpMethod.GET, request, MemberResponse.class);
+
+        assertEquals("Lee", response.getBody().getName());
+    }
+
 
     ResponseEntity<MemberResponse> registerMember() {
         MemberRequest.RegisterRequest registerRequest = MemberRequest.RegisterRequest.builder()
