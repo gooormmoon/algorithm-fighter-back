@@ -21,7 +21,7 @@ public class MemberController {
 
     @PostMapping("/api/member/register")
     public ResponseEntity<MemberResponse> register(@RequestBody @Valid MemberRequest.RegisterRequest registerRequest) {
-        return ResponseEntity.ok().body(memberService.register(registerRequest));
+        return ResponseEntity.ok(memberService.register(registerRequest));
     }
 
     @ExceptionHandler(DuplicateLoginIdException.class)
@@ -31,13 +31,13 @@ public class MemberController {
 
     @PostMapping("/api/member/login")
     public ResponseEntity<TokenResponse> login(@RequestBody @Valid MemberRequest.LoginRequest loginRequest) {
-        return ResponseEntity.ok().body(memberService.authenticate(loginRequest.getId(), loginRequest.getPassword()));
+        return ResponseEntity.ok(memberService.authenticate(loginRequest.getId(), loginRequest.getPassword()));
     }
 
     @GetMapping("/api/member")
     public ResponseEntity<MemberResponse> myInfo(Authentication auth) {
         MemberResponse memberResponse = memberService.getMyInfo(auth.getName());
-        return ResponseEntity.ok().body(memberResponse);
+        return ResponseEntity.ok(memberResponse);
     }
 
     @PutMapping("/api/member/change-password")
@@ -49,7 +49,7 @@ public class MemberController {
     @PutMapping("/api/member")
     public ResponseEntity<MemberResponse> updateInfo(Authentication auth, @RequestBody @Valid MemberRequest memberRequest) {
         MemberResponse memberResponse = memberService.updateMemberInfo(auth.getName(), memberRequest);
-        return ResponseEntity.ok().body(memberResponse);
+        return ResponseEntity.ok(memberResponse);
     }
 
     @DeleteMapping("/api/member")
