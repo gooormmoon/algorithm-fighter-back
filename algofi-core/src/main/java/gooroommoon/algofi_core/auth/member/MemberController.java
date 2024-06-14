@@ -37,25 +37,25 @@ public class MemberController {
 
     @GetMapping("")
     public ResponseEntity<MemberResponse> myInfo(Authentication auth) {
-        MemberResponse memberResponse = memberService.getMemberResponseByLoginId(auth.getName());
+        MemberResponse memberResponse = memberService.getMyInfo(auth.getName());
         return ResponseEntity.ok().body(memberResponse);
     }
 
     @PutMapping("/change-password")
     public ResponseEntity<String> changePassword(Authentication auth, @RequestBody @Valid MemberRequest.ChangePasswordRequest changePasswordRequest) {
-        memberService.updateMemberPasswordByLoginId(auth.getName(), changePasswordRequest.getPassword());
+        memberService.updatePassword(auth.getName(), changePasswordRequest.getPassword());
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("")
     public ResponseEntity<MemberResponse> updateInfo(Authentication auth, @RequestBody @Valid MemberRequest memberRequest) {
-        MemberResponse memberResponse = memberService.updateMemberInfoByLoginId(auth.getName(), memberRequest);
+        MemberResponse memberResponse = memberService.updateMemberInfo(auth.getName(), memberRequest);
         return ResponseEntity.ok().body(memberResponse);
     }
 
     @DeleteMapping("")
     public ResponseEntity<String> deleteMember(Authentication auth, @RequestBody @Valid MemberRequest.LoginRequest deleteRequest) {
-        memberService.deleteMemberByLoginIdAndPassword(auth.getName(), deleteRequest.getPassword());
+        memberService.deleteMember(auth.getName(), deleteRequest.getPassword());
         return ResponseEntity.ok().build();
     }
 

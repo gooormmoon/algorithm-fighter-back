@@ -58,7 +58,7 @@ public class MemberService {
         }
     }
 
-    public MemberResponse getMemberResponseByLoginId(String loginId) {
+    public MemberResponse getMyInfo(String loginId) {
         Optional<Member> optionalMember = memberRepository.findByLoginId(loginId);
         if(optionalMember.isPresent())
             return fromMember(optionalMember.get());
@@ -66,7 +66,7 @@ public class MemberService {
             throw new UsernameNotFoundException("존재하지 않는 아이디입니다.");
     }
 
-    public void updateMemberPasswordByLoginId(String loginId, String password) {
+    public void updatePassword(String loginId, String password) {
         Optional<Member> optionalMember = memberRepository.findByLoginId(loginId);
         if(optionalMember.isPresent()) {
             Member member = optionalMember.get();
@@ -77,7 +77,7 @@ public class MemberService {
             throw new UsernameNotFoundException("존재하지 않는 아이디입니다.");
     }
 
-    public MemberResponse updateMemberInfoByLoginId(String loginId, MemberRequest memberRequest) {
+    public MemberResponse updateMemberInfo(String loginId, MemberRequest memberRequest) {
         Optional<Member> optionalMember = memberRepository.findByLoginId(loginId);
 
 
@@ -96,7 +96,7 @@ public class MemberService {
             throw new UsernameNotFoundException("존재하지 않는 아이디입니다.");
     }
 
-    public void deleteMemberByLoginIdAndPassword(String loginId, String password) {
+    public void deleteMember(String loginId, String password) {
         Optional<Member> optionalMember = memberRepository.findByLoginId(loginId);
         if(optionalMember.isPresent() && optionalMember.get().getPassword().equals(password)) {
             memberRepository.delete(optionalMember.get());
