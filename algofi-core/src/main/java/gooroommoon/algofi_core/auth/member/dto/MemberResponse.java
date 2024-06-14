@@ -15,5 +15,6 @@ public class MemberResponse {
     private String profileImageUrl;
     private String description;
     private LocalDateTime createdDate;
+    @Setter
     private LocalDateTime loginDate;
 }

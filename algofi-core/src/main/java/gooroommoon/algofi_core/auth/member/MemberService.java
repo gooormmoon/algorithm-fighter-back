@@ -66,6 +66,12 @@ public class MemberService {
             throw new UsernameNotFoundException("존재하지 않는 아이디입니다.");
     }
 
+    public MemberResponse getInfo(String loginId) {
+        MemberResponse memberResponse = getMyInfo(loginId);
+        memberResponse.setLoginDate(null);
+        return memberResponse;
+    }
+
     public void updatePassword(String loginId, String password) {
         Optional<Member> optionalMember = memberRepository.findByLoginId(loginId);
         if(optionalMember.isPresent()) {

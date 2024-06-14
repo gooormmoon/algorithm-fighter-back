@@ -15,12 +15,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/member")
 public class MemberController {
 
     private final MemberService memberService;
 
-    @PostMapping("/register")
+    @PostMapping("/api/member/register")
     public ResponseEntity<MemberResponse> register(@RequestBody @Valid MemberRequest.RegisterRequest registerRequest) {
         return ResponseEntity.ok().body(memberService.register(registerRequest));
     }
@@ -30,33 +29,39 @@ public class MemberController {
         return ResponseEntity.badRequest().body(new ExceptionResponse(exception.getMessage()));
     }
 
-    @PostMapping("/login")
+    @PostMapping("/api/member/login")
     public ResponseEntity<TokenResponse> login(@RequestBody @Valid MemberRequest.LoginRequest loginRequest) {
         return ResponseEntity.ok().body(memberService.authenticate(loginRequest.getId(), loginRequest.getPassword()));
     }
 
-    @GetMapping("")
+    @GetMapping("/api/member")
     public ResponseEntity<MemberResponse> myInfo(Authentication auth) {
         MemberResponse memberResponse = memberService.getMyInfo(auth.getName());
         return ResponseEntity.ok().body(memberResponse);
     }
 
-    @PutMapping("/change-password")
+    @PutMapping("/api/member/change-password")
     public ResponseEntity<String> changePassword(Authentication auth, @RequestBody @Valid MemberRequest.ChangePasswordRequest changePasswordRequest) {
         memberService.updatePassword(auth.getName(), changePasswordRequest.getPassword());
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("")
+    @PutMapping("/api/member")
     public ResponseEntity<MemberResponse> updateInfo(Authentication auth, @RequestBody @Valid MemberRequest memberRequest) {
         MemberResponse memberResponse = memberService.updateMemberInfo(auth.getName(), memberRequest);
         return ResponseEntity.ok().body(memberResponse);
     }
 
-    @DeleteMapping("")
+    @DeleteMapping("/api/member")
     public ResponseEntity<String> deleteMember(Authentication auth, @RequestBody @Valid MemberRequest.LoginRequest deleteRequest) {
         memberService.deleteMember(auth.getName(), deleteRequest.getPassword());
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/api/members/{loginId}")
+    public ResponseEntity<MemberResponse> userInfo(@PathVariable String loginId) {
+        MemberResponse response = memberService.getInfo(loginId);
+        return ResponseEntity.ok(response);
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
