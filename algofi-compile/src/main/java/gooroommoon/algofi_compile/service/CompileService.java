@@ -34,7 +34,7 @@ public class CompileService {
         String line;
         StringBuilder output = new StringBuilder();
         while ((line = reader.readLine()) != null) {
-            output.append(line + "\n");
+            output.append(line).append("\n");
         }
 
         int exitCode = process.waitFor();
@@ -48,7 +48,7 @@ public class CompileService {
         Path cFilePath = getTempFilePath(language);
         Files.write(cFilePath, code.getBytes());
 
-        builder.command("sh", "-c", "gcc " + cFilePath.toString() + " -o temp && ./temp"); //linux 버전
+        builder.command("sh", "-c", "gcc " + cFilePath + " -o temp && ./temp"); //linux 버전
         //builder.command("cmd.exe", "/c", "gcc " + cFilePath.toString() + " -o temp && temp"); //windows 버전
     }
 
@@ -67,7 +67,7 @@ public class CompileService {
 
         String className = javaFilePath.toString().replace(".java", "");
         //builder.command("cmd.exe", "/c", "javac " + javaFilePath.toString() + " && java " + className); //windows 버전
-        builder.command("sh", "-c", "javac " + javaFilePath.toString() + " && java " + className); //linux 버전
+        builder.command("sh", "-c", "javac " + javaFilePath + " && java " + className); //linux 버전
     }
 
     private void commandJavaScriptFile(String code, String language, ProcessBuilder builder) throws IOException {
@@ -75,7 +75,7 @@ public class CompileService {
         Files.write(jsFilePath, code.getBytes());
 
         //builder.command("cmd.exe", "/c", "node " + jsFilePath.toString()); //windows 버전
-        builder.command("sh", "-c", "node " + jsFilePath.toString()); //linux 버전
+        builder.command("sh", "-c", "node " + jsFilePath); //linux 버전
     }
 
     private void commandPythonFile(String code, String language, ProcessBuilder builder) throws IOException {
@@ -83,7 +83,7 @@ public class CompileService {
         Files.write(pyFilePath, code.getBytes());
 
         //builder.command("cmd.exe", "/c", "python " + pyFilePath.toString()); //windows 버전
-        builder.command("sh", "-c", "python3 " + pyFilePath.toString()); //linux 버전
+        builder.command("sh", "-c", "python3 " + pyFilePath); //linux 버전
     }
 
     private Path getTempFilePath(String language) {
