@@ -1,12 +1,7 @@
-package gooroommoon.algofi_compile.api;
+package gooroommoon.algofi_compile.service;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import gooroommoon.algofi_compile.dto.CodeExecutionRequest;
-import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,20 +9,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-@RestController
-@RequestMapping("/api/compile")
-public class CompileApiController {
-    @PostMapping
-    public ResponseEntity<String> compile(@RequestBody CodeExecutionRequest request) {
-        try {
-            String result = runCode(request.getCode(), request.getLanguage());
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error in code execution: " + e.getMessage());
-        }
-    }
+@Service
+public class CompileService {
 
-    private String runCode(String code, String language) throws IOException, InterruptedException {
+    public String runCode(String code, String language) throws IOException, InterruptedException {
         String fileName = "temp";
         ProcessBuilder builder = new ProcessBuilder();
 
@@ -71,7 +56,7 @@ public class CompileApiController {
                 Files.write(pyFilePath, code.getBytes());
 
                 //builder.command("cmd.exe", "/c", "python " + pyFilePath.toString()); //windows 버전
-                builder.command("sh", "-c", "python " + pyFilePath.toString()); //linux 버전
+                builder.command("sh", "-c", "python3 " + pyFilePath.toString()); //linux 버전
 
                 break;
             default:

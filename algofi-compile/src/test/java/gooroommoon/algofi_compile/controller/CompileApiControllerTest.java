@@ -1,4 +1,4 @@
-package gooroommoon.algofi_compile.api;
+package gooroommoon.algofi_compile.controller;
 
 import gooroommoon.algofi_compile.dto.CodeExecutionRequest;
 import org.junit.jupiter.api.Test;
