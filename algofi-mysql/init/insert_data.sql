@@ -89,38 +89,21 @@ INSERT INTO file(content, name, type, path, language, file_storage_id, parent_id
                 for(int i=0; i<=k; i++)', '할로윈의양아치.java', 'file', '/storage', 'java', 1, NULL);
 
 -- insert algorithmproblem
-INSERT INTO algorithmproblem(title, level ,content, recommend_time) VALUES ('할로윈의 양아치','3','### 문제
-    ***Trick or Treat!!***
-
-    10월 31일 할로윈의 밤에는 거리의 여기저기서 아이들이 친구들과 모여 사탕을 받기 위해 돌아다닌다. 올해 할로윈에도 어김없이 많은 아이가 할로윈을 즐겼지만 단 한 사람, 일찍부터 잠에 빠진 **스브러스**는 할로윈 밤을 즐길 수가 없었다. 뒤늦게 일어나 사탕을 얻기 위해 혼자 돌아다녀 보지만 이미 사탕은 바닥나 하나도 얻을 수 없었다.
-
-    단단히 화가 난 **스브러스**는 거리를 돌아다니며 다른 아이들의 사탕을 빼앗기로 마음을 먹는다. 다른 아이들보다 몸집이 큰 **스브러스**에게 사탕을 빼앗는 건 어렵지 않다. 또한, **스브러스**는 매우 공평한 사람이기 때문에 한 아이의 사탕을 뺏으면 그 아이 친구들의 사탕도 모조리 뺏어버린다. (친구의 친구는 친구다?!)
-
-    사탕을 다 빼앗긴 아이들은 거리에 주저앉아 울고 K명 이상의 아이들이 울기 시작하면 울음소리가 공명하여 온 집의 어른들이 거리로 나온다. **스브러스**가 어른들에게 들키지 않고 최대로 뺏을 수 있는 사탕의 양을 구하여라.
-
-    **스브러스**는 혼자 모든 집을 돌아다녔기 때문에 다른 아이들이 받은 사탕의 양을 모두 알고 있다. 또한, 모든 아이는 **스브러스**를 피해 갈 수 없다.
-
-    ### 입력
-
-    첫째 줄에 정수 N, M, K가 주어진다. N은 거리에 있는 아이들의 수, M은 아이들의 친구 관계 수, K는 울음소리가 공명하기 위한 최소 아이의 수이다. (1≤N≤30 000, 0≤M≤100 000, 1≤K≤min{N,3 000})
-
-    둘째 줄에는 아이들이 받은 사탕의 수를 나타내는 정수 C1,C2,⋯,Cn 이 주어진다. (1≤Ci≤10 000)
-
-    셋째 줄부터 M개 줄에 갈쳐 각각의 줄에 정수 a, b가 주어진다. 이는 a와 b가 친구임을 의미한다. 같은 친구 관계가 두 번 주어지는 경우는 없다. (1≤a,b≤N, a≠b)
-
-    ### 출력
-
-    스브러스가 어른들에게 들키지 않고 아이들로부터 뺏을 수 있는 최대 사탕의 수를 출력한다.
-
-    ### 예시
-
-    |예제 입력1|예제 출력1|
-    |---|---|
-    |10 6 6<br>9 15 4 4 1 5 19 14 20 5<br>1 3<br>2 5<br>4 9<br>6 2<br>7 8<br>6 10|57|
-
-    |예제 입력1|예제 출력1|
-    |---|---|
-    |5 4 4<br>9 9 9 9 9<br>1 2<br>2 3<br>3 4<br>4 5|0|', '40');
+INSERT INTO algorithmproblem(title, level ,content, recommend_time)
+VALUES
+    ('문자 찾기','1','한 개의 문자열을 입력받고,특정 문자를 입력받아 해당 특정문자가 입력받은 문자열에 몇 개 존재하는지 알아내는 프로그램을 작성하세요. 대소문자를 구분하지 않습니다.문자열의 길이는 100을 넘지 않습니다.',10),
+    ('대소문자 변환','1','대문자와 소문자가 같이 존재하는 문자열을 입력받아 대문자는 소문자로 소문자는 대문자로 변환하여 출력하는 프로그램을 작성하세요.',10),
+    ('문장 속 단어','1','한 개의 문장이 주어지면 그 문장 속에서 가장 긴 단어를 출력하는 프로그램을 작성하세요. 문장속의 각 단어는 공백으로 구분됩니다.',10),
+    ('단어 뒤집기','1','N개의 단어가 주어지면 각 단어를 뒤집어 출력하는 프로그램을 작성하세요',10),
+    ('특정 문자 뒤집기','2','영어 알파벳과 특수문자로 구성된 문자열이 주어지면 영어 알파벡만 뒤집고, 특수문자는 자기 자리에 그대로 있는 문자열을 만들어 출력하는 프로그램을 작성하세요.',20),
+    ('중복문자제거','1','소문자로 된 한개의 문자열이 입력되면 중복된 문자를 제거하고 출력하는 프로그램을 작성하세요. 중복이 제거된 문자열의 각 문자는 원래 문자열의 순서를 유지합니다.',15),
+    ('회문 문자열','2','앞에서 읽을 때나 뒤에서 읽을 때나 같은 문자열을 회문 문자열이라고 합니다. 문자열이 입력되면 해당 문자열이 회문 문자열이면 \"YES\", 회문 문자열이 아니면 \"NO\"를 출력하는 프로그램을 작성하세요. 단 회문을 검사할 때 대소문자를 구분하지 않습니다.',15),
+    ('유요한 팰린드롬','2','앞에서 읽을 때나 뒤에서 읽을 때나 같은 문자열을 팰린드롬이라고 합니다. 문자열이 입력되면 해당 문자열이 팰린드롬이면 \"YES\", 아니면 \"NO\"를 출력하는 프로그램을 작성하세요.',25),
+    ('숫자만 추출','1','문자와 숫자가 섞여있는 문자열이 주어지면 그 중 숫자만 추출하여 그 순서대로 자연수를 만듭니다. 만약 \"tge0a1h205er\"에서 숫자만 추출하면 0,1,2,0,5이고 이것을 자연수를 만들면 1205이 됩니다. 추출하여 만들어지는 자연수는 100,000,000을 넘지 않습니다.',20),
+    ('가장 짧은 문자거리','3','한 개의 문자열 s와 문자 t가 주어지면 문자열 s의 각 문자가 문자 t와 떨어진 최소거리를 출력하는 프로그램을 작성하세요.',25),
+    ('문자열 압축','1','알파벳 대문자로 이루어진 문자열을 입력받아 같은 문자가 연속으로 반복되는 경우 반복되는 문자 바로 오른쪽에 반복 횟수를 표기하는 방법으로 문자열을 압축하는 프로그램을 작성하시오. 단 반복횟수가 1인 경우 생략합니다.',15),
+    ('암호','2','현수는 영희에게 알파벳 대문자로 구성된 비밀편지를 매일 컴퓨터를 이용해 보냅니다. 비밀편지는 현수와 영희가 서로 약속한 암호로 구성되어 있습니다. 비밀편지는 알파벳 한 문자마나 # 또는 *이 일곱 개로 구성되어 있습니다. 만약 현수가 \"#*****#\"으로 구성된 문자를 보냈다면 영희는 현수와 약속한 규칙대로 다음과 같이 해석합니다. 1.\"#*****#\"를 일곱자리의 이진수로 바꿉니다. #은 이진수의 1로, *은 이진수의 0으로 변환합니다. 결과는 \"1000001\"로 변환됩니다. 2.바뀐 2진수를 10진수화 합니다. \"1000001\"을 10진수화 하면 65가 됩니다. 3.아스키 번호가 65문자로 변환합니다. 즉 아스키번호 65는 대문자 \"A\"입니다. 참고로 대문자들의 아스키 번호는 \"A\"는 65번~ \"Z\"는 90번입니다. 현수가 보낸 신호를 해석해주는 프로그램을 작성하세요.',25),
+    ('최대점수 구하기(냅색 알고리즘)','5','이번 정보올림피아드대회에서 좋은 성적을 내기 위하여 현수는 선생님이 주신 N개의 문제를 풀려고 합니다. 각 문제는 그것을 풀었을 때 얻는 점수와 푸는데 걸리는 시간이 주어지게 됩니다. 제한시간 M안에 N개의 문제 중 최대점수를 얻을 수 있도록 해야 합니다.(해당문제는 해당시간이 걸리면 푸는 걸로 간주한다. 한 유형당 한개만 풀 수 있습니다.)',50);
 
 -- insert chatroom
 INSERT INTO chatroom(chatroom_name) VALUES('global');
@@ -140,17 +123,69 @@ INSERT INTO member_gameresult(game_result_id, member_id) VALUES (1, 1);
 
 -- insert testcase
 INSERT INTO testcase(test_input, test_output, algorithm_problem_id)
-VALUES ('10 6 6
-    9 15 4 4 1 5 19 14 20 5
-    1 3
-    2 5
-    4 9
-    6 2
-    7 8
-    6 10', '57', 1),
-       ('5 4 4
-    9 9 9 9 9
-    1 2
-    2 3
-    3 4
-    4 5', '0', 1);
+VALUES
+    ('computerprogramming r','3',1),
+    ('Computercooler c','2',1),
+    ('sssssss','7',1),
+    ('itistimetogoii','i',1),
+    ('tttccttccTT','T',1),
+    ('StuDY','sTUdy',2),
+    ('akfHHLkdjlgKHL','AKFhhlKDJLGkhl',2),
+    ('znlakHLnvLHHLgkdieytYOY','ZNLAKhlNVlhhlGKDIEYTyoy',2),
+    ('dkieoYOIUOotokdjgljajYOYOHKGhkgLKJLKJgBlkBlLJ','DKIEOyoiuoOTOKDJGLJAJyoyohkgHKGlkjlkjGbLKbLlj',2),
+    ('djkjgKLUOIHkjHGYhUYFUYGjGUYGUYfUFUGUguYURrUHGUYUguOK','DJKJGkluoihKJhgyHuyfuygJguyguyFufuguGUyurRuhguyuGUok',2),
+    ('it is time to study','study',3),
+    ('dkjg LKKL KJkjglkd Kjgkd LKKJLJLJLKJLLLLLLL','LKKJLJLJLKJLLLLLLL',3),
+    ('eitoiw iruow witouweiotwiowioei eiiuow e','witouweiotwiowioei',3),
+    ('jddgshsgskjkdj dijglolkdwoig dkjkljglkd gksjlkjgls gkjldkjgla','jddgshsgskjkdj',3),
+    ('loveispower','loveispower',3),
+    ('3 good Time Big','doog emiT giB',4),
+    ('5 dkjg Gkkjdg DGSGjkjdgkAGGA dkKJKLHLkjlkd HLKJLKJLKHL','gjkd gdjkkG AGGAkgdjkjGSGD dkljkLHLKJKkd LHKLJKLJKLH',4),
+    ('7 dkjg Gkkjdg DGSGjkjdgkAGGA dkKJKLHLkjlkd HLKJLKJLKHL dkjkghlsKJLJLJLKJK dkNBHGKJHKJHKJHKJHKJHKJHKJH','gjkd gdjkkG AGGAkgdjkjGSGD dkljkLHLKJKkd LHKLJKLJKLH KJKLJLJLJKslhgkjkd HJKHJKHJKHJKHJKHJKHJKGHBNkd',4),
+    ('10 dkjg Gkkjdg DGSGjkjdgkAGGA dkKJKLHLkjlkd HLKJLKJLKHL dkjkghlsKJLJLJLKJK dkNBHGKJHKJHKJHKJHKJHKJHKJH djklgj skjglkjkljdlk kdjglk','gjkd gdjkkG AGGAkgdjkjGSGD dkljkLHLKJKkd LHKLJKLJKLH KJKLJLJLJKslhgkjkd HJKHJKHJKHJKHJKHJKHJKGHBNkd jglkjd kldjlkjklgjks klgjdk',4),
+    ('20 dkjg Gkkjdg DGSGjkjdgkAGGA dkKJKLHLkjlkd HLKJLKJLKHL dkjkghlsKJLJLJLKJK dkNBHGKJHKJHKJHKJHKJHKJHKJH djklgj skjglkjkljdlk kdjglk dkjgdg Gkkjdgsgdg DGSGjkjdgkAGGAdgs dkKJKLHLkjlkdsg HLKJLKJLKHLsg dkjkghlsKJLJLJLKJKsgs dkNBHGKJHKJHKJHKJHKJHKJHKJHsg djklgjsg skjglkjkljdlksh kdjglksbgs','gjkd gdjkkG AGGAkgdjkjGSGD dkljkLHLKJKkd LHKLJKLJKLH KJKLJLJLJKslhgkjkd HJKHJKHJKHJKHJKHJKHJKGHBNkd jglkjd kldjlkjklgjks klgjdk gdgjkd gdgsgdjkkG sgdAGGAkgdjkjGSGD gsdkljkLHLKJKkd gsLHKLJKLJKLH sgsKJKLJLJLJKslhgkjkd gsHJKHJKHJKHJKHJKHJKHJKGHBNkd gsjglkjd hskldjlkjklgjks sgbsklgjdk',4),
+    ('a#b!GE*T@S','S#T!EG*b@a',5),
+    ('kdj#@kdjg%$#kdjgk@kd$dk','kdd#@kkgj%$#dkgjd@kj$dk',5),
+    ('kqQdj#@kd#g%$#kdj&&gk@kd$dQGk','kGQdd#@kk#g%$#jdk&&gd@kj$dQqk',5),
+    ('kqQ!DGSGSdj#@kd#g%$#kdj&&gk@kd$d#%&DGS@!DHSQGk','kGQ!SHDSGDd#@dk#k%$#gjd&&kg@dk$j#%&dSG@!SGDQqk',5),
+    ('kHSHHS#qQ!DGSG#@Sdj#@kd#g%$#kdj&&gk@kd$d#%&DGS@!DH%SQGk#','kGQSHD#SG!Dddk#@kgj#@dk#g%$#dkj&&dS@GS$G#%&DQq@!SH%HSHk#',5),
+    ('ksekkset','kset',6),
+    ('kjkgjlskjekieogiwo','kjglseiow',6),
+    ('kdkgksjgkjlsjgkjsljgkjaksjg','kdgsjla',6),
+    ('eiotuoiwtitoiywiotieoiutoiwioweuotiuwoieut','eiotuwy',6),
+    ('qiutoiwuotiqpituoiwuiotuowutowiutoityioqp','qiutowpy',6),
+    ('gooG','YES',7),
+    ('tttttttttttttt','YES',7),
+    ('sssssssssssssssksssssssssssssss','YES',7),
+    ('kstudkgksjlkgjlksjdggkkllllllllllllllllllllllsjgksjldgjlllllllllllllllgjks','NO',7),
+    ('skSKskuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuKSksks','YES',7),
+    ('Tae,aba;e#%a*T','YES',8),
+    ('found7, timk: study; Yduts; emit, 7Dnuof','NO',8),
+    ('found7, time: study; Yduts; emit, 7Dnuof','YES',8),
+    ('kdjg$@kjkldjkg%@dkjgkj','NO',8),
+    ('a sd fg #%hjkl; %#$@! lkj&*hgfd s ##a','YES',8),
+    ('kdk1k0kdjfkj0kkdjkfj0fkd','1000',9),
+    ('dkf0jkk0dkjkgjljl1kgh0ekjlkjf2lkjsklfjlkdj','102',9),
+    ('Akdj0Gk1djADG2SDGkdjf','12',9),
+    ('Akdj0Gk1djADG2SDGkdj0f','120',9),
+    ('Akdj0Gk1dgdgdAGSGAG3DGGA45GAGADGDGdjADG2SDGkdj0f','134520',9),
+    ('teachermode e','1 0 1 2 1 0 1 2 2 1 0',10),
+    ('fkdgkjdflkgjljslgjkfldjlkfdg f','0 1 2 3 3 2 1 0 1 2 3 4 5 6 5 4 3 2 1 0 1 2 3 2 1 0 1 2',10),
+    ('kkkkkkkk k','0 0 0 0 0 0 0 0',10),
+    ('eochjgoekghlakegh h','3 2 1 0 1 2 3 3 2 1 0 1 2 3 2 1 0',10),
+    ('timeout t','30 1 2 3 2 1 0',10),
+    ('KKTFFFFFFEEE','K2TF6E3',11),
+    ('KSTTTSEEKFKKKDJJGG','KST3SE2KFK3DJ2G2',11),
+    ('KDKGKKSKKFJKKKKSLSSSSKFKSSSS','KDKGK2SK2FJK4SLS4KFKS4',11),
+    ('KKKKKDDDDDKDDDKKSKKFJKKKKSLSSSSKFKSSSS','K5D5KD3K2SK2FJK4SLS4KFKS4',11),
+    ('KKKKTTTUUUKDDDDDKDDDKKSKKFJKYYYKUYY','K4T3U3KD5KD3K2SK2FJKY3KUY2',11),
+    ('4 #****###**#####**#####**##**','COOL',12),
+    ('8 #**#**##*#*#**#**#**##*#**###*#*#**#**#**##**##*##***#*#','ITISTIME',12),
+    ('7 #*#*#**#**#**##**##*##***#*##**#####*#*#*##*#*#**','TIMEOUT',12),
+    ('7 #*#**###*#*#**#*#*#*##***#**#***#*##**###*#*#*#**','STUDENT',12),
+    ('10 #*#*#**#***#*##*****##****###**#***#***#*##*#**#*#****#*#*****##***###','TEACHERBAG',12),
+    ('5 20 10 5 25 12 15 8 6 3 7 4','41',13),
+    ('9 50 12 7 16 8 20 10 30 15 10 5 25 12 15 8 6 3 7 4','101',13),
+    ('12 70 5 2 11 5 12 7 16 8 20 10 30 15 10 5 25 12 15 8 6 3 7 4 3 2','141',13),
+    ('15 150 5 2 11 5 12 7 16 8 20 10 30 15 10 5 25 12 15 8 6 3 7 4 3 2 8 5 9 12 19 11','196',13),
+    ('19 150 16 11 20 16 11 6 5 2 11 5 12 7 16 8 20 10 30 15 10 5 25 12 15 8 6 3 7 4 3 2 8 5 9 12 19 11 9 6','252',13);
