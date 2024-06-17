@@ -33,11 +33,17 @@ public class MemberControllerIntegrateTests {
 
     @AfterEach
     void afterEach() {
+        //매 테스트마다 테이블 초기화
+        //H2 Database
         List<String> truncateQueries = jdbcTemplate.queryForList(
                 "SELECT CONCAT('TRUNCATE TABLE ', TABLE_NAME, ';') AS q FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'PUBLIC'", String.class);
         jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
         truncateQueries.forEach(jdbcTemplate::execute);
         jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
+        //MySQL
+//        jdbcTemplate.execute("SET foreign_key_checks = 0;");
+//        jdbcTemplate.execute("TRUNCATE TABLE member");
+//        jdbcTemplate.execute("SET foreign_key_checks = 1;");
     }
 
     @Test
