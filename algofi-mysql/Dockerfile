@@ -12,6 +12,9 @@ RUN chmod 644 /etc/my.cnf
 COPY ./init/create_table.sql /docker-entrypoint-initdb.d/
 COPY ./init/insert_data.sql /docker-entrypoint-initdb.d/
 
+RUN chmod 755 /docker-entrypoint-initdb.d/create_table.sql
+RUN chmod 755 /docker-entrypoint-initdb.d/insert_data.sql
+
 # 환경변수로 MySQL 계정 정보 설정
 ENV MYSQL_ROOT_PASSWORD=mypassword
 ENV MYSQL_USER=myuser
