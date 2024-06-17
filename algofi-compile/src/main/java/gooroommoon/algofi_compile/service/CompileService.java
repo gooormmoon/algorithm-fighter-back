@@ -16,51 +16,42 @@ public class CompileService {
         String fileName = "temp";
         ProcessBuilder builder = new ProcessBuilder();
 
-        switch (language.toLowerCase()) {
-            case "c":
-                Path cFilePath = Paths.get("temp." + language.toLowerCase());
-                Files.write(cFilePath, code.getBytes());
+        if (language.equalsIgnoreCase("c")) {
+            Path cFilePath = Paths.get("temp." + language.toLowerCase());
+            Files.write(cFilePath, code.getBytes());
 
-                builder.command("sh", "-c", "gcc " + cFilePath.toString() + " -o temp && ./temp"); //linux 버전
-                //builder.command("cmd.exe", "/c", "gcc " + cFilePath.toString() + " -o temp && temp"); //windows 버전
-                break;
-
-            case "java":
-                int classIndex = code.indexOf("public class ");
-                if (classIndex != -1) {
-                    int startIndex = classIndex + "public class ".length();
-                    int endIndex = code.indexOf(" ", startIndex);
-                    if (endIndex != -1) {
-                        fileName = code.substring(startIndex, endIndex);
-                    }
+            builder.command("sh", "-c", "gcc " + cFilePath.toString() + " -o temp && ./temp"); //linux 버전
+            //builder.command("cmd.exe", "/c", "gcc " + cFilePath.toString() + " -o temp && temp"); //windows 버전
+        } else if (language.equalsIgnoreCase("java")) {
+            int classIndex = code.indexOf("public class ");
+            if (classIndex != -1) {
+                int startIndex = classIndex + "public class ".length();
+                int endIndex = code.indexOf(" ", startIndex);
+                if (endIndex != -1) {
+                    fileName = code.substring(startIndex, endIndex);
                 }
+            }
 
-                Path javaFilePath = Paths.get(fileName + "." + language.toLowerCase());
-                Files.write(javaFilePath, code.getBytes());
+            Path javaFilePath = Paths.get(fileName + "." + language.toLowerCase());
+            Files.write(javaFilePath, code.getBytes());
 
-                String className = javaFilePath.toString().replace(".java", "");
-                //builder.command("cmd.exe", "/c", "javac " + javaFilePath.toString() + " && java " + className); //windows 버전
-                builder.command("sh", "-c", "javac " + javaFilePath.toString() + " && java " + className); //linux 버전
-                break;
+            String className = javaFilePath.toString().replace(".java", "");
+            //builder.command("cmd.exe", "/c", "javac " + javaFilePath.toString() + " && java " + className); //windows 버전
+            builder.command("sh", "-c", "javac " + javaFilePath.toString() + " && java " + className); //linux 버전
+        } else if (language.equalsIgnoreCase("javascript")) {
+            Path jsFilePath = Paths.get("temp." + language.toLowerCase());
+            Files.write(jsFilePath, code.getBytes());
 
-            case "javascript":
-                Path jsFilePath = Paths.get("temp." + language.toLowerCase());
-                Files.write(jsFilePath, code.getBytes());
+            //builder.command("cmd.exe", "/c", "node " + jsFilePath.toString()); //windows 버전
+            builder.command("sh", "-c", "node " + jsFilePath.toString()); //linux 버전
+        } else if (language.equalsIgnoreCase("python")) {
+            Path pyFilePath = Paths.get("temp." + language.toLowerCase());
+            Files.write(pyFilePath, code.getBytes());
 
-                //builder.command("cmd.exe", "/c", "node " + jsFilePath.toString()); //windows 버전
-                builder.command("sh", "-c", "node " + jsFilePath.toString()); //linux 버전
-
-                break;
-            case "python":
-                Path pyFilePath = Paths.get("temp." + language.toLowerCase());
-                Files.write(pyFilePath, code.getBytes());
-
-                //builder.command("cmd.exe", "/c", "python " + pyFilePath.toString()); //windows 버전
-                builder.command("sh", "-c", "python3 " + pyFilePath.toString()); //linux 버전
-
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported language: " + language);
+            //builder.command("cmd.exe", "/c", "python " + pyFilePath.toString()); //windows 버전
+            builder.command("sh", "-c", "python3 " + pyFilePath.toString()); //linux 버전
+        } else {
+            throw new IllegalArgumentException("Unsupported language: " + language);
         }
 
         builder.redirectErrorStream(true);
