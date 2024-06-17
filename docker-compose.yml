@@ -35,7 +35,7 @@ services:
     build: ./algofi-compile
     image: algofi-compile:5.0.0-compose
     ports:
-      - 9999:9999
+      - 9000:9000
     deploy:
       resources:
         limits:
