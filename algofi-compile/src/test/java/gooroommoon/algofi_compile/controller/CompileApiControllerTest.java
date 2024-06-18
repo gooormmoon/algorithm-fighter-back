@@ -5,6 +5,7 @@ import gooroommoon.algofi_compile.dto.CodeExecutionResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.io.BufferedReader;
@@ -28,7 +29,7 @@ class CompileApiControllerTest {
 
         ResponseEntity response = compileApiController.compile(request);
         CodeExecutionResponse result = (CodeExecutionResponse) response.getBody();
-        assertThat(result.isCorrect()).isTrue();
+        assertThat(result.getOutput()).isEqualTo(result.getExpected());
     }
 
     @Test
@@ -39,7 +40,7 @@ class CompileApiControllerTest {
 
         ResponseEntity response = compileApiController.compile(request);
         CodeExecutionResponse result = (CodeExecutionResponse) response.getBody();
-        assertThat(result.isCorrect()).isTrue();
+        assertThat(result.getOutput()).isEqualTo(result.getExpected());
     }
 
     @Test
@@ -50,7 +51,7 @@ class CompileApiControllerTest {
 
         ResponseEntity response = compileApiController.compile(request);
         CodeExecutionResponse result = (CodeExecutionResponse) response.getBody();
-        assertThat(result.isCorrect()).isTrue();
+        assertThat(result.getOutput()).isEqualTo(result.getExpected());
     }
 
     @Test
@@ -61,7 +62,7 @@ class CompileApiControllerTest {
 
         ResponseEntity response = compileApiController.compile(request);
         CodeExecutionResponse result = (CodeExecutionResponse) response.getBody();
-        assertThat(result.isCorrect()).isTrue();
+        assertThat(result.getOutput()).isEqualTo(result.getExpected());
     }
 
     @Test
@@ -72,7 +73,7 @@ class CompileApiControllerTest {
 
         ResponseEntity response = compileApiController.compile(request);
         CodeExecutionResponse result = (CodeExecutionResponse) response.getBody();
-        assertThat(result.isCorrect()).isTrue();
+        assertThat(result.getOutput()).isEqualTo(result.getExpected());
     }
 
     @Test
@@ -83,7 +84,7 @@ class CompileApiControllerTest {
 
         ResponseEntity response = compileApiController.compile(request);
         CodeExecutionResponse result = (CodeExecutionResponse) response.getBody();
-        assertThat(result.isCorrect()).isTrue();
+        assertThat(result.getOutput()).isEqualTo(result.getExpected());
     }
 
 
@@ -95,7 +96,7 @@ class CompileApiControllerTest {
 
         ResponseEntity response = compileApiController.compile(request);
         CodeExecutionResponse result = (CodeExecutionResponse) response.getBody();
-        assertThat(result.isCorrect()).isTrue();
+        assertThat(result.getOutput()).isEqualTo(result.getExpected());
     }
 
     @Test
@@ -106,7 +107,17 @@ class CompileApiControllerTest {
 
         ResponseEntity response = compileApiController.compile(request);
         CodeExecutionResponse result = (CodeExecutionResponse) response.getBody();
-        assertThat(result.isCorrect()).isTrue();
+        assertThat(result.getOutput()).isEqualTo(result.getExpected());
+    }
+
+    @Test
+    public void timeoutTest() throws IOException {
+        File file = new File("src/test/resources/fixture/While.java");
+        String code = fileToString(file);
+        CodeExecutionRequest request = new CodeExecutionRequest(code, "java", null, null);
+
+        ResponseEntity response = compileApiController.compile(request);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private String fileToString(File file) throws IOException {

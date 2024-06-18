@@ -8,25 +8,43 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @Service
 public class CompileService {
 
     public CodeExecutionResponse runCode(CodeExecutionRequest request) throws IOException, InterruptedException {
-        ProcessBuilder builder = new ProcessBuilder();
-
         String language = request.getLanguage();
         String code = request.getCode();
 
+        ProcessBuilder builder = new ProcessBuilder();
         commandFileByLanguage(language, code, builder);
+
         Process process = startProcess(builder);
 
-        transferInput(request, process);
-        StringBuilder output = readOutput(process);
+        CompletableFuture<StringBuilder> future = CompletableFuture.supplyAsync(() -> {
+            try {
+                transferInput(request.getInput(), process);
+                return readOutput(process);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        StringBuilder output;
+        try {
+            output = future.get(10000, TimeUnit.MILLISECONDS);
+        } catch (ExecutionException | TimeoutException e) {
+            throw new RuntimeException(e);
+        }
 
         int exitCode = process.waitFor();
+
         if (exitCode != 0) {
-            throw new RuntimeException("Execution failed with exit code " + exitCode);
+            throw new RuntimeException("Execution failed");
         }
 
         String actual = output.toString();
@@ -48,10 +66,10 @@ public class CompileService {
         }
     }
 
-    private void transferInput(CodeExecutionRequest request, Process process) throws IOException {
-        if (request.getInput() != null) {
+    private void transferInput(String input, Process process) throws IOException {
+        if (input != null) {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-            writer.write(request.getInput());
+            writer.write(input);
             writer.newLine();
             writer.flush();
         }
@@ -64,11 +82,14 @@ public class CompileService {
 
     private StringBuilder readOutput(Process process) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String line;
+
         StringBuilder output = new StringBuilder();
+        String line;
+
         while ((line = reader.readLine()) != null) {
             output.append(line).append("\n");
         }
+
         return output;
     }
 
