@@ -17,6 +17,21 @@ public class CompileService {
         String language = request.getLanguage();
         String code = request.getCode();
 
+        commandFileByLanguage(language, code, builder);
+        Process process = startProcess(builder);
+
+        transferInput(request, process);
+        StringBuilder output = readOutput(process);
+
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            throw new RuntimeException("Execution failed with exit code " + exitCode);
+        }
+
+        return output.toString();
+    }
+
+    private void commandFileByLanguage(String language, String code, ProcessBuilder builder) throws IOException {
         if (language.equalsIgnoreCase("c")) {
             commandCFile(code, language, builder);
         } else if (language.equalsIgnoreCase("java")) {
@@ -28,29 +43,40 @@ public class CompileService {
         } else {
             throw new IllegalArgumentException("Unsupported language: " + language);
         }
+    }
 
-        builder.redirectErrorStream(true);
-        Process process = builder.start();
-
+    private void transferInput(CodeExecutionRequest request, Process process) throws IOException {
         if (request.getInput() != null) {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
             writer.write(request.getInput());
             writer.newLine();
             writer.flush();
         }
+    }
 
+    private Process startProcess(ProcessBuilder builder) throws IOException {
+        builder.redirectErrorStream(true);
+        return builder.start();
+    }
+
+    private StringBuilder readOutput(Process process) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
         StringBuilder output = new StringBuilder();
         while ((line = reader.readLine()) != null) {
             output.append(line).append("\n");
         }
+        return output;
+    }
 
-        int exitCode = process.waitFor();
-        if (exitCode != 0) {
-            throw new RuntimeException("Execution failed with exit code " + exitCode);
+    private Path getTempFilePath(String language) {
+        if (language.equalsIgnoreCase("javascript")) {
+            return Paths.get("temp." + "js");
         }
-        return output.toString();
+        if (language.equalsIgnoreCase("python")) {
+            return Paths.get("temp." + "py");
+        }
+        return Paths.get("temp." + language.toLowerCase());
     }
 
     private void commandCFile(String code, String language, ProcessBuilder builder) throws IOException {
@@ -94,15 +120,5 @@ public class CompileService {
 
         //builder.command("cmd.exe", "/c", "python " + pyFilePath.toString()); //windows 버전
         builder.command("sh", "-c", "python3 " + pyFilePath); //linux 버전
-    }
-
-    private Path getTempFilePath(String language) {
-        if (language.equalsIgnoreCase("javascript")) {
-            return Paths.get("temp." + "js");
-        }
-        if (language.equalsIgnoreCase("python")) {
-            return Paths.get("temp." + "py");
-        }
-        return Paths.get("temp." + language.toLowerCase());
     }
 }
