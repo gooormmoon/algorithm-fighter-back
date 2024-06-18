@@ -21,6 +21,8 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -29,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@Transactional
 public class ChatServiceTest {
     @InjectMocks
     private ChatService chatService;
@@ -77,7 +80,7 @@ public class ChatServiceTest {
                 .build();
 
         // 테스트할 메서드 호출
-        chatService.saveMessage(messageDTO);
+        chatService.saveMessage(messageDTO, authentication);
 
         // 메시지가 저장되었는지 확인
         verify(messageRepository, times(1)).save(any(Message.class));
@@ -135,7 +138,7 @@ public class ChatServiceTest {
         messageDTO.setContent(mockMember.getNickname() + "님이 입장하셨습니다.");
 
         // Call the method under test
-        chatService.enterRoom(1L, messageDTO, headerAccessor);
+        chatService.enterRoom(1L, messageDTO, headerAccessor, authentication);
 
         // Verify interactions
         // enterRoom 메소드와 saveMessage 메소드에서 findByLoginId는 각각 2번 호출됨.

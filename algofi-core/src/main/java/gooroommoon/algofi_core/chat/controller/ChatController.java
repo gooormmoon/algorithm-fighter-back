@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -24,15 +25,15 @@ public class ChatController {
 
     @MessageMapping("/enter-room/{roomId}")
     @SendTo("/topic/room/{roomId}")
-    public void enterRoom(@PathVariable Long roomId, @Payload MessageDTO message, SimpMessageHeaderAccessor headerAccessor) {
-        chatService.enterRoom(roomId, message, headerAccessor);
+    public void enterRoom(@PathVariable Long roomId, @Payload MessageDTO message, SimpMessageHeaderAccessor headerAccessor, Principal principal) {
+        chatService.enterRoom(roomId, message, headerAccessor, principal);
     }
     @MessageMapping("/send-message")
-    public void sendMessage(@Payload MessageDTO message) {
-        chatService.saveAndSendMessage(message);
+    public void sendMessage(@Payload MessageDTO message, Principal principal) {
+        chatService.saveAndSendMessage(message, principal);
     }
 
-    @GetMapping("/{chatRoomId}/messages")
+    @GetMapping("/chat/{chatRoomId}/messages")
     public List<MessageDTO> getMessagesInChattingRoom(@PathVariable Long chatRoomId) {
         return chatService.getMessagesInChattingRoom(chatRoomId);
     }

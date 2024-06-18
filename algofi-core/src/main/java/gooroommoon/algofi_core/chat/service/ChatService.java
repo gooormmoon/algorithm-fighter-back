@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,12 +37,10 @@ public class ChatService {
     private final ChatRoomService chatRoomService;
 
     @Transactional
-    public void saveMessage(MessageDTO messageDTO) {
-        // 현재 인증된 사용자의 Authentication 객체를 가져옴
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public void saveMessage(MessageDTO messageDTO, Principal principal) {
 
         // 인증 정보에서 사용자 이름(로그인 ID) 가져오기
-        String loginId = authentication.getName();
+        String loginId = principal.getName();
 
         // 로그인 ID를 기반으로 Member 엔티티 조회
         Member member = memberRepository.findByLoginId(loginId)
@@ -88,12 +87,12 @@ public class ChatService {
 
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
 
-        Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
-        if (sessionAttributes == null) {
+        Principal principal = headerAccessor.getUser();
+        if (!(principal instanceof Authentication)) {
             throw new IllegalArgumentException("STOMP SessionHeader Error.");
         }
 
-        String username = (String) sessionAttributes.get("username");
+        String username = principal.getName();
 
         // 사용자가 참여한 채팅방 조회
         Optional<Chatroom> optionalChatRoom = chatRoomRepository.findByChatroomName(username);
@@ -102,10 +101,6 @@ public class ChatService {
 
         // chat room 삭제
         chatRoomRepository.delete(chatRoom);
-
-        // 사용자 조회
-        Member member = memberRepository.findByLoginId(username)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found."));
 
         log.info("chatRoom: {}", chatRoom);
 
@@ -133,18 +128,20 @@ public class ChatService {
                         .messageId(message.getId())
                         .chatRoomId(message.getChatroomId().getChatroomId())
                         .content(message.getContent())
+                        .senderId(message.getSenderId().getId())
+                        .createdDate(message.getCreatedDate())
                         .build())
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public void saveAndSendMessage(MessageDTO message) {
-        saveMessage(message);
+    public void saveAndSendMessage(MessageDTO message, Principal principal) {
+        saveMessage(message, principal);
         sendMessage(message);
     }
 
     @Transactional
-    public void enterRoom(Long roomId, MessageDTO message, SimpMessageHeaderAccessor headerAccessor) {
+    public void enterRoom(Long roomId, MessageDTO message, SimpMessageHeaderAccessor headerAccessor, Principal principal) {
         log.info("TEST");
         addInfoInSessionAttribute(headerAccessor);
         ensureChatRoomExists(roomId);
@@ -153,15 +150,16 @@ public class ChatService {
         String roomName = (String) headerAccessor.getSessionAttributes().get("roomName");
         chatRoomService.saveChatRoom(roomName);
 
-        String loginId = (String) headerAccessor.getSessionAttributes().get("username");
+        // 현재 인증된 사용자 정보 가져오기
+        String loginId = principal.getName();
         Member member = memberRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new IllegalArgumentException("Current authenticated user not found."));
+                .orElseThrow(() -> new IllegalArgumentException("Member not found."));
 
         message.setChatRoomId(roomId);
         message.setType(MessageType.ENTER);
         message.setContent(member.getNickname() + "님이 입장하셨습니다.");
 
-        saveMessage(message);
+        saveMessage(message, principal);
     }
 
     private void ensureChatRoomExists(Long roomId) {

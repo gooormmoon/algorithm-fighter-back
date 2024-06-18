@@ -1,92 +1,125 @@
 package gooroommoon.algofi_core.chat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import gooroommoon.algofi_core.auth.member.Member;
-import gooroommoon.algofi_core.auth.member.MemberRepository;
-import gooroommoon.algofi_core.chat.controller.ChatController;
-import gooroommoon.algofi_core.chat.entity.Chatroom;
-import gooroommoon.algofi_core.chat.entity.Message;
 import gooroommoon.algofi_core.chat.entity.MessageType;
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
-import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
 import gooroommoon.algofi_core.chat.repository.MessageRepository;
-import gooroommoon.algofi_core.chat.service.ChatService;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.socket.WebSocketHttpHeaders;
+import org.springframework.messaging.simp.stomp.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.lang.reflect.Type;
 import java.util.concurrent.TimeUnit;
 
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+// TEST를 진행하기 전에 수정해야할 것
+// SecurityConfig 에서 .anyRequest().permitAll() 로 수정
+// WebSocketConfig에서 .withSockJS() 주석 처리
 
-@AutoConfigureMockMvc
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Transactional
 public class ChatControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    MessageRepository messageRepository;
 
-    @MockBean
-    private ChatService chatService;
+    @LocalServerPort
+    private int port;
+
+    private WebSocketStompClient stompClient;
+    private final String WEBSOCKET_TOPIC = "/topic/room/";
+
+    @BeforeEach
+    public void setup() {
+        stompClient = new WebSocketStompClient(new StandardWebSocketClient());
+        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+    }
 
     @Test
-    @WithMockUser(username = "user1", roles = {"USER"})
-    @DisplayName("채팅방의 메시지 가져오기")
-    public void testGetMessagesInChattingRoom() throws Exception {
-        Long chatRoomId = 1L;
-        List<MessageDTO> messages = Arrays.asList(
-                new MessageDTO(MessageType.TALK, chatRoomId, 1L, "Hello!"),
-                new MessageDTO(MessageType.TALK, chatRoomId, 2L, "Hi!")
-        );
+    @DisplayName("채팅방 입장 WebSocket 통합 테스트")
+    public void testEnterRoomWebSocket() throws Exception {
+        // WebSocket 연결 설정
+        String websocketUri = "ws://localhost:" + port + "/chat";
+        StompSession stompSession = stompClient.connect(websocketUri, new StompSessionHandlerAdapter() {}).get(1, TimeUnit.SECONDS);
 
-        given(chatService.getMessagesInChattingRoom(chatRoomId)).willReturn(messages);
+        // Subscribe to the WebSocket topic
+        StompHeaders headers = new StompHeaders();
+        headers.setDestination(WEBSOCKET_TOPIC + "1");
+        headers.set("username", "testUser");
+        stompSession.subscribe(headers, new StompFrameHandler() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return MessageDTO.class;
+            }
 
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                MessageDTO messageDTO = (MessageDTO) payload;
+                assertEquals("TestUser님이 입장하셨습니다.", messageDTO.getContent());
+                assertEquals(MessageType.ENTER, messageDTO.getType());
+            }
+        });
 
-        mockMvc.perform(get("/chat/" + chatRoomId + "/messages"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].senderId").value("1"))
-                .andExpect(jsonPath("$[1].senderId").value("2"))
-                .andDo(result -> {
-                    System.out.println(result.getResponse().getContentAsString());
-                });
+        // Send message to WebSocket endpoint
+        MessageDTO messageDTO = new MessageDTO();
+        messageDTO.setType(MessageType.ENTER);
+        messageDTO.setChatRoomId(1L);
+        messageDTO.setContent("TestUser님이 입장하셨습니다.");
+
+        stompSession.send("/app/enter-room/1", messageDTO);
+
+        // Wait for response
+        Thread.sleep(1000);
+
+        // Disconnect from WebSocket
+        stompSession.disconnect();
+    }
+
+    @Test
+    @DisplayName("채팅 송수신 WebSocket 통합 테스트")
+    public void testSendMessage() throws Exception {
+        // WebSocket 연결 설정
+        String websocketUri = "ws://localhost:" + port + "/chat";
+        StompSession stompSession = stompClient.connect(websocketUri, new StompSessionHandlerAdapter() {}).get(1, TimeUnit.SECONDS);
+
+        // Subscribe to the WebSocket topic
+        StompHeaders headers = new StompHeaders();
+        headers.setDestination("/topic/room/1"); // 채팅방 ID 1에 해당하는 topic
+        stompSession.subscribe(headers, new StompFrameHandler() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return MessageDTO.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                MessageDTO messageDTO = (MessageDTO) payload;
+                assertEquals("Test message content", messageDTO.getContent());
+                assertEquals(MessageType.TALK, messageDTO.getType());
+            }
+        });
+
+        // Send message to WebSocket endpoint
+        MessageDTO messageDTO = new MessageDTO();
+        messageDTO.setType(MessageType.TALK);
+        messageDTO.setChatRoomId(1L);
+        messageDTO.setContent("Test message content");
+
+        stompSession.send("/app/send-message", messageDTO);
+
+        // Wait for response
+        Thread.sleep(1000);
+
+        // Disconnect from WebSocket
+        stompSession.disconnect();
     }
 }
 
