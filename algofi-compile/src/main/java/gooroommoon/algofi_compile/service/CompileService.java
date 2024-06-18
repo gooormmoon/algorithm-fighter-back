@@ -15,6 +15,7 @@ import java.util.concurrent.TimeoutException;
 
 @Service
 public class CompileService {
+    private static final long TIME_OUT_MILLIS = 10000;
 
     public CodeExecutionResponse runCode(CodeExecutionRequest request) throws IOException, InterruptedException {
         String language = request.getLanguage();
@@ -36,7 +37,7 @@ public class CompileService {
 
         StringBuilder output;
         try {
-            output = future.get(10000, TimeUnit.MILLISECONDS);
+            output = future.get(TIME_OUT_MILLIS, TimeUnit.MILLISECONDS);
         } catch (ExecutionException | TimeoutException e) {
             throw new RuntimeException(e);
         }
