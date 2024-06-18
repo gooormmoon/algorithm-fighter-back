@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/algorithm-fighter-back.iml" filepath="$PROJECT_DIR$/.idea/algorithm-fighter-back.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/algofi-compile.iml" filepath="$PROJECT_DIR$/.idea/algofi-compile.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/algofi-compile.algofi-compile.test.iml" filepath="$PROJECT_DIR$/.idea/modules/algofi-compile.algofi-compile.test.iml" />
     </modules>
   </component>
 </project>
