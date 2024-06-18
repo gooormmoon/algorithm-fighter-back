@@ -99,4 +99,56 @@ public class ChatServiceTest {
         // template.convertAndSend() 메서드가 한 번 호출되었는지 검증
         verify(template, times(1)).convertAndSend("/topic/room/1", messageDTO);
     }
+
+    @Test
+    @DisplayName("채팅방 입장")
+    public void testEnterRoom() {
+        // Mock authentication
+        Authentication authentication = mock(Authentication.class);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        when(authentication.getName()).thenReturn("testUser");
+
+        // Mock session attributes
+        Map<String, Object> sessionAttributes = new HashMap<>();
+        sessionAttributes.put("username", "testUser");
+        sessionAttributes.put("roomName", "testRoom");
+        when(headerAccessor.getSessionAttributes()).thenReturn(sessionAttributes);
+
+        // Mock member repository
+        Member mockMember = new Member();
+        mockMember.setNickname("TestUser");
+        when(memberRepository.findByLoginId("testUser")).thenReturn(Optional.of(mockMember));
+
+        // Mock chat room repository
+        when(chatRoomRepository.existsById(1L)).thenReturn(false); // Room does not exist initially
+        Chatroom mockChatRoom = new Chatroom();
+        mockChatRoom.setChatroomId(1L);
+        when(chatRoomRepository.save(any(Chatroom.class))).thenReturn(mockChatRoom);
+        when(chatRoomRepository.findById(1L)).thenReturn(Optional.of(mockChatRoom));
+
+        // Mock chat room service
+        when(chatRoomService.saveChatRoom("testRoom")).thenReturn(mockChatRoom);
+
+        // Prepare message DTO
+        MessageDTO messageDTO = new MessageDTO();
+        messageDTO.setType(MessageType.ENTER);
+        messageDTO.setChatRoomId(1L);
+        messageDTO.setContent(mockMember.getNickname() + "님이 입장하셨습니다.");
+
+        // Call the method under test
+        chatService.enterRoom(1L, messageDTO, headerAccessor);
+
+        // Verify interactions
+        // enterRoom 메소드와 saveMessage 메소드에서 findByLoginId는 각각 2번 호출됨.
+        verify(memberRepository, times(2)).findByLoginId("testUser");
+        verify(chatRoomRepository, times(1)).existsById(1L);
+        verify(chatRoomRepository, times(1)).save(any(Chatroom.class));
+        verify(chatRoomService, times(1)).saveChatRoom("testRoom");
+        verify(messageRepository, times(1)).save(any(Message.class));
+
+        // Assert
+        assertEquals(1L, messageDTO.getChatRoomId());
+        assertEquals(MessageType.ENTER, messageDTO.getType());
+        assertEquals("TestUser님이 입장하셨습니다.", messageDTO.getContent());
+    }
 }
