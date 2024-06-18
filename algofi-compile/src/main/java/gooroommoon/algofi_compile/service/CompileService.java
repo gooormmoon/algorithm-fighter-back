@@ -1,10 +1,9 @@
 package gooroommoon.algofi_compile.service;
 
+import gooroommoon.algofi_compile.dto.CodeExecutionRequest;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,14 +11,16 @@ import java.nio.file.Paths;
 @Service
 public class CompileService {
 
-    public String runCode(String code, String language) throws IOException, InterruptedException {
-        String fileName = "temp";
+    public String runCode(CodeExecutionRequest request) throws IOException, InterruptedException {
         ProcessBuilder builder = new ProcessBuilder();
+
+        String language = request.getLanguage();
+        String code = request.getCode();
 
         if (language.equalsIgnoreCase("c")) {
             commandCFile(code, language, builder);
         } else if (language.equalsIgnoreCase("java")) {
-            commandJavaFile(code, language, fileName, builder);
+            commandJavaFile(code, language, builder);
         } else if (language.equalsIgnoreCase("javascript")) {
             commandJavaScriptFile(code, language, builder);
         } else if (language.equalsIgnoreCase("python")) {
@@ -30,6 +31,14 @@ public class CompileService {
 
         builder.redirectErrorStream(true);
         Process process = builder.start();
+
+        if (request.getInput() != null) {
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+            writer.write(request.getInput());
+            writer.newLine();
+            writer.flush();
+        }
+
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
         StringBuilder output = new StringBuilder();
@@ -52,7 +61,8 @@ public class CompileService {
         //builder.command("cmd.exe", "/c", "gcc " + cFilePath.toString() + " -o temp && temp"); //windows 버전
     }
 
-    private void commandJavaFile(String code, String language, String fileName, ProcessBuilder builder) throws IOException {
+    private void commandJavaFile(String code, String language, ProcessBuilder builder) throws IOException {
+        String fileName = "";
         int classIndex = code.indexOf("public class ");
         if (classIndex != -1) {
             int startIndex = classIndex + "public class ".length();
@@ -87,6 +97,12 @@ public class CompileService {
     }
 
     private Path getTempFilePath(String language) {
+        if (language.equalsIgnoreCase("javascript")) {
+            return Paths.get("temp." + "js");
+        }
+        if (language.equalsIgnoreCase("python")) {
+            return Paths.get("temp." + "py");
+        }
         return Paths.get("temp." + language.toLowerCase());
     }
 }

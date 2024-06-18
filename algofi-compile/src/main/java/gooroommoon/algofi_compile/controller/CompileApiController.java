@@ -19,12 +19,11 @@ public class CompileApiController {
     @PostMapping
     public ResponseEntity<String> compile(@RequestBody CodeExecutionRequest request) {
         try {
-            String result = compileService.runCode(request.getCode(), request.getLanguage());
+            String result = compileService.runCode(request);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error in code execution: " + e.getMessage());
         }
     }
-
 
 }

@@ -1,44 +1,23 @@
 package gooroommoon.algofi_compile.dto;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class CodeExecutionRequest {
-    private String code; // 실행할 코드
-    private String language; // 코드의 프로그래밍 언어
+    private String code;
+    private String language;
+    private String input;
+    private String expected;
 
-    // 기본 생성자
-    public CodeExecutionRequest() {
-    }
-
-    // 매개변수가 있는 생성자
-    public CodeExecutionRequest(String code, String language) {
+    public CodeExecutionRequest(String code, String language, String input, String expected) {
         this.code = code;
         this.language = language;
-    }
-
-    // code 필드의 getter
-    public String getCode() {
-        return code;
-    }
-
-    // code 필드의 setter
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    // language 필드의 getter
-    public String getLanguage() {
-        return language;
-    }
-
-    // language 필드의 setter
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
-    @Override
-    public String toString() {
-        return "CodeExecutionRequest{" +
-                "code='" + code + '\'' +
-                ", language='" + language + '\'' +
-                '}';
+        this.input = input;
+        this.expected = expected;
     }
 }
