@@ -1,6 +1,7 @@
 package gooroommoon.algofi_compile.service;
 
 import gooroommoon.algofi_compile.dto.CodeExecutionRequest;
+import gooroommoon.algofi_compile.dto.CodeExecutionResponse;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -11,7 +12,7 @@ import java.nio.file.Paths;
 @Service
 public class CompileService {
 
-    public String runCode(CodeExecutionRequest request) throws IOException, InterruptedException {
+    public CodeExecutionResponse runCode(CodeExecutionRequest request) throws IOException, InterruptedException {
         ProcessBuilder builder = new ProcessBuilder();
 
         String language = request.getLanguage();
@@ -28,7 +29,9 @@ public class CompileService {
             throw new RuntimeException("Execution failed with exit code " + exitCode);
         }
 
-        return output.toString();
+        String actual = output.toString();
+        String expected = request.getExpected();
+        return new CodeExecutionResponse(actual, expected, actual.equals(expected));
     }
 
     private void commandFileByLanguage(String language, String code, ProcessBuilder builder) throws IOException {

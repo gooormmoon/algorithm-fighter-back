@@ -1,6 +1,7 @@
 package gooroommoon.algofi_compile.controller;
 
 import gooroommoon.algofi_compile.dto.CodeExecutionRequest;
+import gooroommoon.algofi_compile.dto.CodeExecutionResponse;
 import gooroommoon.algofi_compile.service.CompileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,10 +18,10 @@ public class CompileApiController {
 
     private final CompileService compileService;
     @PostMapping
-    public ResponseEntity<String> compile(@RequestBody CodeExecutionRequest request) {
+    public ResponseEntity compile(@RequestBody CodeExecutionRequest request) {
         try {
-            String result = compileService.runCode(request);
-            return ResponseEntity.ok(result);
+            CodeExecutionResponse response = compileService.runCode(request);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error in code execution: " + e.getMessage());
         }
