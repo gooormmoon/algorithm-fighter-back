@@ -3,6 +3,7 @@ package gooroommoon.algofi_core.chat;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
 import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
 import gooroommoon.algofi_core.chat.service.ChatRoomService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,6 +27,7 @@ public class ChatRoomServiceTest {
     private ChatRoomRepository chatRoomRepository;
 
     @Test
+    @DisplayName("채팅방 저장하기")
     public void testSaveChatRoom() {
         Chatroom chatRoom = new Chatroom();
         chatRoom.setChatroomName("Test Room");
@@ -39,6 +41,7 @@ public class ChatRoomServiceTest {
     }
 
     @Test
+    @DisplayName("채팅방 아이디 찾기")
     public void testFindRoomById() {
         Long roomId = 1L;
         Chatroom chatRoom = new Chatroom();

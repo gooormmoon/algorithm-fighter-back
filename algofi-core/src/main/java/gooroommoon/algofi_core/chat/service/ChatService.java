@@ -57,26 +57,28 @@ public class ChatService {
                 .senderId(member)
                 .type(messageDTO.getType())
                 .content(messageDTO.getContent())
-                .createdDate(LocalDateTime.now())
                 .build();
 
         messageRepository.save(message);
     }
 
 
-    private void sendMessage(MessageDTO message) {
+    public void sendMessage(MessageDTO message) {
         log.info("접속 채팅방 ID: {}", message.getChatRoomId());
         log.info("접속 채팅방 Content: {}", message.getContent());
         template.convertAndSend("/topic/room/" + message.getChatRoomId(), message);
     }
 
-    private void addInfoInSessionAttribute(MessageDTO message, SimpMessageHeaderAccessor headerAccessor) {
+    private void addInfoInSessionAttribute(SimpMessageHeaderAccessor headerAccessor) {
         Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
         if (sessionAttributes == null) {
             throw new IllegalArgumentException("STOMP SessionHeader Error.");
         }
         log.info("세션 정보: {}", sessionAttributes);
-        sessionAttributes.put("username", message.getSenderId());
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loginId = authentication.getName();
+        sessionAttributes.put("username", loginId);
     }
 
     // WebSocket 연결이 끊겼을 때
@@ -93,6 +95,7 @@ public class ChatService {
 
         String username = (String) sessionAttributes.get("username");
 
+        // 사용자가 참여한 채팅방 조회
         Optional<Chatroom> optionalChatRoom = chatRoomRepository.findByChatroomName(username);
         Chatroom chatRoom = optionalChatRoom
                 .orElseThrow(() -> new IllegalArgumentException("Chat room not found."));
@@ -100,6 +103,7 @@ public class ChatService {
         // chat room 삭제
         chatRoomRepository.delete(chatRoom);
 
+        // 사용자 조회
         Member member = memberRepository.findByLoginId(username)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found."));
 
@@ -109,7 +113,6 @@ public class ChatService {
 
         MessageDTO message = MessageDTO.builder()
                 .type(MessageType.LEAVE)
-                .senderId(member.getId())
                 .chatRoomId(chatRoom.getChatroomId())
                 .content(leaveMessage)
                 .build();
@@ -129,9 +132,7 @@ public class ChatService {
                         .type(message.getType())
                         .messageId(message.getId())
                         .chatRoomId(message.getChatroomId().getChatroomId())
-                        .senderId(message.getSenderId().getId())
                         .content(message.getContent())
-                        .createdDate(message.getCreatedDate())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -145,15 +146,20 @@ public class ChatService {
     @Transactional
     public void enterRoom(Long roomId, MessageDTO message, SimpMessageHeaderAccessor headerAccessor) {
         log.info("TEST");
-        addInfoInSessionAttribute(message, headerAccessor);
+        addInfoInSessionAttribute(headerAccessor);
         ensureChatRoomExists(roomId);
+
         // 클라이언트가 전달한 세션 정보를 채팅방 이름으로 설정
         String roomName = (String) headerAccessor.getSessionAttributes().get("roomName");
         chatRoomService.saveChatRoom(roomName);
 
+        String loginId = (String) headerAccessor.getSessionAttributes().get("username");
+        Member member = memberRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new IllegalArgumentException("Current authenticated user not found."));
+
+        message.setChatRoomId(roomId);
         message.setType(MessageType.ENTER);
-        message.setContent(message.getSenderId() + "님이 입장하셨습니다.");
-        message.setCreatedDate(LocalDateTime.now());
+        message.setContent(member.getNickname() + "님이 입장하셨습니다.");
 
         saveMessage(message);
     }

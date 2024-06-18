@@ -36,14 +36,18 @@ public class Message {
 
 
     @Column(nullable = false)
-    private LocalDateTime createdDate = LocalDateTime.now();
+    private LocalDateTime createdDate;
+
+    @PrePersist
+    protected void onCreate() {
+        createdDate = LocalDateTime.now();
+    }
 
     @Builder
-    public Message(Chatroom chatroomId, Member senderId, MessageType type, String content, LocalDateTime createdDate) {
+    public Message(Chatroom chatroomId, Member senderId, MessageType type, String content) {
         this.chatroomId = chatroomId;
         this.senderId = senderId;
         this.type = type;
         this.content = content;
-        this.createdDate = createdDate;
     }
 }
