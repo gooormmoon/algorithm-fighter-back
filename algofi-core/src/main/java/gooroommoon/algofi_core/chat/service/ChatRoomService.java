@@ -16,9 +16,7 @@ public class ChatRoomService {
     @Transactional
     public Chatroom saveChatRoom(String roomName) {
         // 채팅방 엔티티 생성
-        Chatroom chatRoom = new Chatroom();
-        chatRoom.setChatroomName(roomName); // 채팅방 이름 설정
-
+        Chatroom chatRoom = new Chatroom(roomName);
         // 채팅방 저장
         return chatRoomRepository.save(chatRoom);
     }

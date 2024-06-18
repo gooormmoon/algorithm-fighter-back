@@ -6,7 +6,6 @@ import lombok.*;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@NoArgsConstructor
 @Getter @Setter
 public class Chatroom {
 
@@ -15,4 +14,9 @@ public class Chatroom {
 
     private String chatroomName;
 
+    public Chatroom() {}
+
+    public Chatroom(String roomName) {
+        this.chatroomName = roomName;
+    }
 }
