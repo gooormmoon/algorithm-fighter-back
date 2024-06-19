@@ -1,4 +1,4 @@
-version: '3'
+version: "3.8"
 services:
   algofi-mysql:
     build: ./algofi-mysql
@@ -11,7 +11,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
+          cpus: "1"
           memory: 256M
     restart: always
 
@@ -27,7 +27,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.5'
+          cpus: "1.5"
           memory: 512M
     restart: on-failure
 
@@ -35,11 +35,11 @@ services:
     build: ./algofi-compile
     image: algofi-compile:5.0.0-compose
     ports:
-      - 9999:9999
+      - 9000:9000
     deploy:
       resources:
         limits:
-          cpus: '1.5'
+          cpus: "1.5"
           memory: 512M
     restart: on-failure
 
