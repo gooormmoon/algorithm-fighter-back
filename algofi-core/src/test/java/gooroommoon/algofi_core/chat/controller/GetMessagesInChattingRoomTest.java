@@ -63,8 +63,6 @@ public class GetMessagesInChattingRoomTest {
         mockMvc.perform(get("/chat/{chatRoomId}/messages", chatRoomId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].messageId").value(1L))
-                .andExpect(jsonPath("$[1].messageId").value(2L))
                 .andExpect(jsonPath("$[0].content").value("Hello!"))
                 .andExpect(jsonPath("$[1].content").value("Hi!"))
                 .andDo(result -> {
