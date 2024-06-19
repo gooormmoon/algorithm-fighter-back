@@ -1,5 +1,5 @@
-# Base 이미지로 OpenJDK 17 Alpine 설정
-FROM openjdk:17-alpine
+# arm64, amd64 모두 지원
+FROM openjdk:23-ea-17-jdk-bullseye
 
 # 작업 디렉토리 설정
 WORKDIR /app
