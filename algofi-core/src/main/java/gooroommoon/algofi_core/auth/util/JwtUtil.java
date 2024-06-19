@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.Optional;
 
 @Component
 public class JwtUtil {
@@ -49,6 +50,14 @@ public class JwtUtil {
                 .signWith(secretKey)
                 .compact();
 
+    }
+
+    public Optional<String> stripBearerHeader(String header) {
+        String token = null;
+        if(header != null && header.startsWith("Bearer ")) {
+            token = header.substring("Bearer ".length());
+        }
+        return Optional.ofNullable(token);
     }
 
     public Authentication getAuthentication(String token) {
