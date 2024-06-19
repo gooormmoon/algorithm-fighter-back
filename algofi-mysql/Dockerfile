@@ -11,8 +11,8 @@ RUN chmod 644 /etc/my.cnf.d/my.cnf
 
 # init 파일을 /docker-entrypoint-initdb.d/로 복사
 # 이 디렉토리에 있는 SQL 스크립트는 컨테이너가 처음 실행 시 자동 실행됨
-COPY ./init/create_table.sql /docker-entrypoint-initdb.d/
-COPY ./init/insert_data.sql /docker-entrypoint-initdb.d/
+COPY ./init/create_table.sql /docker-entrypoint-initdb.d/create_table.sql
+COPY ./init/insert_data.sql /docker-entrypoint-initdb.d/insert_data.sql
 RUN chmod 755 /docker-entrypoint-initdb.d/*.sql
 
 # 환경변수로 MySQL 계정 정보 설정
