@@ -1,3 +1,6 @@
+#
+# 해당 설정으론 401 응답 오류 발생
+#
 # 빌드 이미지로 OpenJDK 11 & Gradle을 지정
 FROM gradle:jdk17
 
