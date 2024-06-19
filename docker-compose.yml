@@ -1,0 +1,47 @@
+version: "3.8"
+services:
+  algofi-mysql:
+    build: ./algofi-mysql
+    image: algofi-mysql:5.0.0-compose
+    ports:
+      - 3306:3306
+    volumes:
+      - mydata:/var/lib/mysql
+      - ./algofi-mysql/init:/docker-entrypoint-initdb.d
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 256M
+    restart: always
+
+  algofi-core:
+    build: ./algofi-core
+    image: algofi-core:5.0.0-compose
+    ports:
+      - 8080:8080
+    environment:
+      - DB_URL=algofi-mysql
+    depends_on:
+      - algofi-mysql
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 512M
+    restart: on-failure
+
+  algofi-compile:
+    build: ./algofi-compile
+    image: algofi-compile:5.0.0-compose
+    ports:
+      - 9000:9000
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 512M
+    restart: on-failure
+
+volumes:
+  mydata:
