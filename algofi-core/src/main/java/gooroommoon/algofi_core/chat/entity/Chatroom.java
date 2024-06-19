@@ -8,6 +8,7 @@ import java.util.UUID;
 
 @Entity
 @Getter @Setter
+@AllArgsConstructor
 public class Chatroom {
 
     @Id

@@ -1,5 +1,7 @@
 package gooroommoon.algofi_core.game.session;
 
+import gooroommoon.algofi_core.chat.entity.Chatroom;
+import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
 import gooroommoon.algofi_core.game.session.dto.GameSessionOverResponse;
 import gooroommoon.algofi_core.game.session.dto.GameSessionUpdateRequest;
 import gooroommoon.algofi_core.game.session.exception.AlreadyInGameSessionException;
@@ -17,15 +19,12 @@ import java.util.concurrent.*;
 @RequiredArgsConstructor
 public class GameSessionService {
 
-    //TODO ChatRoom DB에 저장하기
-    //게임세션이 chatRoomId를 들고 있다가 게임에 참가중인 유저에게 id를 보내주기
     //유저가 채팅방에 새로 들어올 때 입장 메시지 보내는 메서드 호출하기
-    //룸아이디 (String) 보낸 사람 이름(String)
-    // chat room UUID
-    // sendMessage("/topic/chat/" + id)
 
     private final Map<String, GameSession> gameSessions = new ConcurrentHashMap<>();
     private final SimpMessagingTemplate messagingTemplate;
+
+    private final ChatRoomRepository chatRoomRepository;
 
     private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
 
@@ -41,6 +40,8 @@ public class GameSessionService {
         checkPlayerInGame(hostId);
         GameSession session = new GameSession(hostId, request.getTitle(), request.getProblemLevel(), request.getTimerTime());
         gameSessions.put(hostId, session);
+        Chatroom chatroom = new Chatroom(session.getChatRoomId(), hostId);
+        chatRoomRepository.save(chatroom);
 
         sendUpdateToPlayers(session);
     }
