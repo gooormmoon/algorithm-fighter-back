@@ -1,5 +1,7 @@
 package gooroommoon.algofi_core.auth.member.dto;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gooroommoon.algofi_core.auth.member.Member;
 import gooroommoon.algofi_core.auth.member.MemberRole;
 import jakarta.validation.constraints.NotEmpty;
@@ -9,6 +11,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MemberRequest {
     private String id;
     private String password;
