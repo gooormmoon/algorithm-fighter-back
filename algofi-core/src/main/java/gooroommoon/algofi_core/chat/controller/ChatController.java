@@ -26,7 +26,7 @@ public class ChatController {
 
     @MessageMapping("/enter-room/{roomId}")
     @SendTo("/topic/room/{roomId}")
-    public void enterRoom(@PathVariable UUID roomId, @Payload MessageDTO message, Principal principal) {
+    public void enterRoom(@PathVariable("roomId") UUID roomId, @Payload MessageDTO message, Principal principal) {
         chatService.enterRoom(roomId, message, principal);
     }
     @MessageMapping("/send-message")
