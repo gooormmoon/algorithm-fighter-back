@@ -23,6 +23,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+// TEST를 진행하기 전에 수정해야할 것
+// SecurityConfig 에서 .anyRequest().permitAll() 로 수정
+
 @AutoConfigureMockMvc
 @SpringBootTest
 public class GetMessagesInChattingRoomTest {

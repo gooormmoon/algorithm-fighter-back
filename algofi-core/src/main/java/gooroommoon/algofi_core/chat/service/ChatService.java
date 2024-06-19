@@ -57,6 +57,8 @@ public class ChatService {
                 .createdDate(LocalDateTime.now())
                 .build();
 
+        log.info("접속 채팅방 ID: {}", message.getChatroomId().getChatroomId());
+        log.info("Content: {}", message.getContent());
         messageRepository.save(message);
     }
 
