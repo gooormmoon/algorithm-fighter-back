@@ -8,6 +8,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +39,19 @@ public class CompileService {
         StringBuilder output;
         try {
             output = future.get(TIME_OUT_MILLIS, TimeUnit.MILLISECONDS);
-        } catch (ExecutionException | TimeoutException e) {
+        } catch (TimeoutException e) {
+            List<ProcessHandle> children = ProcessHandle.allProcesses()
+                    .filter(processHandle -> processHandle.parent()
+                            .map(ProcessHandle::pid)
+                            .orElse(-1L) == process.pid())
+                    .toList();
+
+            children.forEach(ProcessHandle::destroyForcibly);
+
+            process.destroyForcibly();
+
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
 
@@ -69,10 +82,11 @@ public class CompileService {
 
     private void transferInput(String input, Process process) throws IOException {
         if (input != null) {
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-            writer.write(input);
-            writer.newLine();
-            writer.flush();
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()))) {
+                writer.write(input);
+                writer.newLine();
+                writer.flush();
+            }
         }
     }
 
@@ -82,13 +96,14 @@ public class CompileService {
     }
 
     private StringBuilder readOutput(Process process) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
         StringBuilder output = new StringBuilder();
-        String line;
 
-        while ((line = reader.readLine()) != null) {
-            output.append(line).append("\n");
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                output.append(line).append("\n");
+            }
         }
 
         return output;
