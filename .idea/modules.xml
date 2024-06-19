@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/algofi-compile.iml" filepath="$PROJECT_DIR$/.idea/algofi-compile.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/algofi-compile.algofi-compile.test.iml" filepath="$PROJECT_DIR$/.idea/modules/algofi-compile.algofi-compile.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gooroommoon.algofi-compile.main.iml" filepath="$PROJECT_DIR$/.idea/modules/gooroommoon.algofi-compile.main.iml" />
     </modules>
   </component>
 </project>
