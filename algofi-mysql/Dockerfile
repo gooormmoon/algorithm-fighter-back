@@ -1,6 +1,6 @@
 # fedora 계열의 Oracle Linux 이미지를 사용
 # arm64, amd64 모두 지원
-FROM mysql:oraclelinux9
+FROM mysql:8.0.37-oracle
 
 # 사용자 정의 설정 파일을 /etc/my.cnf.d로 복사
 # 이 디렉토리에 파일을 넣으면 MySQL이 자동으로 이 설정 파일을 읽게 됩니다.
