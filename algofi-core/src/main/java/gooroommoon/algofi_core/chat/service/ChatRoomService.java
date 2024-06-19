@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @Slf4j
 @Service
@@ -21,9 +23,19 @@ public class ChatRoomService {
         return chatRoomRepository.save(chatRoom);
     }
 
+    @Transactional
+    public Chatroom ensureChatRoomExists(UUID roomId) {
+        return chatRoomRepository.findByChatroomId(roomId)
+                .orElseGet(() -> {
+                    Chatroom chatRoom = new Chatroom();
+                    chatRoom.setChatroomId(roomId);
+                    return chatRoomRepository.save(chatRoom);
+                });
+    }
+
     @Transactional(readOnly = true)
-    public Chatroom findRoomById(Long roomId) {
-        return chatRoomRepository.findById(roomId)
+    public Chatroom findRoomById(UUID roomId) {
+        return chatRoomRepository.findByChatroomId(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다. roomId: " + roomId));
     }
 }

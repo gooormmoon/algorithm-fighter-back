@@ -1,4 +1,4 @@
-package gooroommoon.algofi_core.chat;
+package gooroommoon.algofi_core.chat.controller;
 
 import gooroommoon.algofi_core.chat.entity.MessageType;
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
@@ -18,11 +18,11 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Type;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 // TEST를 진행하기 전에 수정해야할 것
 // SecurityConfig 에서 .anyRequest().permitAll() 로 수정
-// WebSocketConfig에서 .withSockJS() 주석 처리
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
@@ -51,8 +51,9 @@ public class ChatControllerTest {
         StompSession stompSession = stompClient.connect(websocketUri, new StompSessionHandlerAdapter() {}).get(1, TimeUnit.SECONDS);
 
         // Subscribe to the WebSocket topic
+        UUID roomId = UUID.randomUUID();
         StompHeaders headers = new StompHeaders();
-        headers.setDestination(WEBSOCKET_TOPIC + "1");
+        headers.setDestination(WEBSOCKET_TOPIC + roomId.toString());
         headers.set("username", "testUser");
         stompSession.subscribe(headers, new StompFrameHandler() {
             @Override
@@ -71,7 +72,7 @@ public class ChatControllerTest {
         // Send message to WebSocket endpoint
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setType(MessageType.ENTER);
-        messageDTO.setChatRoomId(1L);
+        messageDTO.setChatRoomId(roomId);
         messageDTO.setContent("TestUser님이 입장하셨습니다.");
 
         stompSession.send("/app/enter-room/1", messageDTO);
@@ -91,8 +92,9 @@ public class ChatControllerTest {
         StompSession stompSession = stompClient.connect(websocketUri, new StompSessionHandlerAdapter() {}).get(1, TimeUnit.SECONDS);
 
         // Subscribe to the WebSocket topic
+        UUID roomId = UUID.randomUUID();
         StompHeaders headers = new StompHeaders();
-        headers.setDestination("/topic/room/1"); // 채팅방 ID 1에 해당하는 topic
+        headers.setDestination(WEBSOCKET_TOPIC + roomId.toString());
         stompSession.subscribe(headers, new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
@@ -110,7 +112,7 @@ public class ChatControllerTest {
         // Send message to WebSocket endpoint
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setType(MessageType.TALK);
-        messageDTO.setChatRoomId(1L);
+        messageDTO.setChatRoomId(roomId);
         messageDTO.setContent("Test message content");
 
         stompSession.send("/app/send-message", messageDTO);

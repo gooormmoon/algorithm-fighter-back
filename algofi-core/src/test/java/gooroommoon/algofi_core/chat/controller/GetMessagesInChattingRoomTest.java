@@ -1,4 +1,4 @@
-package gooroommoon.algofi_core.chat;
+package gooroommoon.algofi_core.chat.controller;
 
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
 import gooroommoon.algofi_core.chat.entity.MessageType;
@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
@@ -35,7 +36,8 @@ public class GetMessagesInChattingRoomTest {
     @WithMockUser(username = "user1", roles = {"USER"})
     @DisplayName("채팅방의 메시지 가져오기")
     public void testGetMessagesInChattingRoom() throws Exception {
-        Long chatRoomId = 1L;
+        UUID chatRoomId = UUID.randomUUID(); // 랜덤 UUID 생성
+
         List<MessageDTO> messages = Arrays.asList(
                 MessageDTO.builder()
                         .type(MessageType.TALK)

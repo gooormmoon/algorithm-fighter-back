@@ -1,4 +1,4 @@
-package gooroommoon.algofi_core.chat;
+package gooroommoon.algofi_core.chat.service;
 
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
@@ -7,6 +7,7 @@ import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
 import gooroommoon.algofi_core.chat.service.ChatService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,7 +22,10 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.security.Principal;
 import java.util.Optional;
+import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -66,7 +70,7 @@ public class WebSocketDisconnectListenerTest {
 
         // 가짜 Chatroom 객체 생성
         Chatroom chatRoom = new Chatroom();
-        chatRoom.setChatroomId(1L);
+        chatRoom.setChatroomId(UUID.randomUUID());
         chatRoom.setChatroomName("user1");
 
         // chatRoomRepository mock 객체 설정
@@ -81,7 +85,19 @@ public class WebSocketDisconnectListenerTest {
         // chatRoomRepository.delete 메서드가 1회 호출되었는지 검증
         verify(chatRoomRepository, times(1)).delete(chatRoom);
 
+        // chatRoomRepository.delete 메서드가 1회 호출되었는지 검증
+        verify(chatRoomRepository, times(1)).delete(chatRoom);
+
         // template.convertAndSend 메서드가 1회 호출되었는지 검증
-        verify(template, times(1)).convertAndSend(eq("/topic/room/1"), any(MessageDTO.class));
+        ArgumentCaptor<String> destinationCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<MessageDTO> messageCaptor = ArgumentCaptor.forClass(MessageDTO.class);
+        verify(template, times(1)).convertAndSend(destinationCaptor.capture(), messageCaptor.capture());
+
+        // 전송된 destination과 messageDTO 검증
+        assertEquals("/topic/room/" + chatRoom.getChatroomId(), destinationCaptor.getValue());
+        MessageDTO capturedMessageDTO = messageCaptor.getValue();
+        assertEquals(MessageType.LEAVE, capturedMessageDTO.getType());
+        assertEquals(chatRoom.getChatroomId(), capturedMessageDTO.getChatRoomId());
+        assertTrue(capturedMessageDTO.getContent().contains("user1"));
     }
 }

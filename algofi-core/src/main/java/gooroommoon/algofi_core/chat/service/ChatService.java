@@ -11,11 +11,9 @@ import gooroommoon.algofi_core.chat.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
@@ -46,38 +44,26 @@ public class ChatService {
         Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new IllegalArgumentException("현재 인증된 사용자의 정보를 찾을 수 없습니다."));
 
-        // 채팅방 엔티티 조회
-        Chatroom chatRoom = chatRoomRepository.findById(messageDTO.getChatRoomId())
-                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다. chatRoomId: " + messageDTO.getChatRoomId()));
+        // 채팅방 찾기
+        Chatroom chatroom = chatRoomRepository.findByChatroomId(messageDTO.getChatRoomId())
+                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
 
         // Message 엔티티 생성 및 저장
         Message message = Message.builder()
-                .chatroomId(chatRoom)
+                .chatroomId(chatroom)
                 .senderId(member)
                 .type(messageDTO.getType())
                 .content(messageDTO.getContent())
+                .createdDate(LocalDateTime.now())
                 .build();
 
         messageRepository.save(message);
     }
 
-
     public void sendMessage(MessageDTO message) {
         log.info("접속 채팅방 ID: {}", message.getChatRoomId());
         log.info("접속 채팅방 Content: {}", message.getContent());
         template.convertAndSend("/topic/room/" + message.getChatRoomId(), message);
-    }
-
-    private void addInfoInSessionAttribute(SimpMessageHeaderAccessor headerAccessor) {
-        Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
-        if (sessionAttributes == null) {
-            throw new IllegalArgumentException("STOMP SessionHeader Error.");
-        }
-        log.info("세션 정보: {}", sessionAttributes);
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String loginId = authentication.getName();
-        sessionAttributes.put("username", loginId);
     }
 
     // WebSocket 연결이 끊겼을 때
@@ -104,8 +90,8 @@ public class ChatService {
 
         log.info("chatRoom: {}", chatRoom);
 
+        // 퇴장 메시지 생성 및 전송
         String leaveMessage = username + "님이 퇴장하셨습니다.";
-
         MessageDTO message = MessageDTO.builder()
                 .type(MessageType.LEAVE)
                 .chatRoomId(chatRoom.getChatroomId())
@@ -115,10 +101,9 @@ public class ChatService {
     }
 
     @Transactional
-    public List<MessageDTO> getMessagesInChattingRoom(Long chatRoomId) {
+    public List<MessageDTO> getMessagesInChattingRoom(UUID chatRoomId) {
 
-        ensureChatRoomExists(chatRoomId);
-
+        // 채팅방의 메시지 목록을 가져옴
         List<Message> messages = messageRepository.findByChatroomIdChatroomId(chatRoomId);
 
         // Message 엔티티를 DTO로 반환
@@ -141,32 +126,24 @@ public class ChatService {
     }
 
     @Transactional
-    public void enterRoom(Long roomId, MessageDTO message, SimpMessageHeaderAccessor headerAccessor, Principal principal) {
-        log.info("TEST");
-        addInfoInSessionAttribute(headerAccessor);
-        ensureChatRoomExists(roomId);
-
-        // 클라이언트가 전달한 세션 정보를 채팅방 이름으로 설정
-        String roomName = (String) headerAccessor.getSessionAttributes().get("roomName");
-        chatRoomService.saveChatRoom(roomName);
+    public void enterRoom(UUID roomId, MessageDTO message, Principal principal) {
+        log.info("방 ID: {}로 입장", roomId);
 
         // 현재 인증된 사용자 정보 가져오기
-        String loginId = principal.getName();
-        Member member = memberRepository.findByLoginId(loginId)
+        String username = principal.getName();
+        Member member = memberRepository.findByLoginId(username)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found."));
+
+        // 채팅방이 존재하는지 확인하고 없으면 생성하기
+        Chatroom chatRoom = chatRoomService.ensureChatRoomExists(roomId);
+        chatRoom.setChatroomId(roomId);
+        chatRoom.setChatroomName(username);
+        chatRoomRepository.save(chatRoom);
 
         message.setChatRoomId(roomId);
         message.setType(MessageType.ENTER);
         message.setContent(member.getNickname() + "님이 입장하셨습니다.");
 
         saveMessage(message, principal);
-    }
-
-    private void ensureChatRoomExists(Long roomId) {
-        if (!chatRoomRepository.existsById(roomId)) {
-            Chatroom chatRoom = new Chatroom();
-            chatRoom.setChatroomId(roomId);
-            chatRoomRepository.save(chatRoom);
-        }
     }
 }
