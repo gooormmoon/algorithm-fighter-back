@@ -76,8 +76,9 @@ public class ChatService {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
 
         Principal principal = headerAccessor.getUser();
-        if (!(principal instanceof Authentication)) {
-            throw new IllegalArgumentException("STOMP SessionHeader Error.");
+        // principal null check
+        if (principal == null) {
+            throw new IllegalArgumentException("Principal must not be null");
         }
 
         String username = principal.getName();
