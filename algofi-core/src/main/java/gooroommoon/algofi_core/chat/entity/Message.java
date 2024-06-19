@@ -22,15 +22,15 @@ public class Message {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "chatroom_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CHATROOM_ID")
     private Chatroom chatroomId;
 
     private MessageType type;
 
     private String content;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member senderId;
 
@@ -44,10 +44,11 @@ public class Message {
     }
 
     @Builder
-    public Message(Chatroom chatroomId, Member senderId, MessageType type, String content) {
+    public Message(Chatroom chatroomId, Member senderId, MessageType type, String content, LocalDateTime createdDate) {
         this.chatroomId = chatroomId;
         this.senderId = senderId;
         this.type = type;
         this.content = content;
+        this.createdDate = createdDate;
     }
 }
