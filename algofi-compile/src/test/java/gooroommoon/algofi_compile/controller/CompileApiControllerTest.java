@@ -2,6 +2,7 @@ package gooroommoon.algofi_compile.controller;
 
 import gooroommoon.algofi_compile.dto.CodeExecutionRequest;
 import gooroommoon.algofi_compile.dto.CodeExecutionResponse;
+import gooroommoon.algofi_compile.service.JudgeResult;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,9 +29,8 @@ class CompileApiControllerTest {
         String pythonCode = fileToString(file);
         CodeExecutionRequest request = new CodeExecutionRequest(pythonCode, "python", null, "Hello, Python\n");
 
-        ResponseEntity response = compileApiController.compile(request);
-        CodeExecutionResponse result = (CodeExecutionResponse) response.getBody();
-        assertThat(result.getOutput()).isEqualTo(result.getExpected());
+        ResponseEntity<CodeExecutionResponse> response = compileApiController.compile(request);
+        assertThat(Objects.requireNonNull(response.getBody()).getMessage()).isEqualTo(JudgeResult.ACCEPTED.getMessage());
     }
 
     @Test
@@ -38,9 +39,8 @@ class CompileApiControllerTest {
         String javascriptCode = fileToString(file);
         CodeExecutionRequest request = new CodeExecutionRequest(javascriptCode, "javascript", null, "Hello, JavaScript\n");
 
-        ResponseEntity response = compileApiController.compile(request);
-        CodeExecutionResponse result = (CodeExecutionResponse) response.getBody();
-        assertThat(result.getOutput()).isEqualTo(result.getExpected());
+        ResponseEntity<CodeExecutionResponse> response = compileApiController.compile(request);
+        assertThat(Objects.requireNonNull(response.getBody()).getMessage()).isEqualTo(JudgeResult.ACCEPTED.getMessage());
     }
 
     @Test
@@ -49,9 +49,8 @@ class CompileApiControllerTest {
         String cCode = fileToString(file);
         CodeExecutionRequest request = new CodeExecutionRequest(cCode, "c", null, "Hello, C\n");
 
-        ResponseEntity response = compileApiController.compile(request);
-        CodeExecutionResponse result = (CodeExecutionResponse) response.getBody();
-        assertThat(result.getOutput()).isEqualTo(result.getExpected());
+        ResponseEntity<CodeExecutionResponse> response = compileApiController.compile(request);
+        assertThat(Objects.requireNonNull(response.getBody()).getMessage()).isEqualTo(JudgeResult.ACCEPTED.getMessage());
     }
 
     @Test
@@ -60,9 +59,8 @@ class CompileApiControllerTest {
         String javaCode = fileToString(file);
         CodeExecutionRequest request = new CodeExecutionRequest(javaCode, "java", null, "Hello, Java\n");
 
-        ResponseEntity response = compileApiController.compile(request);
-        CodeExecutionResponse result = (CodeExecutionResponse) response.getBody();
-        assertThat(result.getOutput()).isEqualTo(result.getExpected());
+        ResponseEntity<CodeExecutionResponse> response = compileApiController.compile(request);
+        assertThat(Objects.requireNonNull(response.getBody()).getMessage()).isEqualTo(JudgeResult.ACCEPTED.getMessage());
     }
 
     @Test
@@ -71,9 +69,8 @@ class CompileApiControllerTest {
         String pythonCode = fileToString(file);
         CodeExecutionRequest request = new CodeExecutionRequest(pythonCode, "python", "Hello, python\n", "Hello, python\n");
 
-        ResponseEntity response = compileApiController.compile(request);
-        CodeExecutionResponse result = (CodeExecutionResponse) response.getBody();
-        assertThat(result.getOutput()).isEqualTo(result.getExpected());
+        ResponseEntity<CodeExecutionResponse> response = compileApiController.compile(request);
+        assertThat(Objects.requireNonNull(response.getBody()).getMessage()).isEqualTo(JudgeResult.ACCEPTED.getMessage());
     }
 
     @Test
@@ -82,9 +79,8 @@ class CompileApiControllerTest {
         String javascriptCode = fileToString(file);
         CodeExecutionRequest request = new CodeExecutionRequest(javascriptCode, "javascript", "Hello, JavaScript\n", "Hello, JavaScript\n");
 
-        ResponseEntity response = compileApiController.compile(request);
-        CodeExecutionResponse result = (CodeExecutionResponse) response.getBody();
-        assertThat(result.getOutput()).isEqualTo(result.getExpected());
+        ResponseEntity<CodeExecutionResponse> response = compileApiController.compile(request);
+        assertThat(Objects.requireNonNull(response.getBody()).getMessage()).isEqualTo(JudgeResult.ACCEPTED.getMessage());
     }
 
 
@@ -94,9 +90,8 @@ class CompileApiControllerTest {
         String cCode = fileToString(file);
         CodeExecutionRequest request = new CodeExecutionRequest(cCode, "c", "Hello, C\n", "Hello, C\n");
 
-        ResponseEntity response = compileApiController.compile(request);
-        CodeExecutionResponse result = (CodeExecutionResponse) response.getBody();
-        assertThat(result.getOutput()).isEqualTo(result.getExpected());
+        ResponseEntity<CodeExecutionResponse> response = compileApiController.compile(request);
+        assertThat(Objects.requireNonNull(response.getBody()).getMessage()).isEqualTo(JudgeResult.ACCEPTED.getMessage());
     }
 
     @Test
@@ -105,19 +100,31 @@ class CompileApiControllerTest {
         String javaCode = fileToString(file);
         CodeExecutionRequest request = new CodeExecutionRequest(javaCode, "java", "Hello, Java\n", "Hello, Java\n");
 
-        ResponseEntity response = compileApiController.compile(request);
-        CodeExecutionResponse result = (CodeExecutionResponse) response.getBody();
-        assertThat(result.getOutput()).isEqualTo(result.getExpected());
+        ResponseEntity<CodeExecutionResponse> response = compileApiController.compile(request);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(response.getBody()).getMessage()).isEqualTo(JudgeResult.ACCEPTED.getMessage());
     }
 
     @Test
     public void timeoutTest() throws IOException {
         File file = new File("src/test/resources/fixture/While.java");
         String code = fileToString(file);
-        CodeExecutionRequest request = new CodeExecutionRequest(code, "java", null, null);
+        CodeExecutionRequest request = new CodeExecutionRequest(code, "java", null, "fail");
 
-        ResponseEntity response = compileApiController.compile(request);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        ResponseEntity<CodeExecutionResponse> response = compileApiController.compile(request);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(response.getBody()).toString()).contains(JudgeResult.TIME_LIMIT_EXCEEDED.getMessage());
+    }
+
+    @Test
+    public void wrongAnswerPy() throws IOException {
+        File file = new File("src/test/resources/fixture/Hello.py");
+        String pythonCode = fileToString(file);
+        CodeExecutionRequest request = new CodeExecutionRequest(pythonCode, "python", null, "Hello, C\n");
+
+        ResponseEntity<CodeExecutionResponse> response = compileApiController.compile(request);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(response.getBody()).getMessage()).isEqualTo(JudgeResult.WRONG_ANSWER.getMessage());
     }
 
     private String fileToString(File file) throws IOException {

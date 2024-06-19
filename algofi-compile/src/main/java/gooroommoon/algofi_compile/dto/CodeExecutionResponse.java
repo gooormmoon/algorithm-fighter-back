@@ -7,12 +7,10 @@ import lombok.ToString;
 @ToString
 public class CodeExecutionResponse {
     private final String output;
-    private final String expected;
-    private final boolean isCorrect;
+    private final String message;
 
-    public CodeExecutionResponse(String output, String expected, boolean isCorrect) {
+    public CodeExecutionResponse(String output, String message) {
         this.output = output;
-        this.expected = expected;
-        this.isCorrect = isCorrect;
+        this.message = message;
     }
 }
