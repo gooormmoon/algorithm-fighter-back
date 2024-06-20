@@ -49,7 +49,7 @@ CREATE TABLE algorithmproblem (
 
 /* chatroom table 생성 */
 CREATE TABLE chatroom (
-                          chatroom_id INT(11) AUTO_INCREMENT PRIMARY KEY,
+                          chatroom_id VARCHAR(36) DEFAULT (UUID()) PRIMARY KEY,
                           chatroom_name VARCHAR(100)
 );
 
@@ -60,14 +60,14 @@ CREATE TABLE message (
                          type VARCHAR(10),
                          created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                          sender_id INT NULL,
-                         chatroom_id INT NULL,
+                         chatroom_id VARCHAR(36) NOT NULL,
                          FOREIGN KEY(sender_id) REFERENCES member(member_id),
                          FOREIGN KEY(chatroom_id) REFERENCES chatroom(chatroom_id)
 );
 
 /* member_chatroom table 생성 */
 CREATE TABLE member_chatroom (
-                                 chatroom_id INT NULL,
+                                 chatroom_id VARCHAR(36) NOT NULL,
                                  member_id INT NULL,
                                  FOREIGN KEY(chatroom_id) REFERENCES chatroom(chatroom_id),
                                  FOREIGN KEY(member_id) REFERENCES  member(member_id)
@@ -77,11 +77,11 @@ CREATE TABLE member_chatroom (
 CREATE TABLE gameresult (
                             game_result_id INT(11) AUTO_INCREMENT PRIMARY KEY,
                             running_time VARCHAR(100),
-                            member_code_content VARCHAR(5500),
-                            other_member_code_content VARCHAR(5500),
+                            host_code_content VARCHAR(5500),
+                            guest_code_content VARCHAR(5500),
                             created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                             algorithm_problem_id INT NOT NULL,
-                            chatroom_id INT NOT NULL,
+                            chatroom_id VARCHAR(36) NOT NULL,
                             FOREIGN KEY (algorithm_problem_id) REFERENCES algorithmproblem(algorithm_problem_id),
                             FOREIGN KEY (chatroom_id) REFERENCES chatroom(chatroom_id)
 );

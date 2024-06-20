@@ -1,92 +1,92 @@
 -- insert member
-INSERT INTO member(name, nickname, login_id, password, role, profile_image_url, description, alert)
-VALUES ('testname', 'immm', 'test', 'test!', '역할', 'https://avatars.githubusercontent.com/u/62759872?s=400&v=4', '게임 고수', '알람1');
+-- INSERT INTO member(name, nickname, login_id, password, role, profile_image_url, description, alert)
+-- VALUES ('testname', 'immm', 'test', 'test!', '역할', 'https://avatars.githubusercontent.com/u/62759872?s=400&v=4', '게임 고수', '알람1');
 
-INSERT INTO member(name, nickname, login_id, password, role, profile_image_url, description, alert)
-VALUES ('testname2', 'immm2', 'test2', 'test!', '역할', 'https://avatars.githubusercontent.com/u/62759872?s=400&v=4', '게임 하수', '알람1');
+-- INSERT INTO member(name, nickname, login_id, password, role, profile_image_url, description, alert)
+-- VALUES ('testname2', 'immm2', 'test2', 'test!', '역할', 'https://avatars.githubusercontent.com/u/62759872?s=400&v=4', '게임 하수', '알람1');
 
 -- insert filestorage
-INSERT INTO filestorage(name, member_id) VALUES ('fileStorage1', '1');
+-- INSERT INTO filestorage(name, member_id) VALUES ('fileStorage1', '1');
 
 -- insert file
-INSERT INTO file(content, name, type, path, language, file_storage_id, parent_id) VALUES ('import java.util.*;
-
-    class Group{
-        int totalCandy,cnt;
-
-        public Group(int w, int cnt){
-            this.totalCandy =w;
-            this.cnt= cnt;
-        }
-    }
-
-    public class Main {
-        static int n,m,k;
-        static int[] candy;
-        static int totalCandy,cnt;
-        static List<ArrayList<Integer>> friends;
-        static ArrayList<Group> groups;
-        static boolean[] check;
-
-        public static void main(String args[]) {
-            Scanner sc = new Scanner(System.in);
-
-            n = sc.nextInt();
-            m = sc.nextInt();
-            k = sc.nextInt();
-            friends = new ArrayList<ArrayList<Integer>>();
-
-            for(int i=0; i<=n; i++) friends.add(new ArrayList<>());
-
-            candy= new int[n+1];
-            check= new boolean[n+1];
-
-            for(int i=1; i<=n; i++){
-                candy[i] = sc.nextInt();
-            }
-
-            for(int i=0; i<m; i++){
-                int a = sc.nextInt();
-                int b = sc.nextInt();
-
-                friends.get(a).add(b);
-                friends.get(b).add(a);
-            }
-
-            DivideGroup();
-            getCandy();
-        }
-
-
-        private static void DivideGroup() {
-            groups = new ArrayList<>();
-            for(int i=1; i<=n; i++){
-                if(!check[i]){
-                    totalCandy = 0;
-                    cnt= 0;
-                    DFS(i);
-                    groups.add(new Group(totalCandy,cnt));
-                }
-            }
-        }
-
-        private static void DFS(int v) {
-            check[v] = true;
-            totalCandy += candy[v];
-            cnt += 1;
-            for(int nv : friends.get(v)){
-                if(check[nv]){
-                    continue;
-                }
-                DFS(nv);
-            }
-        }
-
-        private static void getCandy() {
-            int dp[][] = new int[2][k+1];
-
-            for (Group group : groups) {
-                for(int i=0; i<=k; i++)', '할로윈의양아치.java', 'file', '/storage', 'java', 1, NULL);
+-- INSERT INTO file(content, name, type, path, language, file_storage_id, parent_id) VALUES ('import java.util.*;
+--
+--     class Group{
+--         int totalCandy,cnt;
+--
+--         public Group(int w, int cnt){
+--             this.totalCandy =w;
+--             this.cnt= cnt;
+--         }
+--     }
+--
+--     public class Main {
+--         static int n,m,k;
+--         static int[] candy;
+--         static int totalCandy,cnt;
+--         static List<ArrayList<Integer>> friends;
+--         static ArrayList<Group> groups;
+--         static boolean[] check;
+--
+--         public static void main(String args[]) {
+--             Scanner sc = new Scanner(System.in);
+--
+--             n = sc.nextInt();
+--             m = sc.nextInt();
+--             k = sc.nextInt();
+--             friends = new ArrayList<ArrayList<Integer>>();
+--
+--             for(int i=0; i<=n; i++) friends.add(new ArrayList<>());
+--
+--             candy= new int[n+1];
+--             check= new boolean[n+1];
+--
+--             for(int i=1; i<=n; i++){
+--                 candy[i] = sc.nextInt();
+--             }
+--
+--             for(int i=0; i<m; i++){
+--                 int a = sc.nextInt();
+--                 int b = sc.nextInt();
+--
+--                 friends.get(a).add(b);
+--                 friends.get(b).add(a);
+--             }
+--
+--             DivideGroup();
+--             getCandy();
+--         }
+--
+--
+--         private static void DivideGroup() {
+--             groups = new ArrayList<>();
+--             for(int i=1; i<=n; i++){
+--                 if(!check[i]){
+--                     totalCandy = 0;
+--                     cnt= 0;
+--                     DFS(i);
+--                     groups.add(new Group(totalCandy,cnt));
+--                 }
+--             }
+--         }
+--
+--         private static void DFS(int v) {
+--             check[v] = true;
+--             totalCandy += candy[v];
+--             cnt += 1;
+--             for(int nv : friends.get(v)){
+--                 if(check[nv]){
+--                     continue;
+--                 }
+--                 DFS(nv);
+--             }
+--         }
+--
+--         private static void getCandy() {
+--             int dp[][] = new int[2][k+1];
+--
+--             for (Group group : groups) {
+--                 for(int i=0; i<=k; i++)', '할로윈의양아치.java', 'file', '/storage', 'java', 1, NULL);
 
 -- insert algorithmproblem
 INSERT INTO algorithmproblem(title, level ,content, recommend_time)
@@ -106,20 +106,20 @@ VALUES
     ('최대점수 구하기(냅색 알고리즘)','5','이번 정보올림피아드대회에서 좋은 성적을 내기 위하여 현수는 선생님이 주신 N개의 문제를 풀려고 합니다. 각 문제는 그것을 풀었을 때 얻는 점수와 푸는데 걸리는 시간이 주어지게 됩니다. 제한시간 M안에 N개의 문제 중 최대점수를 얻을 수 있도록 해야 합니다.(해당문제는 해당시간이 걸리면 푸는 걸로 간주한다. 한 유형당 한개만 풀 수 있습니다.)',50);
 
 -- insert chatroom
-INSERT INTO chatroom(chatroom_name) VALUES('global');
+INSERT INTO chatroom(chatroom_name) VALUES('GLOBAL');
 
 -- insert message
-INSERT INTO message(content, sender_id, chatroom_id) VALUES ('안녕하세요!!~!', 1,1);
+-- INSERT INTO message(content, sender_id, chatroom_id) VALUES ('안녕하세요!!~!', 1,1);
 
 -- insert member_chatroom
-INSERT INTO member_chatroom(chatroom_id, member_id) VALUES (1,1);
+-- INSERT INTO member_chatroom(chatroom_id, member_id) VALUES (1,1);
 
 -- insert gameresult
-INSERT INTO gameresult(running_time, member_code_content, other_member_code_content, algorithm_problem_id, chatroom_id)
-VALUES('20:30', 'code1' , 'code2', 1 , 1);
+-- INSERT INTO gameresult(running_time, member_code_content, other_member_code_content, algorithm_problem_id, chatroom_id)
+-- VALUES('20:30', 'code1' , 'code2', 1 , 1);
 
 -- insert member_gameresult
-INSERT INTO member_gameresult(game_result_id, member_id) VALUES (1, 1);
+-- INSERT INTO member_gameresult(game_result_id, member_id) VALUES (1, 1);
 
 -- insert testcase
 INSERT INTO testcase(test_input, test_output, algorithm_problem_id)
