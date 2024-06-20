@@ -41,12 +41,3 @@ jobs:
           # 이미지를 레지스트리에 푸시합니다.
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/algofi-mysql:${{ github.sha }}
           platforms: linux/amd64,linux/arm64
-
-      - name: Send Discord Notification
-        if: success()
-        run: |
-          commit_message=$(echo "${{ github.event.head_commit.message }}" | jq -sRr @uri)
-          image_tag="${{ secrets.DOCKERHUB_USERNAME }}/algofi-core:${{ github.sha }}"
-          curl -H "Content-Type: application/json" \
-               -d "{\"content\": \"Docker image has been successfully built and pushed to Docker Hub.\nimage: ${image_tag}\nmessage: ${commit_message}\"}" \
-               https://discord.com/api/webhooks/1248567167566217276/W2qD9qYOADW1gtG62HK43fE3xqtZxLT8ClkpuiS5HbmNsdxmWt2kGWYngrxs53TBBBUO/github
