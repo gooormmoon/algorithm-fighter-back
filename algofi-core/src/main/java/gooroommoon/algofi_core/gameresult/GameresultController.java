@@ -2,12 +2,10 @@ package gooroommoon.algofi_core.gameresult;
 
 import gooroommoon.algofi_core.gameresult.dto.GameresultResponse;
 import gooroommoon.algofi_core.gameresult.dto.GameresultsResponse;
-import gooroommoon.algofi_core.gameresult.dto.GameresultsResponseWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,15 +37,9 @@ public class GameresultController {
      */
     //TODO uri 정해야함
     @GetMapping("/api/game/member/gameresults")
-    public ResponseEntity<GameresultsResponseWrapper> findAllGameresults(Principal principal) {
+    public ResponseEntity<List<GameresultsResponse>> findAllGameresults(Principal principal) {
         List<GameresultsResponse> gameresultList = gameresultService.findGameresultList(principal.getName());
 
-        GameresultsResponseWrapper responseWrapper = GameresultsResponseWrapper.builder()
-                .statusCode(HttpStatus.OK.value())
-                .message("성공")
-                .gameresultList(gameresultList)
-                .build();
-
-        return ResponseEntity.ok().body(responseWrapper);
+        return ResponseEntity.ok().body(gameresultList);
     }
 }
