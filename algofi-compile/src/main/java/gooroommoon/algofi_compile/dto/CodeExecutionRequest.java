@@ -1,44 +1,44 @@
 package gooroommoon.algofi_compile.dto;
 
+import gooroommoon.algofi_compile.exception.RequestException;
+import lombok.Getter;
+import lombok.ToString;
+import org.springframework.util.StringUtils;
+
+@Getter
+@ToString
 public class CodeExecutionRequest {
-    private String code; // 실행할 코드
-    private String language; // 코드의 프로그래밍 언어
+    private final String code;
+    private final String language;
+    private final String input;
+    private final String expected;
 
-    // 기본 생성자
-    public CodeExecutionRequest() {
-    }
+    public CodeExecutionRequest(String code, String language, String input, String expected) {
+        validatedNotEmptyCode(code);
+        validatedNotEmptyLanguage(language);
+        validatedNotEmptyExpected(expected);
 
-    // 매개변수가 있는 생성자
-    public CodeExecutionRequest(String code, String language) {
         this.code = code;
         this.language = language;
+        this.input = input;
+        this.expected = expected;
     }
 
-    // code 필드의 getter
-    public String getCode() {
-        return code;
+    private void validatedNotEmptyCode(String code) {
+        if (!StringUtils.hasText(code)) {
+            throw new RequestException("Code cannot be empty");
+        }
     }
 
-    // code 필드의 setter
-    public void setCode(String code) {
-        this.code = code;
+    private void validatedNotEmptyLanguage(String language) {
+        if (!StringUtils.hasText(language)) {
+            throw new RequestException("Language cannot be empty");
+        }
     }
 
-    // language 필드의 getter
-    public String getLanguage() {
-        return language;
-    }
-
-    // language 필드의 setter
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
-    @Override
-    public String toString() {
-        return "CodeExecutionRequest{" +
-                "code='" + code + '\'' +
-                ", language='" + language + '\'' +
-                '}';
+    private void validatedNotEmptyExpected(String expected) {
+        if (!StringUtils.hasText(expected)) {
+            throw new RequestException("Expected input cannot be empty");
+        }
     }
 }
