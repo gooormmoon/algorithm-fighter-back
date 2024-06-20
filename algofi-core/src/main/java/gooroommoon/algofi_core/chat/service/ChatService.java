@@ -74,7 +74,7 @@ public class ChatService {
                         .messageId(message.getId())
                         .chatRoomId(message.getChatroomId().getChatroomId())
                         .content(message.getContent())
-                        .senderId(message.getSenderId().getId())
+                        .senderId(message.getSenderId().getLoginId())
                         .createdDate(message.getCreatedDate())
                         .build())
                 .collect(Collectors.toList());
@@ -108,7 +108,16 @@ public class ChatService {
 
         messageRepository.save(message);
 
+        MessageDTO messageDTO = MessageDTO.builder()
+                .type(message.getType())
+                .messageId(message.getId())
+                .chatRoomId(message.getChatroomId().getChatroomId())
+                .senderId(message.getSenderId().getLoginId())
+                .content(message.getContent())
+                .createdDate(message.getCreatedDate())
+                .build();
+
         // 입장 메시지 발송
-        template.convertAndSend("/topic/room/" + chatroom.getChatroomId(), message);
+        template.convertAndSend("/topic/room/" + chatroom.getChatroomId(), messageDTO);
     }
 }
