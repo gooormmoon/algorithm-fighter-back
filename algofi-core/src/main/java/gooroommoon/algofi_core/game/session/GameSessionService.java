@@ -1,5 +1,6 @@
 package gooroommoon.algofi_core.game.session;
 
+import gooroommoon.algofi_core.algorithmproblem.AlgorithmproblemService;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
 import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
 import gooroommoon.algofi_core.game.session.dto.GameSessionOverResponse;
@@ -8,8 +9,7 @@ import gooroommoon.algofi_core.game.session.exception.AlreadyInGameSessionExcept
 import gooroommoon.algofi_core.game.session.exception.GameSessionNotFoundException;
 import gooroommoon.algofi_core.game.session.exception.NotAHostException;
 import gooroommoon.algofi_core.game.session.exception.PlayersNotReadyException;
-import gooroommoon.algofi_core.algorithmproblem.AlgorithmProblemService;
-import gooroommoon.algofi_core.gameresult.GameResultService;
+import gooroommoon.algofi_core.gameresult.GameresultService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -30,8 +30,8 @@ public class GameSessionService {
 
     private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
 
-    private final AlgorithmProblemService algorithmProblemService;
-    private final GameResultService gameResultService;
+    private final AlgorithmproblemService algorithmproblemService;
+    private final GameresultService gameresultService;
 
     public GameSession getSession(String playerId) {
         GameSession session = gameSessions.get(playerId);
@@ -89,7 +89,7 @@ public class GameSessionService {
         }
         //TODO 문제 가져와서 넣기
         //랜덤 알고리즘문제
-        algorithmProblemService.getRandom(session.getProblemLevel());
+        algorithmproblemService.getRandom(session.getProblemLevel());
         session.start();
         //TODO 알고리즘 문제 가져와서 메시지 발행
         GameSessionService gameSessionService = this;
@@ -123,7 +123,7 @@ public class GameSessionService {
         }
         //TODO 게임 결과 저장
         //TODO gameSession에서 필요한 것 다 가져오기
-        gameResultService.save(session, runningTime);
+        gameresultService.save(session, runningTime);
         removeSession(session);
     }
 
