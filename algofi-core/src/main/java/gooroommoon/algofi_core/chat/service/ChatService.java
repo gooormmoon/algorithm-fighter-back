@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
@@ -68,9 +67,9 @@ public class ChatService {
         template.convertAndSend("/topic/room/" + message.getChatRoomId(), message);
     }
 
-    // WebSocket 연결이 끊겼을 때
     @EventListener
     @Transactional
+    // TODO 게임 세션에서 처리 WebSocket 연결이 끊겼을 때
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
 
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
@@ -84,7 +83,6 @@ public class ChatService {
         String username = principal.getName();
 
         // 사용자가 참여한 채팅방 조회
-        //TODO 챗룸이 사용자 이름으로 되어있지 않으면 에러 ( 글로벌, 호스트가 아닌 유저 등에서 오류 발생함 )
         Optional<Chatroom> optionalChatRoom = chatRoomRepository.findByChatroomName(username);
         Chatroom chatRoom = optionalChatRoom
                 .orElseThrow(() -> new IllegalArgumentException("Chat room not found."));
@@ -130,25 +128,29 @@ public class ChatService {
     }
 
     @Transactional
-    public void enterRoom(UUID roomId, MessageDTO message, Principal principal) {
-        log.info("방 ID: {}로 입장", roomId);
+    public void enterRoom(UUID roomId, String hostId) {
+        log.info("방 ID: {}로 입장 메시지 보내기", roomId);
 
-        // 현재 인증된 사용자 정보 가져오기
-        String username = principal.getName();
-        Member member = memberRepository.findByLoginId(username)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found."));
+        // hostId를 기반으로 Member 엔티티 조회
+        Member member = memberRepository.findById(Long.valueOf(hostId))
+                .orElseThrow(() -> new IllegalArgumentException("Invalid host ID"));
 
-        // 채팅방이 존재하는지 확인하고 없으면 생성하기
-        //TODO 유저가 들어올 때 마다 룸 이름이 바뀜
-        Chatroom chatRoom = chatRoomService.ensureChatRoomExists(roomId);
-        chatRoom.setChatroomId(roomId);
-        chatRoom.setChatroomName(username);
-        chatRoomRepository.save(chatRoom);
+        // 채팅방 찾기
+        Chatroom chatroom = chatRoomRepository.findByChatroomId(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
 
-        message.setChatRoomId(roomId);
-        message.setType(MessageType.ENTER);
-        message.setContent(member.getNickname() + "님이 입장하셨습니다.");
+        // Message 저장
+        Message message = Message.builder()
+                .chatroomId(chatroom)
+                .senderId(member)
+                .type(MessageType.ENTER)
+                .content(member.getNickname() + "님이 입장하셨습니다.")
+                .createdDate(LocalDateTime.now())
+                .build();
 
-        saveMessage(message, principal);
+        messageRepository.save(message);
+
+        // 입장 메시지 발송
+        template.convertAndSend("/topic/room/" + chatroom.getChatroomId(), message);
     }
 }
