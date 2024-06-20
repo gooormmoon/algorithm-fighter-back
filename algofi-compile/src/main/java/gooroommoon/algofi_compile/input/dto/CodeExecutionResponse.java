@@ -1,4 +1,4 @@
-package gooroommoon.algofi_compile.dto;
+package gooroommoon.algofi_compile.input.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;

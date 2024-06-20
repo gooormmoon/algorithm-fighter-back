@@ -1,9 +1,9 @@
-package gooroommoon.algofi_compile.service;
+package gooroommoon.algofi_compile.judge.service;
 
-import gooroommoon.algofi_compile.exception.CodeExecutionException;
-import gooroommoon.algofi_compile.exception.ServerException;
-import gooroommoon.algofi_compile.service.language.CodeExecutor;
-import gooroommoon.algofi_compile.service.language.Language;
+import gooroommoon.algofi_compile.judge.exception.CodeExecutionException;
+import gooroommoon.algofi_compile.judge.exception.ServerException;
+import gooroommoon.algofi_compile.judge.service.language.CodeExecutor;
+import gooroommoon.algofi_compile.judge.service.language.Language;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @Service
-public class CompileService {
+public class JudgeService {
     private static final long TIME_OUT_MILLIS = 10000;
 
     public CodeExecutor getCodeExecutor(String language) {

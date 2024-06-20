@@ -1,10 +1,10 @@
-package gooroommoon.algofi_compile.controller;
+package gooroommoon.algofi_compile.input;
 
-import gooroommoon.algofi_compile.dto.CodeExecutionRequest;
-import gooroommoon.algofi_compile.dto.CodeExecutionResponse;
-import gooroommoon.algofi_compile.service.CompileService;
-import gooroommoon.algofi_compile.service.JudgeResult;
-import gooroommoon.algofi_compile.service.language.CodeExecutor;
+import gooroommoon.algofi_compile.input.dto.CodeExecutionRequest;
+import gooroommoon.algofi_compile.input.dto.CodeExecutionResponse;
+import gooroommoon.algofi_compile.judge.service.JudgeService;
+import gooroommoon.algofi_compile.judge.service.JudgeResult;
+import gooroommoon.algofi_compile.judge.service.language.CodeExecutor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,17 +16,17 @@ import java.nio.file.Path;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/compile")
-public class CompileApiController {
+@RequestMapping("/api/judge-input")
+public class InputJudgeController {
 
-    private final CompileService compileService;
+    private final JudgeService judgeService;
     @PostMapping
-    public ResponseEntity<CodeExecutionResponse> compile(@RequestBody CodeExecutionRequest request) {
-        CodeExecutor codeExecutor = compileService.getCodeExecutor(request.getLanguage());
+    public ResponseEntity<CodeExecutionResponse> judgeInput(@RequestBody CodeExecutionRequest request) {
+        CodeExecutor codeExecutor = judgeService.getCodeExecutor(request.getLanguage());
 
         Path path = codeExecutor.makeFileFromCode(request.getCode());
 
-        Process process = compileService.executeCode(codeExecutor, path);
+        Process process = judgeService.executeCode(codeExecutor, path);
 
         StringBuilder output = insertInputAndGetOutput(request.getInput(), process, codeExecutor, path);
 
@@ -37,9 +37,9 @@ public class CompileApiController {
 
     private StringBuilder insertInputAndGetOutput(String input, Process process, CodeExecutor codeExecutor, Path path) {
         try {
-            return compileService.insertInputAndGetOutput(process, input);
+            return judgeService.insertInputAndGetOutput(process, input);
         } finally {
-            compileService.destroy(process);
+            judgeService.destroy(process);
             codeExecutor.deleteFile(path);
         }
     }

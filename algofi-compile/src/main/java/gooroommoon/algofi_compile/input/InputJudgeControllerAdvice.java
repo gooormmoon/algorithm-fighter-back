@@ -1,6 +1,9 @@
-package gooroommoon.algofi_compile.exception;
+package gooroommoon.algofi_compile.input;
 
-import gooroommoon.algofi_compile.dto.CodeExecutionResponse;
+import gooroommoon.algofi_compile.input.dto.CodeExecutionResponse;
+import gooroommoon.algofi_compile.judge.exception.CodeExecutionException;
+import gooroommoon.algofi_compile.judge.exception.RequestException;
+import gooroommoon.algofi_compile.judge.exception.ServerException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -8,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @RestControllerAdvice
-public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
+public class InputJudgeControllerAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {ServerException.class})
     public ResponseEntity<CodeExecutionResponse> handleServerException(ServerException e) {
         CodeExecutionResponse response = new CodeExecutionResponse(null, e.getMessage());
