@@ -162,7 +162,7 @@ public class GameSessionService {
         String leaveMessage = playerId + "님이 퇴장하셨습니다.";
         MessageDTO message = MessageDTO.builder()
                 .type(MessageType.LEAVE)
-                .chatRoomId(session.getChatRoomId())
+                .chatroomId(session.getChatRoomId())
                 .content(leaveMessage)
                 .build();
         messagingTemplate.convertAndSend("/topic/room/" + session.getChatRoomId(), message);
