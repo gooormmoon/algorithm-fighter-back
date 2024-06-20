@@ -67,40 +67,40 @@ public class ChatService {
         template.convertAndSend("/topic/room/" + message.getChatRoomId(), message);
     }
 
-    @EventListener
-    @Transactional
-    // TODO 게임 세션에서 처리 WebSocket 연결이 끊겼을 때
-    public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
-
-        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-
-        Principal principal = headerAccessor.getUser();
-        // principal null check
-        if (principal == null) {
-            throw new IllegalArgumentException("Principal must not be null");
-        }
-
-        String username = principal.getName();
-
-        // 사용자가 참여한 채팅방 조회
-        Optional<Chatroom> optionalChatRoom = chatRoomRepository.findByChatroomName(username);
-        Chatroom chatRoom = optionalChatRoom
-                .orElseThrow(() -> new IllegalArgumentException("Chat room not found."));
-
-        // chat room 삭제
-        chatRoomRepository.delete(chatRoom);
-
-        log.info("chatRoom: {}", chatRoom);
-
-        // 퇴장 메시지 생성 및 전송
-        String leaveMessage = username + "님이 퇴장하셨습니다.";
-        MessageDTO message = MessageDTO.builder()
-                .type(MessageType.LEAVE)
-                .chatRoomId(chatRoom.getChatroomId())
-                .content(leaveMessage)
-                .build();
-        template.convertAndSend("/topic/room/" + chatRoom.getChatroomId(), message);
-    }
+//    @EventListener
+//    @Transactional
+//    // TODO 게임 세션에서 처리 WebSocket 연결이 끊겼을 때
+//    public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
+//
+//        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+//
+//        Principal principal = headerAccessor.getUser();
+//        // principal null check
+//        if (principal == null) {
+//            throw new IllegalArgumentException("Principal must not be null");
+//        }
+//
+//        String username = principal.getName();
+//
+//        // 사용자가 참여한 채팅방 조회
+//        Optional<Chatroom> optionalChatRoom = chatRoomRepository.findByChatroomName(username);
+//        Chatroom chatRoom = optionalChatRoom
+//                .orElseThrow(() -> new IllegalArgumentException("Chat room not found."));
+//
+//        // chat room 삭제
+//        chatRoomRepository.delete(chatRoom);
+//
+//        log.info("chatRoom: {}", chatRoom);
+//
+//        // 퇴장 메시지 생성 및 전송
+//        String leaveMessage = username + "님이 퇴장하셨습니다.";
+//        MessageDTO message = MessageDTO.builder()
+//                .type(MessageType.LEAVE)
+//                .chatRoomId(chatRoom.getChatroomId())
+//                .content(leaveMessage)
+//                .build();
+//        template.convertAndSend("/topic/room/" + chatRoom.getChatroomId(), message);
+//    }
 
     @Transactional
     public List<MessageDTO> getMessagesInChattingRoom(UUID chatRoomId) {
