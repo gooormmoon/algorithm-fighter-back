@@ -1,4 +1,4 @@
-package gooroommoon.algofi_core.gamesession.testcase;
+package gooroommoon.algofi_core.algorithmproblem.testcase;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

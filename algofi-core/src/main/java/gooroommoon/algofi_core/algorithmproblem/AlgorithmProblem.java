@@ -1,4 +1,4 @@
-package gooroommoon.algofi_core.gamesession.algorithmproblem;
+package gooroommoon.algofi_core.algorithmproblem;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
