@@ -44,15 +44,10 @@ jobs:
 
       - name: Send Discord Notification
         if: success()
-        run: |
-          commit_message=$(echo "${{ github.event.head_commit.message }}" | jq -sRr @uri)
-          image_tag="${{ secrets.DOCKERHUB_USERNAME }}/algofi-mysql:${{ github.sha }}"
-
-          payload=$(jq -n \
-            --arg content "Docker image has been successfully built and pushed to Docker Hub.\nimage: ${image_tag}\nmessage: ${commit_message}" \
-            --arg username "GitHub Actions" \
-            '{content: $content, username: $username}')
-
-          curl -H "Content-Type: application/json" \
-               -d "$payload" \
-               ${{ secrets.DISCORD_WEBHOOK_URL }}
+        uses: tsickert/discord-webhook-action@v5.3.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          content: |
+            Docker image has been successfully built and pushed to Docker Hub.
+            img: ${{ secrets.DOCKERHUB_USERNAME }}/algofi-mysql:${{ github.sha }}
+            msg: ${{ github.event.head_commit.message }}
