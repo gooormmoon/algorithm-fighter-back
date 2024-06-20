@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Getter
 @Builder
@@ -25,4 +26,6 @@ public class GameSessionResponse {
     private String problemLevel;
 
     private int timerTime;
+
+    private UUID chatRoomId;
 }
