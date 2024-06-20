@@ -1,6 +1,7 @@
 package gooroommoon.algofi_core.auth.filter;
 
 import gooroommoon.algofi_core.auth.util.JwtUtil;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,12 +22,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        Optional<String> token = jwtUtil.stripBearerHeader(header);
-            if(token.isPresent() && !jwtUtil.isExpired(token.get())) {
+        try {
+            String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+            Optional<String> token = jwtUtil.stripBearerHeader(header);
+            if (token.isPresent() && !jwtUtil.isExpired(token.get())) {
                 Authentication authentication = jwtUtil.getAuthentication(token.get());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+        } catch (MalformedJwtException e) {
+            logger.info("Invalid JWT");
+        }
+
         filterChain.doFilter(request, response);
     }
 }
