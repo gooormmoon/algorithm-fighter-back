@@ -34,8 +34,7 @@ public class CompileService {
         try {
             output = future.get(TIME_OUT_MILLIS, TimeUnit.MILLISECONDS);
         } catch (TimeoutException e) {
-            destroyChildren(process);
-            process.destroyForcibly();
+            handleTimeOut(process);
             return new CodeExecutionResponse(null, JudgeResult.TIME_LIMIT_EXCEEDED.getMessage());
         } catch (RuntimeException e) {
             return new CodeExecutionResponse(null, JudgeResult.RUNTIME_ERROR.getMessage());
@@ -43,12 +42,7 @@ public class CompileService {
             throw new ServerException(e);
         }
 
-        int exitCode;
-        try {
-            exitCode = process.waitFor();
-        } catch (InterruptedException e) {
-            throw new ServerException(e);
-        }
+        int exitCode = getExitCode(process);
 
         if (exitCode != 0) {
             return new CodeExecutionResponse(null, JudgeResult.RUNTIME_ERROR.getMessage());
@@ -57,12 +51,7 @@ public class CompileService {
         codeExecutor.deleteFile(path);
 
         String result = output.toString();
-
-        if (!result.equals(request.getExpected())) {
-            return new CodeExecutionResponse(result, JudgeResult.WRONG_ANSWER.getMessage());
-        }
-
-        return new CodeExecutionResponse(result, JudgeResult.ACCEPTED.getMessage());
+        return generateResponse(request, result);
     }
 
     private Process startProcess(ProcessBuilder builder) {
@@ -114,5 +103,26 @@ public class CompileService {
         }
 
         return output;
+    }
+
+    private void handleTimeOut(Process process) {
+        destroyChildren(process);
+        process.destroyForcibly();
+    }
+
+    private int getExitCode(Process process) {
+        try {
+            return process.waitFor();
+        } catch (InterruptedException e) {
+            throw new ServerException(e);
+        }
+    }
+
+    private CodeExecutionResponse generateResponse(CodeExecutionRequest request, String result) {
+        if (!result.equals(request.getExpected())) {
+            return new CodeExecutionResponse(result, JudgeResult.WRONG_ANSWER.getMessage());
+        }
+
+        return new CodeExecutionResponse(result, JudgeResult.ACCEPTED.getMessage());
     }
 }
