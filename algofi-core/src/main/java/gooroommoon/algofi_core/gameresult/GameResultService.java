@@ -1,17 +1,27 @@
 package gooroommoon.algofi_core.gameresult;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import gooroommoon.algofi_core.algorithmproblem.AlgorithmProblem;
+import gooroommoon.algofi_core.algorithmproblem.AlgorithmProblemRepository;
+import gooroommoon.algofi_core.algorithmproblem.exception.AlgorithmProblemNotFoundException;
 import gooroommoon.algofi_core.auth.member.Member;
-import gooroommoon.algofi_core.auth.member.MemberService;
+import gooroommoon.algofi_core.auth.member.MemberRepository;
+import gooroommoon.algofi_core.chat.entity.Chatroom;
+import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
+import gooroommoon.algofi_core.game.session.GameSession;
+import gooroommoon.algofi_core.gameresult.dto.GameResultResponse;
+import gooroommoon.algofi_core.gameresult.dto.GameResultsResponse;
 import gooroommoon.algofi_core.gameresult.membergameresult.MemberGameResult;
 import gooroommoon.algofi_core.gameresult.membergameresult.MemberGameResultService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 @Service
@@ -20,34 +30,44 @@ public class GameResultService {
 
     private final GameResultRepository gameResultRepository;
     private final MemberGameResultService memberGameResultService;
-    private final MemberService memberService;
+    private final AlgorithmProblemRepository algorithmProblemRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final MemberRepository memberRepository;
 
     /**
      * 멤버의 게임결과 저장하기
      */
-    public GameResult save(String jsonData, String loginId) {
-        JsonObject asJsonObject = JsonParser.parseString(jsonData).getAsJsonObject();
-        Long algorithmProblemId = getLongOrNull(asJsonObject, "algorithmProblemId");
-        String chatRoomId = getStringOrNull(asJsonObject, "chatroomId");
-        String hostCode = getStringOrNull(asJsonObject, "hostCode");
-        String guestCode = getStringOrNull(asJsonObject, "guestCode");
+    //TODO gameSession에서 문제정보와 chatroom정보, 코드 가져오기
+    public GameResult save(GameSession session,int runningTime) {
+
+        AlgorithmProblem algorithmProblem = algorithmProblemRepository.findById(1L).orElseThrow(() ->
+                new AlgorithmProblemNotFoundException("문제를 찾을 수 없습니다."));
+
+        UUID chatroomId = UUID.fromString("aasdfasdfasdfasdfasdfasdfsadfsda");
+        Chatroom chatroom = chatRoomRepository.findByChatroomId(chatroomId).orElseThrow();
 
         GameResult gameResult = GameResult.builder()
-                .hostCodeContent(hostCode)
-                .guestCodeContent(guestCode)
-                .algorithmProblemId(algorithmProblemId)
-                .chatroomId(chatRoomId)
-                .build();
-
-        Member member = memberService.getMember(loginId);
-
-        MemberGameResult memberGameResult = MemberGameResult.builder()
-                .member(member)
-                .gameResult(gameResult)
+                .hostCodeContent("hostCode")
+                .guestCodeContent("guestCode")
+                .algorithmProblemId(algorithmProblem)
+                .chatroomId(chatroom)
+                .runningTime(runningTime)
                 .build();
 
         GameResult saveGameResult = gameResultRepository.save(gameResult);
-        memberGameResultService.save(memberGameResult);
+
+        Set<String> players = session.getPlayers();
+        for (String playerId : players) {
+            Member member = memberRepository.findByLoginId(playerId).orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다."));
+
+            MemberGameResult memberGameResult = MemberGameResult.builder()
+                    .member(member)
+                    .gameResult(gameResult)
+                    .build();
+
+            memberGameResultService.save(memberGameResult);
+        }
+
         return saveGameResult;
     }
 
@@ -55,35 +75,41 @@ public class GameResultService {
      * 게임 결과 조회하기
      * 멤버의 모든 게임 결과 조회
      */
-    public List<GameResult> findGameResultList(String loginId) {
+    public List<GameResultsResponse> findGameResultList(String loginId) {
         List<GameResult> gameResultsByMemberId = gameResultRepository.findGameResultsByMemberId(loginId);
-        log.info("gameResultByMemberId = {}", gameResultsByMemberId);
-        return gameResultsByMemberId;
+        return fromGameResults(gameResultsByMemberId);
     }
 
     /**
      * 게임 결과 조회하기
      * 멤버의 특정한 게임 결과 조회
      */
-    public GameResult findGameResult(String loginId, Long gameResultId) {
+    public GameResultResponse findGameResult(String loginId, Long gameResultId) {
         GameResult gameResultByMemberIdAndGameResultId = gameResultRepository.findGameResultByMemberIdAndGameResultId(loginId, gameResultId);
-        log.info("gameResultByMemberIdAndGameResultId = {}", gameResultByMemberIdAndGameResultId);
-        return gameResultByMemberIdAndGameResultId;
+        return fromGameResult(gameResultByMemberIdAndGameResultId);
     }
 
-    /**
-     * jsonparse LongType
-     */
-    private static Long getLongOrNull(JsonObject jsonObject, String key) {
-        JsonElement element = jsonObject.get(key);
-        return element != null ? element.getAsLong() : null;
+    private GameResultResponse fromGameResult(GameResult gameResult) {
+        return GameResultResponse.builder()
+                .runningTime(gameResult.getRunningTime())
+                .guestCodeContent(gameResult.getGuestCodeContent())
+                .hostCodeContent(gameResult.getHostCodeContent())
+                .algorithmProblemId(gameResult.getAlgorithmProblemId())
+                .chatroomId(gameResult.getChatroomId())
+                .build();
     }
 
-    /**
-     * jsonParse StringType
-     */
-    private static String getStringOrNull(JsonObject jsonObject, String key) {
-        JsonElement element = jsonObject.get(key);
-        return element != null ? element.getAsString() : null;
+    private List<GameResultsResponse> fromGameResults(List<GameResult> gameResults) {
+        List<GameResultsResponse> results = new CopyOnWriteArrayList<>();
+        for (GameResult gameResult : gameResults) {
+            GameResultsResponse gameResultsResponse = GameResultsResponse.builder()
+                    .title(gameResult.getAlgorithmProblemId().getTitle())
+                    .runningTime(gameResult.getRunningTime())
+                    .build();
+
+            results.add(gameResultsResponse);
+        }
+
+        return results;
     }
 }

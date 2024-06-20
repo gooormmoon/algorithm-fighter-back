@@ -1,5 +1,7 @@
 package gooroommoon.algofi_core.gameresult;
 
+import gooroommoon.algofi_core.gameresult.dto.GameResultResponse;
+import gooroommoon.algofi_core.gameresult.dto.GameResultsResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,33 +22,26 @@ public class GameResultController {
     private final GameResultService gameResultService;
 
     /**
-     * response 데이터에서 게임결과와 관련된 데이터를 갖고 gameResult에 저장
+     * 멤버의 특정 게임결과 조회
      */
-    @MessageMapping("/game/save")
-    @SendTo("/topic/game")
-    public GameResult saveGameResult(String gameResult, Authentication auth) {
-        return gameResultService.save(gameResult, auth.getName());
-    }
-
-    /**
-     * 멤버의 특정 게임결과 조회 , member 정보를 세션에서 가져와야함
-     */
+    //TODO uri 정해야함
     @GetMapping("/app/game/member/{gameResultId}")
     public ResponseEntity findGameResult(@PathVariable Long gameResultId,Authentication auth) {
-        GameResult gameResult = gameResultService.findGameResult(auth.getName(), gameResultId);
+        GameResultResponse gameResult = gameResultService.findGameResult(auth.getName(), gameResultId);
 
-        //상태코드랑, 메세지같이 보내야함
+        //TODO 상태코드랑, 메세지같이 보내야함
         return ResponseEntity.ok().body(gameResult);
     }
 
     /**
-     * 멤버의 모든 게임결과 조회 , member 정보를 세션에서 가져와야함
+     * 멤버의 모든 게임결과 조회
      */
+    //TODO uri 정해야함
     @GetMapping("/app/game/member/gameResults")
     public ResponseEntity findAllGameResults(Authentication auth) {
-        List<GameResult> gameResultList = gameResultService.findGameResultList(auth.getName());
+        List<GameResultsResponse> gameResultList = gameResultService.findGameResultList(auth.getName());
 
-        //상태코드랑, 메세지같이 보내야함
+        //TODO 상태코드랑, 메세지같이 보내야함
         return ResponseEntity.ok().body(gameResultList);
     }
 }

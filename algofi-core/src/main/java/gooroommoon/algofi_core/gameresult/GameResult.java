@@ -1,5 +1,7 @@
 package gooroommoon.algofi_core.gameresult;
 
+import gooroommoon.algofi_core.algorithmproblem.AlgorithmProblem;
+import gooroommoon.algofi_core.chat.entity.Chatroom;
 import jakarta.persistence.*;
 import lombok.*;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -20,7 +22,7 @@ public class GameResult {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String runningTime;
+    private int runningTime;
 
     @NotNull
     private String hostCodeContent;
@@ -33,9 +35,11 @@ public class GameResult {
     @Setter
     private LocalDateTime created_date;
 
-    @Column(name = "algorithm_problem_id", nullable = false)
-    private Long algorithmProblemId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "algorithm_problem_id", nullable = false)
+    private AlgorithmProblem algorithmProblemId;
 
-    @Column(name = "chatroom_id", nullable = false)
-    private String chatroomId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chatroom_id", nullable = false)
+    private Chatroom chatroomId;
 }
