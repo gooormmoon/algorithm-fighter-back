@@ -1,5 +1,7 @@
 package gooroommoon.algofi_core.chat.controller;
 
+import gooroommoon.algofi_core.auth.member.Member;
+import gooroommoon.algofi_core.auth.member.MemberRepository;
 import gooroommoon.algofi_core.chat.entity.MessageType;
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
 import gooroommoon.algofi_core.chat.repository.MessageRepository;
@@ -7,6 +9,7 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -19,11 +22,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.reflect.Type;
+import java.security.Principal;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-// TEST를 진행하기 전에 수정해야할 것
-// SecurityConfig 에서 .anyRequest().permitAll() 로 수정
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
@@ -66,7 +68,7 @@ public class ChatControllerTest {
             public void handleFrame(StompHeaders headers, Object payload) {
                 MessageDTO messageDTO = (MessageDTO) payload;
                 assertEquals(roomId, messageDTO.getChatRoomId());
-                assertEquals("TestUser님이 입장하셨습니다.", messageDTO.getContent());
+                assertEquals("testUser님이 입장하셨습니다.", messageDTO.getContent());
                 assertEquals(MessageType.ENTER, messageDTO.getType());
             }
         });
@@ -75,9 +77,10 @@ public class ChatControllerTest {
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setType(MessageType.ENTER);
         messageDTO.setChatRoomId(roomId);
-        messageDTO.setContent("TestUser님이 입장하셨습니다.");
+        messageDTO.setContent("testUser님이 입장하셨습니다.");
 
         stompSession.send("/app/enter-room/"+ roomId.toString(), messageDTO);
+
         // Wait for response
         Thread.sleep(1000);
 
@@ -90,6 +93,9 @@ public class ChatControllerTest {
     public void testSendMessage() throws Exception {
         // WebSocket 연결 설정
         String websocketUri = "ws://localhost:" + port + "/chat";
+        // 연결하는 순간에 유효한 토큰을 넣어야 인증이 가능함.
+        // DB에 유저가 없으면 안됨.
+        // 회원가입, 로그인 코드 넣고 토큰 가져와서 사용하기
         StompSession stompSession = stompClient.connect(websocketUri, new StompSessionHandlerAdapter() {}).get(1, TimeUnit.SECONDS);
 
         // Subscribe to the WebSocket topic
@@ -122,7 +128,7 @@ public class ChatControllerTest {
         Thread.sleep(1000);
 
         // Disconnect from WebSocket
-        stompSession.disconnect();
+//        stompSession.disconnect();
     }
 }
 
