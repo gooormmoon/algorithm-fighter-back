@@ -77,8 +77,8 @@ CREATE TABLE member_chatroom (
 CREATE TABLE gameresult (
                             game_result_id INT(11) AUTO_INCREMENT PRIMARY KEY,
                             running_time VARCHAR(100),
-                            member_code_content VARCHAR(5500),
-                            other_member_code_content VARCHAR(5500),
+                            host_code_content VARCHAR(5500),
+                            guest_code_content VARCHAR(5500),
                             created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                             algorithm_problem_id INT NOT NULL,
                             chatroom_id INT NOT NULL,
