@@ -2,6 +2,7 @@ package gooroommoon.algofi_compile.controller;
 
 import gooroommoon.algofi_compile.dto.CodeExecutionRequest;
 import gooroommoon.algofi_compile.dto.CodeExecutionResponse;
+import gooroommoon.algofi_compile.exception.CodeExecutionException;
 import gooroommoon.algofi_compile.service.JudgeResult;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 class CompileApiControllerTest {
@@ -111,9 +113,9 @@ class CompileApiControllerTest {
         String code = fileToString(file);
         CodeExecutionRequest request = new CodeExecutionRequest(code, "java", null, "fail");
 
-        ResponseEntity<CodeExecutionResponse> response = compileApiController.compile(request);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(Objects.requireNonNull(response.getBody()).toString()).contains(JudgeResult.TIME_LIMIT_EXCEEDED.getMessage());
+        assertThatThrownBy(() -> compileApiController.compile(request))
+                .isInstanceOf(CodeExecutionException.class)
+                .hasMessageContaining(JudgeResult.TIME_LIMIT_EXCEEDED.getMessage());
     }
 
     @Test

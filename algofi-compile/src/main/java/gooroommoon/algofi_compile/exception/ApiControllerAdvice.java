@@ -20,4 +20,10 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
         CodeExecutionResponse response = new CodeExecutionResponse(null, e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = {CodeExecutionException.class})
+    public ResponseEntity<CodeExecutionResponse> handleCodeExecutionException(CodeExecutionException e) {
+        CodeExecutionResponse response = new CodeExecutionResponse(null, e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

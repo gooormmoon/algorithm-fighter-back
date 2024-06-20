@@ -1,7 +1,6 @@
 package gooroommoon.algofi_compile.service;
 
-import gooroommoon.algofi_compile.dto.CodeExecutionRequest;
-import gooroommoon.algofi_compile.dto.CodeExecutionResponse;
+import gooroommoon.algofi_compile.exception.CodeExecutionException;
 import gooroommoon.algofi_compile.exception.ServerException;
 import gooroommoon.algofi_compile.service.language.CodeExecutor;
 import gooroommoon.algofi_compile.service.language.Language;
@@ -19,39 +18,39 @@ import java.util.concurrent.TimeoutException;
 public class CompileService {
     private static final long TIME_OUT_MILLIS = 10000;
 
-    public CodeExecutionResponse runCode(CodeExecutionRequest request) {
-        Language language = Language.byName(request.getLanguage());
+    public CodeExecutor getCodeExecutor(String language) {
+        Language lang = Language.byName(language);
+        return lang.getCodeExecutor();
+    }
 
-        CodeExecutor codeExecutor = language.getCodeExecutor();
-
-        Path path = codeExecutor.makeFileFromCode(request.getCode());
+    public Process executeCode(CodeExecutor codeExecutor, Path path) {
         ProcessBuilder builder = codeExecutor.executeProcessBuilder(path);
-        Process process = startProcess(builder);
+        return startProcess(builder);
+    }
 
-        CompletableFuture<StringBuilder> future = readAndGetOutputAsync(request, process);
+    public StringBuilder insertInputAndGetOutput(Process process, String input) {
+        CompletableFuture<StringBuilder> future = readAndGetOutputAsync(process, input);
 
-        StringBuilder output;
         try {
-            output = future.get(TIME_OUT_MILLIS, TimeUnit.MILLISECONDS);
+            StringBuilder output = future.get(TIME_OUT_MILLIS, TimeUnit.MILLISECONDS);
+            waitForTerminate(process);
+            return output;
         } catch (TimeoutException e) {
-            handleTimeOut(process);
-            return new CodeExecutionResponse(null, JudgeResult.TIME_LIMIT_EXCEEDED.getMessage());
+            destroy(process);
+            throw new CodeExecutionException(JudgeResult.TIME_LIMIT_EXCEEDED);
         } catch (RuntimeException e) {
-            return new CodeExecutionResponse(null, JudgeResult.RUNTIME_ERROR.getMessage());
+            throw new CodeExecutionException(JudgeResult.RUNTIME_ERROR);
         } catch (ExecutionException | InterruptedException e) {
             throw new ServerException(e);
         }
+    }
 
-        int exitCode = getExitCode(process);
+    public void waitForTerminate(Process process) {
+        int exitCode = waitFor(process);
 
         if (exitCode != 0) {
-            return new CodeExecutionResponse(null, JudgeResult.RUNTIME_ERROR.getMessage());
+            throw new CodeExecutionException(JudgeResult.RUNTIME_ERROR);
         }
-
-        codeExecutor.deleteFile(path);
-
-        String result = output.toString();
-        return generateResponse(request, result);
     }
 
     private Process startProcess(ProcessBuilder builder) {
@@ -63,24 +62,15 @@ public class CompileService {
         }
     }
 
-    private CompletableFuture<StringBuilder> readAndGetOutputAsync(CodeExecutionRequest request, Process process) {
+    private CompletableFuture<StringBuilder> readAndGetOutputAsync(Process process, String input) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                transferInput(request.getInput(), process);
+                transferInput(input, process);
                 return readOutput(process);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
-    }
-
-    private void destroyChildren(Process process) {
-        List<ProcessHandle> children = ProcessHandle.allProcesses()
-                .filter(processHandle -> processHandle.parent()
-                        .map(ProcessHandle::pid)
-                        .orElse(-1L) == process.pid())
-                .toList();
-        children.forEach(ProcessHandle::destroyForcibly);
     }
 
     private void transferInput(String input, Process process) throws IOException {
@@ -105,24 +95,25 @@ public class CompileService {
         return output;
     }
 
-    private void handleTimeOut(Process process) {
+    public void destroy(Process process) {
         destroyChildren(process);
         process.destroyForcibly();
     }
 
-    private int getExitCode(Process process) {
+    private void destroyChildren(Process process) {
+        List<ProcessHandle> children = ProcessHandle.allProcesses()
+                .filter(processHandle -> processHandle.parent()
+                        .map(ProcessHandle::pid)
+                        .orElse(-1L) == process.pid())
+                .toList();
+        children.forEach(ProcessHandle::destroyForcibly);
+    }
+
+    private int waitFor(Process process) {
         try {
             return process.waitFor();
         } catch (InterruptedException e) {
             throw new ServerException(e);
         }
-    }
-
-    private CodeExecutionResponse generateResponse(CodeExecutionRequest request, String result) {
-        if (!result.equals(request.getExpected())) {
-            return new CodeExecutionResponse(result, JudgeResult.WRONG_ANSWER.getMessage());
-        }
-
-        return new CodeExecutionResponse(result, JudgeResult.ACCEPTED.getMessage());
     }
 }
