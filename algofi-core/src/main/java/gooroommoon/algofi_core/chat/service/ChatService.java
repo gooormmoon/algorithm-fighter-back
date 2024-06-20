@@ -6,16 +6,12 @@ import gooroommoon.algofi_core.chat.entity.Chatroom;
 import gooroommoon.algofi_core.chat.entity.Message;
 import gooroommoon.algofi_core.chat.entity.MessageType;
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
-import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
 import gooroommoon.algofi_core.chat.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -28,7 +24,6 @@ import java.util.stream.Collectors;
 public class ChatService {
 
     private final SimpMessageSendingOperations template;
-    private final ChatRoomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
     private final MessageRepository messageRepository;
     private final ChatRoomService chatRoomService;
@@ -44,8 +39,7 @@ public class ChatService {
                 .orElseThrow(() -> new IllegalArgumentException("현재 인증된 사용자의 정보를 찾을 수 없습니다."));
 
         // 채팅방 찾기
-        Chatroom chatroom = chatRoomRepository.findByChatroomId(messageDTO.getChatRoomId())
-                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
+        Chatroom chatroom = chatRoomService.findRoomById(messageDTO.getChatroomId());
 
         // Message 엔티티 생성 및 저장
         Message message = Message.builder()
@@ -62,44 +56,9 @@ public class ChatService {
     }
 
     public void sendMessage(MessageDTO message) {
-        log.info("접속 채팅방 ID: {}", message.getChatRoomId());
+        log.info("접속 채팅방 ID: {}", message.getChatroomId());
         log.info("접속 채팅방 Content: {}", message.getContent());
-        template.convertAndSend("/topic/room/" + message.getChatRoomId(), message);
-    }
-
-    @EventListener
-    @Transactional
-    // TODO 게임 세션에서 처리 WebSocket 연결이 끊겼을 때
-    public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
-
-        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-
-        Principal principal = headerAccessor.getUser();
-        // principal null check
-        if (principal == null) {
-            throw new IllegalArgumentException("Principal must not be null");
-        }
-
-        String username = principal.getName();
-
-        // 사용자가 참여한 채팅방 조회
-        Optional<Chatroom> optionalChatRoom = chatRoomRepository.findByChatroomName(username);
-        Chatroom chatRoom = optionalChatRoom
-                .orElseThrow(() -> new IllegalArgumentException("Chat room not found."));
-
-        // chat room 삭제
-        chatRoomRepository.delete(chatRoom);
-
-        log.info("chatRoom: {}", chatRoom);
-
-        // 퇴장 메시지 생성 및 전송
-        String leaveMessage = username + "님이 퇴장하셨습니다.";
-        MessageDTO message = MessageDTO.builder()
-                .type(MessageType.LEAVE)
-                .chatRoomId(chatRoom.getChatroomId())
-                .content(leaveMessage)
-                .build();
-        template.convertAndSend("/topic/room/" + chatRoom.getChatroomId(), message);
+        template.convertAndSend("/topic/room/" + message.getChatroomId(), message);
     }
 
     @Transactional
@@ -113,9 +72,9 @@ public class ChatService {
                 .map(message -> MessageDTO.builder()
                         .type(message.getType())
                         .messageId(message.getId())
-                        .chatRoomId(message.getChatroomId().getChatroomId())
+                        .chatroomId(message.getChatroomId().getChatroomId())
                         .content(message.getContent())
-                        .senderId(message.getSenderId().getId())
+                        .senderId(message.getSenderId().getLoginId())
                         .createdDate(message.getCreatedDate())
                         .build())
                 .collect(Collectors.toList());
@@ -128,16 +87,15 @@ public class ChatService {
     }
 
     @Transactional
-    public void enterRoom(UUID roomId, String hostId) {
+    public void enterRoom(UUID roomId, String memberId) {
         log.info("방 ID: {}로 입장 메시지 보내기", roomId);
 
-        // hostId를 기반으로 Member 엔티티 조회
-        Member member = memberRepository.findById(Long.valueOf(hostId))
-                .orElseThrow(() -> new IllegalArgumentException("Invalid host ID"));
+        // 입장한 멤버의 엔티티 조회
+        Member member = memberRepository.findByLoginId(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
         // 채팅방 찾기
-        Chatroom chatroom = chatRoomRepository.findByChatroomId(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
+        Chatroom chatroom = chatRoomService.findRoomById(roomId);
 
         // Message 저장
         Message message = Message.builder()
@@ -150,7 +108,16 @@ public class ChatService {
 
         messageRepository.save(message);
 
+        MessageDTO messageDTO = MessageDTO.builder()
+                .type(message.getType())
+                .messageId(message.getId())
+                .chatroomId(message.getChatroomId().getChatroomId())
+                .senderId(message.getSenderId().getLoginId())
+                .content(message.getContent())
+                .createdDate(message.getCreatedDate())
+                .build();
+
         // 입장 메시지 발송
-        template.convertAndSend("/topic/room/" + chatroom.getChatroomId(), message);
+        template.convertAndSend("/topic/room/" + chatroom.getChatroomId(), messageDTO);
     }
 }

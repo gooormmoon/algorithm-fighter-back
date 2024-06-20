@@ -80,7 +80,7 @@ public class WebSocketDisconnectListenerTest {
         doNothing().when(chatRoomRepository).delete(chatRoom);
 
         // 테스트할 메서드 호출
-        chatService.handleWebSocketDisconnectListener(event);
+//        chatService.handleWebSocketDisconnectListener(event);
 
         // chatRoomRepository.delete 메서드가 1회 호출되었는지 검증
         verify(chatRoomRepository, times(1)).delete(chatRoom);
