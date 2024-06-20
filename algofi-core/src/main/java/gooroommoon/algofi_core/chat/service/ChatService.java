@@ -57,6 +57,8 @@ public class ChatService {
                 .createdDate(LocalDateTime.now())
                 .build();
 
+        log.info("접속 채팅방 ID: {}", message.getChatroomId().getChatroomId());
+        log.info("Content: {}", message.getContent());
         messageRepository.save(message);
     }
 
@@ -74,8 +76,9 @@ public class ChatService {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
 
         Principal principal = headerAccessor.getUser();
-        if (!(principal instanceof Authentication)) {
-            throw new IllegalArgumentException("STOMP SessionHeader Error.");
+        // principal null check
+        if (principal == null) {
+            throw new IllegalArgumentException("Principal must not be null");
         }
 
         String username = principal.getName();

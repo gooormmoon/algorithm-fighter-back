@@ -1,4 +1,4 @@
-package gooroommoon.algofi_core.auth.member.dto;
+package gooroommoon.algofi_core.game.session.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -9,6 +9,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class TokenResponse {
-    private String accessToken;
+public class GameSessionJoinRequest {
+    private String hostId;
 }

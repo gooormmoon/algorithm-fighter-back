@@ -16,6 +16,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.reflect.Type;
 import java.util.UUID;
@@ -64,6 +65,7 @@ public class ChatControllerTest {
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
                 MessageDTO messageDTO = (MessageDTO) payload;
+                assertEquals(roomId, messageDTO.getChatRoomId());
                 assertEquals("TestUser님이 입장하셨습니다.", messageDTO.getContent());
                 assertEquals(MessageType.ENTER, messageDTO.getType());
             }
@@ -75,8 +77,7 @@ public class ChatControllerTest {
         messageDTO.setChatRoomId(roomId);
         messageDTO.setContent("TestUser님이 입장하셨습니다.");
 
-        stompSession.send("/app/enter-room/1", messageDTO);
-
+        stompSession.send("/app/enter-room/"+ roomId.toString(), messageDTO);
         // Wait for response
         Thread.sleep(1000);
 

@@ -1,7 +1,8 @@
-package gooroommoon.algofi_core.auth.member.dto;
+package gooroommoon.algofi_core.game.session.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import gooroommoon.algofi_core.game.session.GameOverType;
 import lombok.*;
 
 @Getter
@@ -9,6 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class TokenResponse {
-    private String accessToken;
+public class GameSessionOverResponse {
+    private GameOverType gameOverType;
+    private int runningTime;
 }
