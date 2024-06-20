@@ -6,16 +6,12 @@ import gooroommoon.algofi_core.chat.entity.Chatroom;
 import gooroommoon.algofi_core.chat.entity.Message;
 import gooroommoon.algofi_core.chat.entity.MessageType;
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
-import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
 import gooroommoon.algofi_core.chat.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -28,7 +24,6 @@ import java.util.stream.Collectors;
 public class ChatService {
 
     private final SimpMessageSendingOperations template;
-    private final ChatRoomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
     private final MessageRepository messageRepository;
     private final ChatRoomService chatRoomService;
@@ -44,8 +39,7 @@ public class ChatService {
                 .orElseThrow(() -> new IllegalArgumentException("현재 인증된 사용자의 정보를 찾을 수 없습니다."));
 
         // 채팅방 찾기
-        Chatroom chatroom = chatRoomRepository.findByChatroomId(messageDTO.getChatRoomId())
-                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
+        Chatroom chatroom = chatRoomService.findRoomById(messageDTO.getChatRoomId());
 
         // Message 엔티티 생성 및 저장
         Message message = Message.builder()
@@ -101,8 +95,7 @@ public class ChatService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
         // 채팅방 찾기
-        Chatroom chatroom = chatRoomRepository.findByChatroomId(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
+        Chatroom chatroom = chatRoomService.findRoomById(roomId);
 
         // Message 저장
         Message message = Message.builder()
