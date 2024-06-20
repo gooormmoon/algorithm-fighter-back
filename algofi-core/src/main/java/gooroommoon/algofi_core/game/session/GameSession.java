@@ -33,7 +33,7 @@ public class GameSession {
 
     private boolean isStarted;
 
-    private UUID chatRoomId;
+    private final UUID chatRoomId;
 
     @Setter
     private ScheduledFuture<?> timeOverTask;
@@ -80,6 +80,7 @@ public class GameSession {
 
     public void removePlayer(String playerId) {
         players.remove(playerId);
+        readyPlayers.remove(playerId);
     }
 
     protected void updateSettings(String title, String problemLevel, Integer timerTime) {
