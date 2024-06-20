@@ -1,4 +1,4 @@
-package gooroommoon.algofi_core.gameresult;
+package hello.proxy.gameresult;
 
 import gooroommoon.algofi_core.algorithmproblem.AlgorithmProblem;
 import gooroommoon.algofi_core.chat.entity.Chatroom;

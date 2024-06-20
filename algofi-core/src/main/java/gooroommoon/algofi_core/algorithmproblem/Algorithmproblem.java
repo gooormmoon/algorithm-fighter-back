@@ -13,10 +13,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AlgorithmProblem {
+public class Algorithmproblem {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long algorithmProblemId;
+    private Long AlgorithmproblemId;
     private String title;
 
     @JsonProperty("level")
@@ -24,4 +24,10 @@ public class AlgorithmProblem {
     private String content;
     private int recommend_time;
 
+    public Algorithmproblem(String title, String level, String content, int recommend_time) {
+        this.title = title;
+        this.level = level;
+        this.content = content;
+        this.recommend_time = recommend_time;
+    }
 }

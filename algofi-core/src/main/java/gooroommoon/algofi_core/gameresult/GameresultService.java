@@ -1,4 +1,4 @@
-package gooroommoon.algofi_core.gameresult;
+package hello.proxy.gameresult;
 
 import gooroommoon.algofi_core.algorithmproblem.AlgorithmProblem;
 import gooroommoon.algofi_core.algorithmproblem.AlgorithmProblemRepository;
@@ -18,7 +18,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
