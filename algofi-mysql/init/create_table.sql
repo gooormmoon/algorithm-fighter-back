@@ -49,7 +49,7 @@ CREATE TABLE algorithmproblem (
 
 /* chatroom table 생성 */
 CREATE TABLE chatroom (
-                          chatroom_id VARCHAR(36) DEFAULT (UUID()) PRIMARY KEY,
+                          chatroom_id VARCHAR(36) PRIMARY KEY,
                           chatroom_name VARCHAR(100)
 );
 
