@@ -1,6 +1,6 @@
-package hello.proxy.gameresult;
+package gooroommoon.algofi_core.gameresult;
 
-import gooroommoon.algofi_core.algorithmproblem.AlgorithmProblem;
+import gooroommoon.algofi_core.algorithmproblem.Algorithmproblem;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,11 +16,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class GameResult {
+public class Gameresult {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long GameresultId;
 
     private int runningTime;
 
@@ -37,9 +37,17 @@ public class GameResult {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "algorithm_problem_id", nullable = false)
-    private AlgorithmProblem algorithmProblemId;
+    private Algorithmproblem algorithmproblemId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatroom_id", nullable = false)
     private Chatroom chatroomId;
+
+    public Gameresult(int runningTime, String hostCodeContent, String guestCodeContent, Algorithmproblem algorithmproblemId, Chatroom chatroomId) {
+        this.runningTime = runningTime;
+        this.hostCodeContent = hostCodeContent;
+        this.guestCodeContent = guestCodeContent;
+        this.algorithmproblemId = algorithmproblemId;
+        this.chatroomId = chatroomId;
+    }
 }

@@ -1,24 +1,24 @@
-package hello.proxy.gameresult.dto;
+package gooroommoon.algofi_core.gameresult.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import gooroommoon.algofi_core.algorithmproblem.AlgorithmProblem;
-import gooroommoon.algofi_core.chat.entity.Chatroom;
 import lombok.*;
+
+import java.util.UUID;
 
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class GameResultResponse {
+public class GameresultResponse {
     private int runningTime;
 
     private String hostCodeContent;
 
     private String guestCodeContent;
 
-    private AlgorithmProblem algorithmProblemId;
+    private Long algorithmproblemId;
 
-    private Chatroom chatroomId;
+    private UUID chatroomId;
 }

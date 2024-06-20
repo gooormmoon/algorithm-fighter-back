@@ -1,17 +1,17 @@
-package hello.proxy.gameresult;
+package gooroommoon.algofi_core.gameresult;
 
-import gooroommoon.algofi_core.algorithmproblem.AlgorithmProblem;
-import gooroommoon.algofi_core.algorithmproblem.AlgorithmProblemRepository;
-import gooroommoon.algofi_core.algorithmproblem.exception.AlgorithmProblemNotFoundException;
+import gooroommoon.algofi_core.Algorithmproblem.exception.AlgorithmproblemNotFoundException;
+import gooroommoon.algofi_core.algorithmproblem.Algorithmproblem;
+import gooroommoon.algofi_core.algorithmproblem.AlgorithmproblemRepository;
 import gooroommoon.algofi_core.auth.member.Member;
 import gooroommoon.algofi_core.auth.member.MemberRepository;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
 import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
 import gooroommoon.algofi_core.game.session.GameSession;
-import gooroommoon.algofi_core.gameresult.dto.GameResultResponse;
-import gooroommoon.algofi_core.gameresult.dto.GameResultsResponse;
-import gooroommoon.algofi_core.gameresult.membergameresult.MemberGameResult;
-import gooroommoon.algofi_core.gameresult.membergameresult.MemberGameResultService;
+import gooroommoon.algofi_core.gameresult.dto.GameresultResponse;
+import gooroommoon.algofi_core.gameresult.dto.GameresultsResponse;
+import gooroommoon.algofi_core.gameresult.membergameresult.MemberGameresult;
+import gooroommoon.algofi_core.gameresult.membergameresult.MemberGameresultService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,11 +25,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class GameResultService {
+public class GameresultService {
 
-    private final GameResultRepository gameResultRepository;
-    private final MemberGameResultService memberGameResultService;
-    private final AlgorithmProblemRepository algorithmProblemRepository;
+    private final GameresultRepository gameresultRepository;
+    private final MemberGameresultService memberGameresultService;
+    private final AlgorithmproblemRepository algorithmproblemRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
 
@@ -37,76 +37,76 @@ public class GameResultService {
      * 멤버의 게임결과 저장하기
      */
     //TODO gameSession에서 문제정보와 chatroom정보, 코드 가져오기
-    public GameResult save(GameSession session,int runningTime) {
+    public Gameresult save(GameSession session,int runningTime) {
 
-        AlgorithmProblem algorithmProblem = algorithmProblemRepository.findById(1L).orElseThrow(() ->
-                new AlgorithmProblemNotFoundException("문제를 찾을 수 없습니다."));
+        Algorithmproblem algorithmproblem = algorithmproblemRepository.findById(1L).orElseThrow(() ->
+                new AlgorithmproblemNotFoundException("문제를 찾을 수 없습니다."));
 
         UUID chatroomId = UUID.fromString("aasdfasdfasdfasdfasdfasdfsadfsda");
         Chatroom chatroom = chatRoomRepository.findByChatroomId(chatroomId).orElseThrow();
 
-        GameResult gameResult = GameResult.builder()
+        Gameresult gameresult = Gameresult.builder()
                 .hostCodeContent("hostCode")
                 .guestCodeContent("guestCode")
-                .algorithmProblemId(algorithmProblem)
+                .algorithmproblemId(algorithmproblem)
                 .chatroomId(chatroom)
                 .runningTime(runningTime)
                 .build();
 
-        GameResult saveGameResult = gameResultRepository.save(gameResult);
+        Gameresult saveGameresult = gameresultRepository.save(gameresult);
 
         Set<String> players = session.getPlayers();
         for (String playerId : players) {
             Member member = memberRepository.findByLoginId(playerId).orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다."));
 
-            MemberGameResult memberGameResult = MemberGameResult.builder()
+            MemberGameresult memberGameresult = MemberGameresult.builder()
                     .member(member)
-                    .gameResult(gameResult)
+                    .gameresult(gameresult)
                     .build();
 
-            memberGameResultService.save(memberGameResult);
+            memberGameresultService.save(memberGameresult);
         }
 
-        return saveGameResult;
+        return saveGameresult;
     }
 
     /**
      * 게임 결과 조회하기
      * 멤버의 모든 게임 결과 조회
      */
-    public List<GameResultsResponse> findGameResultList(String loginId) {
-        List<GameResult> gameResultsByMemberId = gameResultRepository.findGameResultsByMemberId(loginId);
-        return fromGameResults(gameResultsByMemberId);
+    public List<GameresultsResponse> findGameresultList(String loginId) {
+        List<Gameresult> GameresultsByMemberId = gameresultRepository.findGameresultsByMemberId(loginId);
+        return fromGameresults(GameresultsByMemberId);
     }
 
     /**
      * 게임 결과 조회하기
      * 멤버의 특정한 게임 결과 조회
      */
-    public GameResultResponse findGameResult(String loginId, Long gameResultId) {
-        GameResult gameResultByMemberIdAndGameResultId = gameResultRepository.findGameResultByMemberIdAndGameResultId(loginId, gameResultId);
-        return fromGameResult(gameResultByMemberIdAndGameResultId);
+    public GameresultResponse findGameresult(String loginId, Long GameresultId) {
+        Gameresult GameresultByMemberIdAndGameresultId = gameresultRepository.findGameresultByMemberIdAndGameresultId(loginId, GameresultId);
+        return fromGameresult(GameresultByMemberIdAndGameresultId);
     }
 
-    private GameResultResponse fromGameResult(GameResult gameResult) {
-        return GameResultResponse.builder()
-                .runningTime(gameResult.getRunningTime())
-                .guestCodeContent(gameResult.getGuestCodeContent())
-                .hostCodeContent(gameResult.getHostCodeContent())
-                .algorithmProblemId(gameResult.getAlgorithmProblemId())
-                .chatroomId(gameResult.getChatroomId())
+    private GameresultResponse fromGameresult(Gameresult Gameresult) {
+        return GameresultResponse.builder()
+                .runningTime(Gameresult.getRunningTime())
+                .guestCodeContent(Gameresult.getGuestCodeContent())
+                .hostCodeContent(Gameresult.getHostCodeContent())
+                .algorithmproblemId(Gameresult.getAlgorithmproblemId().getAlgorithmproblemId())
+                .chatroomId(Gameresult.getChatroomId().getChatroomId())
                 .build();
     }
 
-    private List<GameResultsResponse> fromGameResults(List<GameResult> gameResults) {
-        List<GameResultsResponse> results = new CopyOnWriteArrayList<>();
-        for (GameResult gameResult : gameResults) {
-            GameResultsResponse gameResultsResponse = GameResultsResponse.builder()
-                    .title(gameResult.getAlgorithmProblemId().getTitle())
-                    .runningTime(gameResult.getRunningTime())
+    private List<GameresultsResponse> fromGameresults(List<Gameresult> Gameresults) {
+        List<GameresultsResponse> results = new CopyOnWriteArrayList<>();
+        for (Gameresult Gameresult : Gameresults) {
+            GameresultsResponse gameresultsResponse = GameresultsResponse.builder()
+                    .title(Gameresult.getAlgorithmproblemId().getTitle())
+                    .runningTime(Gameresult.getRunningTime())
                     .build();
 
-            results.add(gameResultsResponse);
+            results.add(gameresultsResponse);
         }
 
         return results;

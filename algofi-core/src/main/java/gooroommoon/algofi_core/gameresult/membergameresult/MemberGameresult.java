@@ -1,7 +1,7 @@
-package hello.proxy.gameresult.membergameresult;
+package gooroommoon.algofi_core.gameresult.membergameresult;
 
 import gooroommoon.algofi_core.auth.member.Member;
-import gooroommoon.algofi_core.gameresult.GameResult;
+import gooroommoon.algofi_core.gameresult.Gameresult;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,11 +13,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberGameResult {
+public class MemberGameresult {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long memberGameresultId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -25,5 +25,10 @@ public class MemberGameResult {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_result_id")
-    private GameResult gameResult;
+    private Gameresult gameresult;
+
+    public MemberGameresult(Member member, Gameresult gameresult) {
+        this.member = member;
+        this.gameresult = gameresult;
+    }
 }

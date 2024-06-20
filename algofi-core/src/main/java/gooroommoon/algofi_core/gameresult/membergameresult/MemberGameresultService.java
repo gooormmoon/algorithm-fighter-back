@@ -1,15 +1,15 @@
-package hello.proxy.gameresult.membergameresult;
+package gooroommoon.algofi_core.gameresult.membergameresult;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class MemberGameResultService {
+public class MemberGameresultService {
 
-    private final MemberGameResultRepository memberGameResultRepository;
+    private final MemberGameresultRepository memberGameresultRepository;
 
-    public MemberGameResult save(MemberGameResult memberGameResult) {
-        return memberGameResultRepository.save(memberGameResult);
+    public MemberGameresult save(MemberGameresult memberGameresult) {
+        return memberGameresultRepository.save(memberGameresult);
     }
 }
