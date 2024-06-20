@@ -1,4 +1,4 @@
-package hello.proxy.gameresult;
+package gooroommoon.algofi_core.gameresult;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -28,7 +28,7 @@ public class GameResultService {
     public GameResult save(String jsonData, String loginId) {
         JsonObject asJsonObject = JsonParser.parseString(jsonData).getAsJsonObject();
         Long algorithmProblemId = getLongOrNull(asJsonObject, "algorithmProblemId");
-        Long chatRoomId = getLongOrNull(asJsonObject, "chatroomId");
+        String chatRoomId = getStringOrNull(asJsonObject, "chatroomId");
         String hostCode = getStringOrNull(asJsonObject, "hostCode");
         String guestCode = getStringOrNull(asJsonObject, "guestCode");
 

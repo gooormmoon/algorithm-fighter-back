@@ -1,4 +1,4 @@
-package hello.proxy.gameresult.membergameresult;
+package gooroommoon.algofi_core.gameresult.membergameresult;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

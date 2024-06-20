@@ -1,4 +1,4 @@
-package hello.proxy.gameresult.membergameresult;
+package gooroommoon.algofi_core.gameresult.membergameresult;
 
 import gooroommoon.algofi_core.auth.member.Member;
 import gooroommoon.algofi_core.gameresult.GameResult;

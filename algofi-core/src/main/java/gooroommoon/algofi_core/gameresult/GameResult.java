@@ -1,4 +1,4 @@
-package hello.proxy.gameresult;
+package gooroommoon.algofi_core.gameresult;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -37,5 +37,5 @@ public class GameResult {
     private Long algorithmProblemId;
 
     @Column(name = "chatroom_id", nullable = false)
-    private Long chatroomId;
+    private String chatroomId;
 }

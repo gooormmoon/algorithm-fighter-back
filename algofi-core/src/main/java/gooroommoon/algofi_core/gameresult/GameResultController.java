@@ -1,4 +1,4 @@
-package hello.proxy.gameresult;
+package gooroommoon.algofi_core.gameresult;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
