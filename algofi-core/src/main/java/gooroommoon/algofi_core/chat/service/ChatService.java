@@ -39,7 +39,7 @@ public class ChatService {
                 .orElseThrow(() -> new IllegalArgumentException("현재 인증된 사용자의 정보를 찾을 수 없습니다."));
 
         // 채팅방 찾기
-        Chatroom chatroom = chatRoomService.findRoomById(messageDTO.getChatRoomId());
+        Chatroom chatroom = chatRoomService.findRoomById(messageDTO.getChatroomId());
 
         // Message 엔티티 생성 및 저장
         Message message = Message.builder()
@@ -56,9 +56,9 @@ public class ChatService {
     }
 
     public void sendMessage(MessageDTO message) {
-        log.info("접속 채팅방 ID: {}", message.getChatRoomId());
+        log.info("접속 채팅방 ID: {}", message.getChatroomId());
         log.info("접속 채팅방 Content: {}", message.getContent());
-        template.convertAndSend("/topic/room/" + message.getChatRoomId(), message);
+        template.convertAndSend("/topic/room/" + message.getChatroomId(), message);
     }
 
     @Transactional
@@ -72,7 +72,7 @@ public class ChatService {
                 .map(message -> MessageDTO.builder()
                         .type(message.getType())
                         .messageId(message.getId())
-                        .chatRoomId(message.getChatroomId().getChatroomId())
+                        .chatroomId(message.getChatroomId().getChatroomId())
                         .content(message.getContent())
                         .senderId(message.getSenderId().getLoginId())
                         .createdDate(message.getCreatedDate())
@@ -111,7 +111,7 @@ public class ChatService {
         MessageDTO messageDTO = MessageDTO.builder()
                 .type(message.getType())
                 .messageId(message.getId())
-                .chatRoomId(message.getChatroomId().getChatroomId())
+                .chatroomId(message.getChatroomId().getChatroomId())
                 .senderId(message.getSenderId().getLoginId())
                 .content(message.getContent())
                 .createdDate(message.getCreatedDate())
