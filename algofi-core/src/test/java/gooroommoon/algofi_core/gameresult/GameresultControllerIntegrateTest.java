@@ -1,4 +1,4 @@
-package hello.proxy.gameresult;
+package gooroommoon.algofi_core.gameresult;
 
 import gooroommoon.algofi_core.algorithmproblem.Algorithmproblem;
 import gooroommoon.algofi_core.algorithmproblem.AlgorithmproblemRepository;
@@ -10,7 +10,7 @@ import gooroommoon.algofi_core.auth.member.dto.TokenResponse;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
 import gooroommoon.algofi_core.chat.service.ChatRoomService;
 import gooroommoon.algofi_core.gameresult.dto.GameresultResponse;
-import gooroommoon.algofi_core.gameresult.dto.GameresultsResponse;
+import gooroommoon.algofi_core.gameresult.dto.GameresultsResponseWrapper;
 import gooroommoon.algofi_core.gameresult.membergameresult.MemberGameresult;
 import gooroommoon.algofi_core.gameresult.membergameresult.MemberGameresultRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -101,16 +101,13 @@ public class GameresultControllerIntegrateTest {
         MemberGameresult memberGameresult = new MemberGameresult(member, gameresult);
         memberGameresultRepository.save(memberGameresult);
 
-        HttpEntity<Objects> request = new HttpEntity<>(null, headers);
+        HttpEntity<Object> request = new HttpEntity<>(headers);
 
         ResponseEntity<GameresultResponse> response = testRestTemplate.exchange("/api/game/member/1", HttpMethod.GET, request, GameresultResponse.class);
 
-        String hostCodeContent = response.getBody().getHostCodeContent();
-        String guestCodeContent = response.getBody().getGuestCodeContent();
-
         assertNotNull(response.getBody());
-        assertEquals(hostCodeContent, HOST_CODE);
-        assertEquals(guestCodeContent, GUEST_CODE);
+        assertEquals(HOST_CODE, response.getBody().getHostCodeContent());
+        assertEquals(GUEST_CODE, response.getBody().getGuestCodeContent());
     }
 
     @Test
@@ -144,13 +141,15 @@ public class GameresultControllerIntegrateTest {
 
         HttpEntity<Objects> request = new HttpEntity<>(null, headers);
 
-        ResponseEntity<List<GameresultsResponse>> response = testRestTemplate.exchange(
+        ResponseEntity<GameresultsResponseWrapper> response = testRestTemplate.exchange(
                 "/api/game/member/gameResults",
                 HttpMethod.GET,
                 request,
-                new ParameterizedTypeReference<List<GameresultsResponse>>() {}
+                GameresultsResponseWrapper.class
         );
 
+        log.info("response.status = {}", response.getBody().getStatusCode());
+        log.info("response.message = {}", response.getBody().getMessage());
 
         assertNotNull(response.getBody());
 //        assertEquals(response.getBody().size(), 2);
