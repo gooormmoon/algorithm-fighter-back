@@ -11,7 +11,8 @@ public interface ChatRoomRepository extends JpaRepository<Chatroom, Long> {
 
     Optional<Chatroom> findByChatroomName(String name);
 
-    Optional<Chatroom> findByChatroomId(UUID chatRoomId);
+
+    Optional<Chatroom> findByChatroomId(UUID chatroomId);
 
     @Query(value = "SELECT * FROM Chatroom", nativeQuery = true)
     List<Chatroom> findAllChatroom();
