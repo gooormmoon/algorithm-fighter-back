@@ -24,6 +24,7 @@ public class ChatController {
 
     private final ChatService chatService;
     // TODO 글로벌 채팅방 id는 UUID 값으로 클라이언트가 정하기 추후 문제는 그때가서 해결
+    // TODO 필요 없으면 지우기
     @MessageMapping("/enter-room/{roomId}")
     public void enterMessage(@PathVariable("roomId") UUID roomId, Principal principal) {
         chatService.enterRoom(roomId, principal.getName());

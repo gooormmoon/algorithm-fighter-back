@@ -1,7 +1,10 @@
 package gooroommoon.algofi_core.game.session;
 
+import gooroommoon.algofi_core.chat.dto.MessageDTO;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
+import gooroommoon.algofi_core.chat.entity.MessageType;
 import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
+import gooroommoon.algofi_core.chat.service.ChatService;
 import gooroommoon.algofi_core.game.session.dto.GameSessionOverResponse;
 import gooroommoon.algofi_core.game.session.dto.GameSessionUpdateRequest;
 import gooroommoon.algofi_core.game.session.exception.AlreadyInGameSessionException;
@@ -9,8 +12,10 @@ import gooroommoon.algofi_core.game.session.exception.GameSessionNotFoundExcepti
 import gooroommoon.algofi_core.game.session.exception.NotAHostException;
 import gooroommoon.algofi_core.game.session.exception.PlayersNotReadyException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.util.Map;
 import java.util.concurrent.*;
@@ -25,6 +30,8 @@ public class GameSessionService {
     private final SimpMessagingTemplate messagingTemplate;
 
     private final ChatRoomRepository chatRoomRepository;
+
+    private final ChatService chatService;
 
     private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
 
@@ -42,7 +49,7 @@ public class GameSessionService {
         gameSessions.put(hostId, session);
         Chatroom chatroom = new Chatroom(session.getChatRoomId(), hostId);
         chatRoomRepository.save(chatroom);
-        //TODO 입장 메시지 출력 메서드 호출
+        chatService.enterRoom(session.getChatRoomId(), hostId);
 
         sendUpdateToPlayers(session);
     }
@@ -52,6 +59,7 @@ public class GameSessionService {
         GameSession session = getSession(hostId);
         session.addPlayer(playerId);
         gameSessions.put(playerId, session);
+        chatService.enterRoom(session.getChatRoomId(), playerId);
 
         sendUpdateToPlayers(session);
     }
@@ -134,5 +142,29 @@ public class GameSessionService {
                     id, "/queue/game/session", session.toResponse()
             );
         });
+    }
+
+    @EventListener
+    public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
+        if(event.getUser() == null || gameSessions.get(event.getUser().getName()) == null) {
+            return;
+        }
+
+        String playerId = event.getUser().getName();
+        GameSession session = getSession(playerId);
+        session.removePlayer(playerId);
+        if(playerId.equals(session.getHost())) {
+            removeSession(session);
+        }
+        //TODO 방 삭제 메시지 발행
+
+        // 퇴장 메시지 발행
+        String leaveMessage = playerId + "님이 퇴장하셨습니다.";
+        MessageDTO message = MessageDTO.builder()
+                .type(MessageType.LEAVE)
+                .chatRoomId(session.getChatRoomId())
+                .content(leaveMessage)
+                .build();
+        messagingTemplate.convertAndSend("/topic/room/" + session.getChatRoomId(), message);
     }
 }
