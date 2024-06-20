@@ -4,8 +4,37 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e1d77121-c330-4309-ac8d-e3b1af895a53" name="Changes" comment="chore: .idea 등 필요 없는 파일 삭제">
+    <list default="true" id="e1d77121-c330-4309-ac8d-e3b1af895a53" name="Changes" comment="refactor: 메소드 분리">
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/reports/tests/test/classes/gooroommoon.algofi_compile.controller.CompileApiControllerTest.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/reports/tests/test/css/base-style.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/reports/tests/test/css/style.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/reports/tests/test/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/reports/tests/test/js/report.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/reports/tests/test/packages/gooroommoon.algofi_compile.controller.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/resources/main/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/resources/test/fixture/Hello.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/resources/test/fixture/Hello.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/resources/test/fixture/Hello.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/resources/test/fixture/Hello.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/resources/test/fixture/PrintInput.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/resources/test/fixture/PrintInput.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/resources/test/fixture/PrintInput.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/resources/test/fixture/PrintInput.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/resources/test/fixture/While.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/test-results/test/TEST-gooroommoon.algofi_compile.controller.CompileApiControllerTest.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/test-results/test/binary/output.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/test-results/test/binary/output.bin.idx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/test-results/test/binary/results.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/tmp/compileJava/compileTransaction/stash-dir/CompileApiController.class.uniqueId1" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/tmp/compileJava/compileTransaction/stash-dir/CompileService.class.uniqueId0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/tmp/compileJava/previous-compilation-data.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/build/tmp/compileTestJava/previous-compilation-data.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/src/main/java/gooroommoon/algofi_compile/controller/CompileApiController.java" beforeDir="false" afterPath="$PROJECT_DIR$/algofi-compile/src/main/java/gooroommoon/algofi_compile/controller/CompileApiController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/src/main/java/gooroommoon/algofi_compile/exception/ApiControllerAdvice.java" beforeDir="false" afterPath="$PROJECT_DIR$/algofi-compile/src/main/java/gooroommoon/algofi_compile/exception/ApiControllerAdvice.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/algofi-compile/src/main/java/gooroommoon/algofi_compile/service/CompileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/algofi-compile/src/main/java/gooroommoon/algofi_compile/service/CompileService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/algofi-compile/src/test/java/gooroommoon/algofi_compile/controller/CompileApiControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/algofi-compile/src/test/java/gooroommoon/algofi_compile/controller/CompileApiControllerTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,6 +93,17 @@
     &quot;assignee&quot;: &quot;cherry-go-round&quot;
   }
 }</component>
+  <component name="GitHubPullRequestState">{
+  &quot;prStates&quot;: [
+    {
+      &quot;id&quot;: {
+        &quot;id&quot;: &quot;PR_kwDOMEsZg85y0O3L&quot;,
+        &quot;number&quot;: 23
+      },
+      &quot;lastSeen&quot;: 1718814057906
+    }
+  ]
+}</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/gooormmoon/algorithm-fighter-back.git&quot;,
@@ -96,6 +136,8 @@
     &quot;Gradle.CompileApiControllerTest.testPythonExecution.executor&quot;: &quot;Run&quot;,
     &quot;Gradle.CompileApiControllerTest.testPythonExecutionWithParam.executor&quot;: &quot;Run&quot;,
     &quot;Gradle.CompileApiControllerTest.timeoutTest.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.CompileApiControllerTest.wrongAnswerPy.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Tests in 'algofi-compile.test'.executor&quot;: &quot;Run&quot;,
     &quot;Gradle.algofi-compile [:PrintInput.main()].executor&quot;: &quot;Run&quot;,
     &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
     &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
@@ -117,7 +159,7 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected="Gradle.CompileApiControllerTest.testCExecution">
+  <component name="RunManager" selected="Gradle.CompileApiControllerTest">
     <configuration name="CompileApiControllerTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -132,30 +174,6 @@
             <option value=":test" />
             <option value="--tests" />
             <option value="&quot;gooroommoon.algofi_compile.controller.CompileApiControllerTest&quot;" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>true</RunAsTest>
-      <method v="2" />
-    </configuration>
-    <configuration name="CompileApiControllerTest.testCExecution" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/algofi-compile" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value=":test" />
-            <option value="--tests" />
-            <option value="&quot;gooroommoon.algofi_compile.controller.CompileApiControllerTest.testCExecution&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -238,6 +256,28 @@
       <RunAsTest>true</RunAsTest>
       <method v="2" />
     </configuration>
+    <configuration name="Tests in 'algofi-compile.test'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/algofi-compile" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":test" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <method v="2" />
+    </configuration>
     <configuration default="true" type="JetRunConfigurationType">
       <method v="2">
         <option name="Make" enabled="true" />
@@ -258,11 +298,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Gradle.CompileApiControllerTest.testCExecution" />
         <item itemvalue="Gradle.CompileApiControllerTest" />
-        <item itemvalue="Gradle.CompileApiControllerTest.testJavaExecution" />
         <item itemvalue="Gradle.CompileApiControllerTest.timeoutTest" />
+        <item itemvalue="Gradle.CompileApiControllerTest.testJavaExecution" />
         <item itemvalue="Gradle.CompileApiControllerTest.testJavaExecutionWithParam" />
+        <item itemvalue="Gradle.Tests in 'algofi-compile.test'" />
       </list>
     </recent_temporary>
   </component>
@@ -297,6 +337,12 @@
       <workItem from="1718782454957" duration="9000" />
       <workItem from="1718782484165" duration="13000" />
       <workItem from="1718782507178" duration="76000" />
+      <workItem from="1718782607133" duration="12837000" />
+      <workItem from="1718809775383" duration="4390000" />
+      <workItem from="1718814232423" duration="44000" />
+      <workItem from="1718846453651" duration="12394000" />
+      <workItem from="1718864008348" duration="2299000" />
+      <workItem from="1718866349190" duration="44000" />
     </task>
     <task id="LOCAL-00001" summary="refactor: CompileService 분리">
       <option name="closed" value="true" />
@@ -434,7 +480,39 @@
       <option name="project" value="LOCAL" />
       <updated>1718779412453</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="chore: .idea 등 필요 없는 파일 삭제">
+      <option name="closed" value="true" />
+      <created>1718782676312</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1718782676312</updated>
+    </task>
+    <task id="LOCAL-00019" summary="feat: 실행 후 파일 삭제 기능 추가, 예외 처리, Response 변경">
+      <option name="closed" value="true" />
+      <created>1718814047591</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1718814047591</updated>
+    </task>
+    <task id="LOCAL-00020" summary="refactor: 파일 생성, 실행, 삭제를 각 언어 별로 분리">
+      <option name="closed" value="true" />
+      <created>1718855462941</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1718855462941</updated>
+    </task>
+    <task id="LOCAL-00021" summary="refactor: 메소드 분리">
+      <option name="closed" value="true" />
+      <created>1718856161194</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1718856161194</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -458,7 +536,6 @@
     <MESSAGE value="refactor: 불필요한 코드 제거 (toString(), throws Exception)" />
     <MESSAGE value="feat: input 전달 기능 구현" />
     <MESSAGE value="test: input 전달 기능 테스트" />
-    <MESSAGE value="refactor: 메소드 분리" />
     <MESSAGE value="refactor: NoArgsConstructor 제거, 필드 final 키워드 추가 (CodeExecutionRequest)" />
     <MESSAGE value="refactor: 성공 응답을 String에서 CodeExecutionResponse로 변경" />
     <MESSAGE value="feat: 코드 실행 시 타임 아웃 기능 추가" />
@@ -467,6 +544,19 @@
     <MESSAGE value="feat: settings" />
     <MESSAGE value="feat: 타임아웃 시 프로세스 제거" />
     <MESSAGE value="chore: .idea 등 필요 없는 파일 삭제" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: .idea 등 필요 없는 파일 삭제" />
+    <MESSAGE value="feat: 실행 후 파일 삭제 기능 추가, 예외 처리, Response 변경" />
+    <MESSAGE value="refactor: 파일 생성, 실행, 삭제를 각 언어 별로 분리" />
+    <MESSAGE value="refactor: 메소드 분리" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: 메소드 분리" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="gooroommoon.algofi_compile.exception.CodeException" package="gooroommoon.algofi_compile.exception" />
+          <option name="timeStamp" value="3" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
