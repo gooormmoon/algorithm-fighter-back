@@ -12,11 +12,6 @@ import java.util.UUID;
 public class Chatroom {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
     @Column(name = "CHATROOM_ID", updatable = false, nullable = false)
     private UUID chatroomId;
 
