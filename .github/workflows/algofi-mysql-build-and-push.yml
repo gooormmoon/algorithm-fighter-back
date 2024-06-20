@@ -46,7 +46,7 @@ jobs:
         if: success()
         run: |
           commit_message=$(echo "${{ github.event.head_commit.message }}" | jq -sRr @uri)
-          image_tag="${{ secrets.DOCKERHUB_USERNAME }}/algofi-core:${{ github.sha }}"
+          image_tag="${{ secrets.DOCKERHUB_USERNAME }}/algofi-mysql:${{ github.sha }}"
 
           payload=$(jq -n \
             --arg content "Docker image has been successfully built and pushed to Docker Hub.\nimage: ${image_tag}\nmessage: ${commit_message}" \
@@ -55,4 +55,4 @@ jobs:
 
           curl -H "Content-Type: application/json" \
                -d "$payload" \
-               "${{ secrets.DISCORD_WEBHOOK_URL }}"
+               ${{ secrets.DISCORD_WEBHOOK_URL }}
