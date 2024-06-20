@@ -10,10 +10,9 @@ import gooroommoon.algofi_core.auth.member.dto.TokenResponse;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
 import gooroommoon.algofi_core.chat.service.ChatRoomService;
 import gooroommoon.algofi_core.gameresult.dto.GameresultResponse;
-import gooroommoon.algofi_core.gameresult.dto.GameresultsResponseWrapper;
+import gooroommoon.algofi_core.gameresult.dto.GameresultsResponse;
 import gooroommoon.algofi_core.gameresult.membergameresult.MemberGameresult;
 import gooroommoon.algofi_core.gameresult.membergameresult.MemberGameresultRepository;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Profile("dev")
-@Slf4j
 public class GameresultControllerIntegrateTest {
 
     public static final String HOST_CODE = "hostCode";
@@ -141,18 +139,11 @@ public class GameresultControllerIntegrateTest {
 
         HttpEntity<Objects> request = new HttpEntity<>(null, headers);
 
-        ResponseEntity<GameresultsResponseWrapper> response = testRestTemplate.exchange(
-                "/api/game/member/gameResults",
-                HttpMethod.GET,
-                request,
-                GameresultsResponseWrapper.class
-        );
-
-        log.info("response.status = {}", response.getBody().getStatusCode());
-        log.info("response.message = {}", response.getBody().getMessage());
+        ResponseEntity<List<GameresultsResponse>> response = testRestTemplate.exchange(
+                "/api/game/member/gameresults", HttpMethod.GET, request, new ParameterizedTypeReference<List<GameresultsResponse>>() {});
 
         assertNotNull(response.getBody());
-//        assertEquals(response.getBody().size(), 2);
+        assertEquals(response.getBody().size(), 2);
     }
 
     ResponseEntity<MemberResponse> registerMember() {
