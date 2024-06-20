@@ -44,8 +44,7 @@ public class ChatService {
                 .orElseThrow(() -> new IllegalArgumentException("현재 인증된 사용자의 정보를 찾을 수 없습니다."));
 
         // 채팅방 찾기
-        Chatroom chatroom = chatRoomRepository.findByChatroomId(messageDTO.getChatRoomId())
-                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
+        Chatroom chatroom = chatRoomService.ensureChatRoomExists(messageDTO.getChatRoomId());
 
         // Message 엔티티 생성 및 저장
         Message message = Message.builder()
@@ -101,8 +100,7 @@ public class ChatService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
         // 채팅방 찾기
-        Chatroom chatroom = chatRoomRepository.findByChatroomId(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
+        Chatroom chatroom = chatRoomService.ensureChatRoomExists(roomId);
 
         // Message 저장
         Message message = Message.builder()
