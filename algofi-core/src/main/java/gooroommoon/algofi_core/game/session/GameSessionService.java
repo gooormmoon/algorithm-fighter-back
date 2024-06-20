@@ -42,6 +42,7 @@ public class GameSessionService {
         gameSessions.put(hostId, session);
         Chatroom chatroom = new Chatroom(session.getChatRoomId(), hostId);
         chatRoomRepository.save(chatroom);
+        //TODO 입장 메시지 출력 메서드 호출
 
         sendUpdateToPlayers(session);
     }
