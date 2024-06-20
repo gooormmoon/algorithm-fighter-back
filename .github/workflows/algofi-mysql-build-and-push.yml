@@ -55,5 +55,4 @@ jobs:
 
           curl -H "Content-Type: application/json" \
                -d "$payload" \
-               https://discord.com/api/webhooks/1248567167566217276/W2qD9qYOADW1gtG62HK43fE3xqtZxLT8ClkpuiS5HbmNsdxmWt2kGWYngrxs53TBBBUO/github
-        shell: /usr/bin/bash -e {0}
+               "${{ secrets.DISCORD_WEBHOOK_URL }}"
