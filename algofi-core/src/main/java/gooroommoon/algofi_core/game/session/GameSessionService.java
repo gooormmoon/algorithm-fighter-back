@@ -84,7 +84,7 @@ public class GameSessionService {
             throw new NotAHostException("방장만 게임을 시작할 수 있습니다.");
         }
         //TODO 문제 가져와서 넣기
-        //알고리즘 문제 가져오기
+        //랜덤 알고리즘문제
         algorithmProblemService.getRandom(session.getProblemLevel());
         session.start();
         //TODO 알고리즘 문제 가져와서 메시지 발행
