@@ -84,6 +84,7 @@ public class ChatService {
         String username = principal.getName();
 
         // 사용자가 참여한 채팅방 조회
+        //TODO 챗룸이 사용자 이름으로 되어있지 않으면 에러 ( 글로벌, 호스트가 아닌 유저 등에서 오류 발생함 )
         Optional<Chatroom> optionalChatRoom = chatRoomRepository.findByChatroomName(username);
         Chatroom chatRoom = optionalChatRoom
                 .orElseThrow(() -> new IllegalArgumentException("Chat room not found."));
@@ -138,6 +139,7 @@ public class ChatService {
                 .orElseThrow(() -> new IllegalArgumentException("Member not found."));
 
         // 채팅방이 존재하는지 확인하고 없으면 생성하기
+        //TODO 유저가 들어올 때 마다 룸 이름이 바뀜
         Chatroom chatRoom = chatRoomService.ensureChatRoomExists(roomId);
         chatRoom.setChatroomId(roomId);
         chatRoom.setChatroomName(username);

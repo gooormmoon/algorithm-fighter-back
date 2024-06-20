@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ScheduledFuture;
 import java.util.stream.Stream;
@@ -32,6 +33,8 @@ public class GameSession {
 
     private boolean isStarted;
 
+    private UUID chatRoomId;
+
     @Setter
     private ScheduledFuture<?> timeOverTask;
 
@@ -44,6 +47,7 @@ public class GameSession {
         this.problemLevel = "1";
         this.timerTime = 1200;
         this.isStarted = false;
+        this.chatRoomId = UUID.randomUUID();
         updateSettings(title, problemLevel, timerTime);
     }
 
@@ -105,6 +109,7 @@ public class GameSession {
                 .maxPlayer(maxPlayer)
                 .problemLevel(problemLevel)
                 .timerTime(timerTime)
+                .chatRoomId(chatRoomId)
                 .build();
     }
 }
