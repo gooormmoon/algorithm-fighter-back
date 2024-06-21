@@ -36,7 +36,6 @@ public class JudgeService {
             waitForTerminate(process);
             return output;
         } catch (TimeoutException e) {
-            destroy(process);
             throw new CodeExecutionException(JudgeResult.TIME_LIMIT_EXCEEDED);
         } catch (RuntimeException e) {
             throw new CodeExecutionException(JudgeResult.RUNTIME_ERROR);
@@ -45,7 +44,12 @@ public class JudgeService {
         }
     }
 
-    public void waitForTerminate(Process process) {
+    public void destroy(Process process) {
+        destroyChildren(process);
+        process.destroyForcibly();
+    }
+
+    private void waitForTerminate(Process process) {
         int exitCode = waitFor(process);
 
         if (exitCode != 0) {
@@ -93,11 +97,6 @@ public class JudgeService {
         }
 
         return output;
-    }
-
-    public void destroy(Process process) {
-        destroyChildren(process);
-        process.destroyForcibly();
     }
 
     private void destroyChildren(Process process) {

@@ -124,9 +124,9 @@ class InputJudgeControllerTest {
         String pythonCode = fileToString(file);
         CodeExecutionRequest request = new CodeExecutionRequest(pythonCode, "python", null, "Hello, C\n");
 
-        ResponseEntity<CodeExecutionResponse> response = inputJudgeController.judgeInput(request);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(Objects.requireNonNull(response.getBody()).getMessage()).isEqualTo(JudgeResult.WRONG_ANSWER.getMessage());
+        assertThatThrownBy(() -> inputJudgeController.judgeInput(request))
+                .isInstanceOf(CodeExecutionException.class)
+                .hasMessageContaining(JudgeResult.WRONG_ANSWER.getMessage());
     }
 
     private String fileToString(File file) throws IOException {

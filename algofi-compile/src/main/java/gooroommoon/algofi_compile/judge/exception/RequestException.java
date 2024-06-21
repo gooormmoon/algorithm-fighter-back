@@ -1,10 +1,10 @@
 package gooroommoon.algofi_compile.judge.exception;
 
-import gooroommoon.algofi_compile.input.InputJudgeControllerAdvice;
+import gooroommoon.algofi_compile.input.InputJudgeController;
 
 /**
  * 이 예외가 발생했다는 것은 사용자가 잘못된 요청을 보냈음을 의미하므로 400 Bad Request 반환
- * @see InputJudgeControllerAdvice
+ * @see InputJudgeController
  */
 public class RequestException extends RuntimeException {
     public RequestException() {
