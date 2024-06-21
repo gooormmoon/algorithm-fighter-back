@@ -5,22 +5,22 @@ import gooroommoon.algofi_core.algorithmproblem.AlgorithmproblemService;
 import gooroommoon.algofi_core.auth.member.MemberService;
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
+import gooroommoon.algofi_core.chat.entity.Message;
 import gooroommoon.algofi_core.chat.entity.MessageType;
 import gooroommoon.algofi_core.chat.repository.ChatroomRepository;
 import gooroommoon.algofi_core.chat.service.ChatService;
 import gooroommoon.algofi_core.game.session.dto.*;
-import gooroommoon.algofi_core.game.session.exception.AlreadyInGameSessionException;
-import gooroommoon.algofi_core.game.session.exception.GameSessionNotFoundException;
-import gooroommoon.algofi_core.game.session.exception.NotAHostException;
-import gooroommoon.algofi_core.game.session.exception.PlayersNotReadyException;
+import gooroommoon.algofi_core.game.session.exception.*;
 import gooroommoon.algofi_core.gameresult.GameresultService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -33,6 +33,7 @@ public class GameSessionService {
     private final Map<String, GameSession> gameSessions = new ConcurrentHashMap<>();
     private final SimpMessagingTemplate messagingTemplate;
     private final SimpUserRegistry userRegistry;
+    private final WebClient webClient;
 
     private final ChatroomRepository chatRoomRepository;
     private final MemberService memberService;
@@ -56,7 +57,7 @@ public class GameSessionService {
         GameSessionsResponse response = new GameSessionsResponse(new ArrayList<>());
         Set<GameSession> sessions = new HashSet<>(gameSessions.values());
 
-        sessions.stream().forEach(session ->
+        sessions.forEach(session ->
             response.getRooms().add(GameSessionsResponse.Session.builder()
                     .host(memberService.getMemberNickName(session.getHostId()))
                     .hostId(session.getHostId())
@@ -76,7 +77,7 @@ public class GameSessionService {
 
     public void sendSessions() {
         GameSessionsResponse response = getSessionsResponse();
-        userRegistry.getUsers().stream().forEach(user -> {
+        userRegistry.getUsers().forEach(user -> {
             String playerId = user.getPrincipal().getName();
             if(!gameSessions.containsKey(playerId)) {
                 messagingTemplate.convertAndSendToUser(playerId, "/queue/game/session", response);
@@ -136,7 +137,6 @@ public class GameSessionService {
         algorithmproblemService.getRandom(session.getProblemLevel());
         session.start();
         //TODO 알고리즘 문제 가져와서 메시지 발행
-        //TODO 러닝타임 기록
         GameSessionService gameSessionService = this;
         ScheduledFuture<?> timeOverTask = executorService.schedule(() ->
             gameSessionService.closeGame(session,null, session.getTimerTime())
@@ -145,10 +145,27 @@ public class GameSessionService {
     }
 
     public void submitCode(String playerId, GameCodeRequest request) {
-        //TODO 제출된 코드 실행 및 결과 받기
-        //TODO 제출했습니다 메시지 전송
         GameSession session = getSession(playerId);
+        if(!session.isStarted()) {
+            throw new GameIsNotStartedException("게임이 아직 시작되지 않았습니다.");
+        }
+        //TODO 실제 알고리즘 ID로 변경
 
+        sendChat(session.getChatroomId(), playerId, "코드를 제출했습니다!");
+        SubmitCodeRequest submitRequest = new SubmitCodeRequest(1L, request.getLanguage(), request.getCode());
+        webClient.post()
+                .uri("/api/judge-problem")
+                .body(submitRequest, SubmitCodeRequest.class)
+                .retrieve()
+                .toEntity(SubmitResultResponse.class)
+                .subscribe(response -> {
+                    String message = response.getBody().getMessage();
+                    if(message.equals("맞았습니다.")) {
+                        closeGame(session, playerId, (int)(System.currentTimeMillis() - session.getStartTime()));
+                    } else {
+                        sendChat(session.getChatroomId(), playerId, "틀렸습니다!");
+                    }
+                });
     }
 
     public void closeGame(GameSession session, String winnerId, int runningTime) {
@@ -173,7 +190,9 @@ public class GameSessionService {
     public void savePlayerCode(String playerId, GameCodeRequest request) {
 
         GameSession session = getSession(playerId);
-        if(session.isStarted()) {
+        if(!session.isStarted()) {
+            throw new GameIsNotStartedException("게임이 아직 시작되지 않았습니다.");
+        }
             if (playerId.equals(session.getHostId())) {
                 session.setHostGameCode(request.getCode());
             } else {
@@ -183,7 +202,7 @@ public class GameSessionService {
             if (session.getHostGameCode() != null && session.getOtherGameCode() != null) {
                 saveResult(session);
             }
-        }
+
     }
 
     private void saveResult(GameSession session) {
@@ -207,6 +226,17 @@ public class GameSessionService {
                     id, "/queue/game/session", toResponse(session)
             )
         );
+    }
+
+    private void sendChat(String chatroomId, String senderId, String content) {
+        MessageDTO chat = MessageDTO.builder()
+                .type(MessageType.TALK)
+                .chatroomId(chatroomId)
+                .content(content)
+                .senderId(senderId)
+                .createdDate(LocalDateTime.now())
+                .build();
+        messagingTemplate.convertAndSend("/topic/room/" + chatroomId, chat);
     }
 
     public GameSessionResponse toResponse(GameSession session) {

@@ -37,6 +37,8 @@ public class GameSession {
 
     private boolean isStarted;
 
+    private long startTime;
+
     private final String chatroomId;
 
     @Setter
@@ -103,5 +105,6 @@ public class GameSession {
     protected void start() {
         //TODO 알고리즘 문제 받아오기
         isStarted = true;
+        startTime = System.currentTimeMillis();
     }
 }
