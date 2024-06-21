@@ -6,13 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.*;
 
-public interface ChatRoomRepository extends JpaRepository<Chatroom, Long> {
-    boolean existsByChatroomId(UUID chatroomId);
+public interface ChatroomRepository extends JpaRepository<Chatroom, String> {
+    boolean existsByChatroomId(String chatroomId);
 
     Optional<Chatroom> findByChatroomName(String name);
 
-
-    Optional<Chatroom> findByChatroomId(UUID chatroomId);
+    Optional<Chatroom> findByChatroomId(String chatroomId);
 
     @Query(value = "SELECT * FROM Chatroom", nativeQuery = true)
     List<Chatroom> findAllChatroom();

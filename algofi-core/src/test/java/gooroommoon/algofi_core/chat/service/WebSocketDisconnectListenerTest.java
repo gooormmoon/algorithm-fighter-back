@@ -3,8 +3,7 @@ package gooroommoon.algofi_core.chat.service;
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
 import gooroommoon.algofi_core.chat.entity.MessageType;
-import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
-import gooroommoon.algofi_core.chat.service.ChatService;
+import gooroommoon.algofi_core.chat.repository.ChatroomRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -36,7 +35,7 @@ public class WebSocketDisconnectListenerTest {
     private ChatService chatService;
 
     @MockBean
-    private ChatRoomRepository chatRoomRepository;
+    private ChatroomRepository chatRoomRepository;
 
     @MockBean
     private SimpMessagingTemplate template;
@@ -70,7 +69,7 @@ public class WebSocketDisconnectListenerTest {
 
         // 가짜 Chatroom 객체 생성
         Chatroom chatRoom = new Chatroom();
-        chatRoom.setChatroomId(UUID.randomUUID());
+        chatRoom.setChatroomId(UUID.randomUUID().toString());
         chatRoom.setChatroomName("user1");
 
         // chatRoomRepository mock 객체 설정
@@ -97,7 +96,7 @@ public class WebSocketDisconnectListenerTest {
         assertEquals("/topic/room/" + chatRoom.getChatroomId(), destinationCaptor.getValue());
         MessageDTO capturedMessageDTO = messageCaptor.getValue();
         assertEquals(MessageType.LEAVE, capturedMessageDTO.getType());
-        assertEquals(chatRoom.getChatroomId(), capturedMessageDTO.getChatRoomId());
+        assertEquals(chatRoom.getChatroomId(), capturedMessageDTO.getChatroomId());
         assertTrue(capturedMessageDTO.getContent().contains("user1"));
     }
 }

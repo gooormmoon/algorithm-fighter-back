@@ -27,5 +27,5 @@ public class GameSessionResponse {
 
     private int timerTime;
 
-    private UUID chatRoomId;
+    private String chatroomId;
 }

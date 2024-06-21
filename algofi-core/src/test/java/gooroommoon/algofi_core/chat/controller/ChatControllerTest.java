@@ -54,7 +54,7 @@ public class ChatControllerTest {
         StompSession stompSession = stompClient.connect(websocketUri, new StompSessionHandlerAdapter() {}).get(1, TimeUnit.SECONDS);
 
         // Subscribe to the WebSocket topic
-        UUID roomId = UUID.randomUUID();
+        String roomId = UUID.randomUUID().toString();
         StompHeaders headers = new StompHeaders();
         headers.setDestination(WEBSOCKET_TOPIC + roomId.toString());
         headers.set("username", "testUser");
@@ -67,7 +67,7 @@ public class ChatControllerTest {
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
                 MessageDTO messageDTO = (MessageDTO) payload;
-                assertEquals(roomId, messageDTO.getChatRoomId());
+                assertEquals(roomId, messageDTO.getChatroomId());
                 assertEquals("testUser님이 입장하셨습니다.", messageDTO.getContent());
                 assertEquals(MessageType.ENTER, messageDTO.getType());
             }
@@ -76,7 +76,7 @@ public class ChatControllerTest {
         // Send message to WebSocket endpoint
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setType(MessageType.ENTER);
-        messageDTO.setChatRoomId(roomId);
+        messageDTO.setChatroomId(roomId);
         messageDTO.setContent("testUser님이 입장하셨습니다.");
 
         stompSession.send("/app/enter-room/"+ roomId.toString(), messageDTO);
@@ -99,9 +99,9 @@ public class ChatControllerTest {
         StompSession stompSession = stompClient.connect(websocketUri, new StompSessionHandlerAdapter() {}).get(1, TimeUnit.SECONDS);
 
         // Subscribe to the WebSocket topic
-        UUID roomId = UUID.randomUUID();
+        String  roomId = UUID.randomUUID().toString();
         StompHeaders headers = new StompHeaders();
-        headers.setDestination(WEBSOCKET_TOPIC + roomId.toString());
+        headers.setDestination(WEBSOCKET_TOPIC + roomId);
         stompSession.subscribe(headers, new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
@@ -119,7 +119,7 @@ public class ChatControllerTest {
         // Send message to WebSocket endpoint
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setType(MessageType.TALK);
-        messageDTO.setChatRoomId(roomId);
+        messageDTO.setChatroomId(roomId);
         messageDTO.setContent("Test message content");
 
         stompSession.send("/app/send-message", messageDTO);

@@ -6,9 +6,8 @@ import gooroommoon.algofi_core.chat.dto.MessageDTO;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
 import gooroommoon.algofi_core.chat.entity.Message;
 import gooroommoon.algofi_core.chat.entity.MessageType;
-import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
+import gooroommoon.algofi_core.chat.repository.ChatroomRepository;
 import gooroommoon.algofi_core.chat.repository.MessageRepository;
-import gooroommoon.algofi_core.chat.service.ChatService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +35,7 @@ public class ChatServiceTest {
     private MemberRepository memberRepository;
 
     @Mock
-    private ChatRoomRepository chatRoomRepository;
+    private ChatroomRepository chatRoomRepository;
 
     @Mock
     private MessageRepository messageRepository;
@@ -59,14 +58,14 @@ public class ChatServiceTest {
 
         // 가짜 채팅방 생성
         Chatroom mockChatroom = new Chatroom();
-        UUID roomId = UUID.randomUUID();
+        String roomId = UUID.randomUUID().toString();
         mockChatroom.setChatroomId(roomId);
         when(chatRoomRepository.findByChatroomId(roomId)).thenReturn(Optional.of(mockChatroom));
 
         // 가짜 메시지 DTO 생성
         MessageDTO messageDTO = MessageDTO.builder()
                 .type(MessageType.TALK)
-                .chatRoomId(roomId)
+                .chatroomId(roomId)
                 .content("Hello, world!")
                 .build();
 
@@ -82,12 +81,12 @@ public class ChatServiceTest {
     public void testSendMessage() {
         // 가짜 메시지 DTO 생성
         MessageDTO messageDTO = new MessageDTO();
-        UUID roomId = UUID.randomUUID();
-        messageDTO.setChatRoomId(roomId);
+        String roomId = UUID.randomUUID().toString();
+        messageDTO.setChatroomId(roomId);
         messageDTO.setContent("Hello, world!");
 
         // sendMessage 호출
-        chatService.sendMessage(messageDTO);
+//        chatService.sendMessage(messageDTO, );
 
         // template.convertAndSend() 메서드가 한 번 호출되었는지 검증
         verify(template, times(1)).convertAndSend("/topic/room/" + roomId, messageDTO);
