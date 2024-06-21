@@ -41,7 +41,7 @@ public class GetMessagesInChattingRoomTest {
         List<MessageDTO> messages = Arrays.asList(
                 MessageDTO.builder()
                         .type(MessageType.TALK)
-                        .messageId(1L)
+//                        .messageId(1L)
                         .chatroomId(chatroomId)
                         .senderId("user") // Mock senderId
                         .content("Hello!")
@@ -49,7 +49,7 @@ public class GetMessagesInChattingRoomTest {
                         .build(),
                 MessageDTO.builder()
                         .type(MessageType.TALK)
-                        .messageId(2L)
+//                        .messageId(2L)
                         .chatroomId(chatroomId)
                         .senderId("user") // Mock senderId
                         .content("Hi!")

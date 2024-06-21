@@ -9,7 +9,6 @@ import gooroommoon.algofi_core.auth.member.dto.MemberResponse;
 import gooroommoon.algofi_core.auth.member.dto.TokenResponse;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
 import gooroommoon.algofi_core.chat.repository.ChatroomRepository;
-import gooroommoon.algofi_core.chat.service.ChatroomService;
 import gooroommoon.algofi_core.gameresult.dto.GameresultResponse;
 import gooroommoon.algofi_core.gameresult.dto.GameresultsResponse;
 import gooroommoon.algofi_core.gameresult.membergameresult.MemberGameresult;
@@ -53,9 +52,6 @@ public class GameresultControllerIntegrateTest {
 
     @Autowired
     AlgorithmproblemRepository algorithmproblemRepository;
-
-    @Autowired
-    ChatroomService chatRoomService;
 
     @Autowired
     GameresultRepository gameresultRepository;
