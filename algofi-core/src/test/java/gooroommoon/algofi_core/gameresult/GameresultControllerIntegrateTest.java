@@ -8,7 +8,8 @@ import gooroommoon.algofi_core.auth.member.dto.MemberRequest;
 import gooroommoon.algofi_core.auth.member.dto.MemberResponse;
 import gooroommoon.algofi_core.auth.member.dto.TokenResponse;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
-import gooroommoon.algofi_core.chat.service.ChatRoomService;
+import gooroommoon.algofi_core.chat.repository.ChatroomRepository;
+import gooroommoon.algofi_core.chat.service.ChatroomService;
 import gooroommoon.algofi_core.gameresult.dto.GameresultResponse;
 import gooroommoon.algofi_core.gameresult.dto.GameresultsResponse;
 import gooroommoon.algofi_core.gameresult.membergameresult.MemberGameresult;
@@ -19,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -27,6 +27,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.Objects;
@@ -35,8 +36,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Profile("dev")
+@ActiveProfiles("dev")
 public class GameresultControllerIntegrateTest {
+
+    /**
+     * 테스트 실행 시 application-dev.properties에서 spring.jpa.hibernate.ddl-auto=create  (update --> create로 변경해야함.)
+     */
 
     public static final String HOST_CODE = "hostCode";
     public static final String GUEST_CODE = "guestCode";
@@ -50,7 +55,7 @@ public class GameresultControllerIntegrateTest {
     AlgorithmproblemRepository algorithmproblemRepository;
 
     @Autowired
-    ChatRoomService chatRoomService;
+    ChatroomService chatRoomService;
 
     @Autowired
     GameresultRepository gameresultRepository;
@@ -60,6 +65,9 @@ public class GameresultControllerIntegrateTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @Autowired
+    private ChatroomRepository chatroomRepository;
 
     @AfterEach
     void afterEach() {
@@ -88,22 +96,26 @@ public class GameresultControllerIntegrateTest {
         Algorithmproblem algorithmproblem = new Algorithmproblem("title", "1", "content!", 20);
         algorithmproblemRepository.save(algorithmproblem);
 
-        Chatroom chatroom = chatRoomService.saveChatRoom("1번방");
+        Chatroom chatroom = new Chatroom();
+        chatroom.setChatroomId("global");
+        chatroom.setChatroomName("1번방");
+        chatroomRepository.save(chatroom);
 
         Member member = memberRepository.findByLoginId("test").orElseThrow(() ->
                 new UsernameNotFoundException("유저가 존재하지 않습니다."));
 
         Gameresult gameresult = new Gameresult(20, HOST_CODE, GUEST_CODE, algorithmproblem, chatroom);
         gameresultRepository.save(gameresult);
+        Long gameresultId = gameresult.getGameresultId();
 
         MemberGameresult memberGameresult = new MemberGameresult(member, gameresult);
         memberGameresultRepository.save(memberGameresult);
 
         HttpEntity<Object> request = new HttpEntity<>(headers);
 
-        ResponseEntity<GameresultResponse> response = testRestTemplate.exchange("/api/game/member/1", HttpMethod.GET, request, GameresultResponse.class);
+        ResponseEntity<GameresultResponse> response = testRestTemplate.exchange("/api/game/member/" + gameresultId, HttpMethod.GET, request, GameresultResponse.class);
 
-        assertNotNull(response.getBody());
+//        assertNotNull(response.getBody());
         assertEquals(HOST_CODE, response.getBody().getHostCodeContent());
         assertEquals(GUEST_CODE, response.getBody().getGuestCodeContent());
     }
@@ -120,8 +132,14 @@ public class GameresultControllerIntegrateTest {
         Algorithmproblem algorithmproblem = new Algorithmproblem("title", "1", "content!", 20);
         algorithmproblemRepository.save(algorithmproblem);
 
-        Chatroom chatroom = chatRoomService.saveChatRoom("1번방");
-        Chatroom chatroom2 = chatRoomService.saveChatRoom("2번방");
+        Chatroom chatroom = new Chatroom();
+        chatroom.setChatroomId("global");
+        chatroom.setChatroomName("1번방");
+        chatroomRepository.save(chatroom);
+        Chatroom chatroom2 = new Chatroom();
+        chatroom2.setChatroomId("local");
+        chatroom2.setChatroomName("2번방");
+        chatroomRepository.save(chatroom2);
 
         Member member = memberRepository.findByLoginId("test").orElseThrow(() ->
                 new UsernameNotFoundException("유저가 존재하지 않습니다."));
