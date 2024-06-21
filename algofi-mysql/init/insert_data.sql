@@ -108,6 +108,20 @@ VALUES
 -- insert chatroom
 INSERT INTO chatroom(chatroom_id, chatroom_name) VALUES('global','GLOBAL');
 
+
+-- insert message
+-- INSERT INTO message(content, sender_id, chatroom_id) VALUES ('안녕하세요!!~!', 1,1);
+
+-- insert member_chatroom
+-- INSERT INTO member_chatroom(chatroom_id, member_id) VALUES (1,1);
+
+-- insert gameresult
+-- INSERT INTO gameresult(running_time, member_code_content, other_member_code_content, algorithm_problem_id, chatroom_id)
+-- VALUES('20:30', 'code1' , 'code2', 1 , 1);
+
+-- insert member_gameresult
+-- INSERT INTO member_gameresult(game_result_id, member_id) VALUES (1, 1);
+
 -- insert testcase
 INSERT INTO testcase(test_input, test_output, algorithm_problem_id)
 VALUES
@@ -189,4 +203,3 @@ VALUES
 --
 -- insert member_gameresult
 -- INSERT INTO member_gameresult(game_result_id, member_id) VALUES (1, 1);
-

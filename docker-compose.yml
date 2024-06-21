@@ -1,4 +1,4 @@
-version: '3'
+version: "3.8"
 services:
   algofi-mysql:
     build: ./algofi-mysql
@@ -6,11 +6,12 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - mydata:/var/lib/mysql/data
+      - mydata:/var/lib/mysql
+      - ./algofi-mysql/init:/docker-entrypoint-initdb.d
     deploy:
       resources:
         limits:
-          cpus: '1'
+          cpus: "1"
           memory: 256M
     restart: always
 
@@ -26,56 +27,20 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.5'
+          cpus: "1.5"
           memory: 512M
     restart: on-failure
 
-  algofi-compile-c:
-    build: ./algofi-compile-c
-    image: algofi-compile-c:5.0.0-compose
+  algofi-compile:
+    build: ./algofi-compile
+    image: algofi-compile:5.0.0-compose
     ports:
-      - 9001:9001
+      - 9000:9000
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 64M
-    restart: on-failure
-
-  algofi-compile-java:
-    build: ./algofi-compile-java
-    image: algofi-compile-java:5.0.0-compose
-    ports:
-      - 9002:9002
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 64M
-    restart: on-failure
-
-  algofi-compile-javascript:
-    build: ./algofi-compile-javascript
-    image: algofi-compile-javascript:5.0.0-compose
-    ports:
-      - 9003:9003
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 64M
-    restart: on-failure
-
-  algofi-compile-python:
-    build: ./algofi-compile-python
-    image: algofi-compile-python:5.0.0-compose
-    ports:
-      - 9004:9004
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 64M
+          cpus: "1.5"
+          memory: 512M
     restart: on-failure
 
 volumes:
