@@ -1,5 +1,7 @@
 package gooroommoon.algofi_core.game.session;
 
+
+import gooroommoon.algofi_core.algorithmproblem.AlgorithmproblemService;
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
 import gooroommoon.algofi_core.chat.entity.MessageType;
@@ -11,6 +13,7 @@ import gooroommoon.algofi_core.game.session.exception.AlreadyInGameSessionExcept
 import gooroommoon.algofi_core.game.session.exception.GameSessionNotFoundException;
 import gooroommoon.algofi_core.game.session.exception.NotAHostException;
 import gooroommoon.algofi_core.game.session.exception.PlayersNotReadyException;
+import gooroommoon.algofi_core.gameresult.GameresultService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -34,6 +37,9 @@ public class GameSessionService {
     private final ChatService chatService;
 
     private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+
+    private final AlgorithmproblemService algorithmproblemService;
+    private final GameresultService gameresultService;
 
     public GameSession getSession(String playerId) {
         GameSession session = gameSessions.get(playerId);
@@ -91,6 +97,8 @@ public class GameSessionService {
             throw new NotAHostException("방장만 게임을 시작할 수 있습니다.");
         }
         //TODO 문제 가져와서 넣기
+        //랜덤 알고리즘문제
+        algorithmproblemService.getRandom(session.getProblemLevel());
         session.start();
         //TODO 알고리즘 문제 가져와서 메시지 발행
         GameSessionService gameSessionService = this;
@@ -123,6 +131,8 @@ public class GameSessionService {
             });
         }
         //TODO 게임 결과 저장
+        //TODO gameSession에서 필요한 것 다 가져오기
+        gameresultService.save(session, runningTime);
         removeSession(session);
     }
 
