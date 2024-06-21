@@ -20,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,10 +33,13 @@ public class ChatServiceTest {
     private ChatService chatService;
 
     @Mock
-    private MemberRepository memberRepository;
+    private ChatroomService chatRoomService;
 
     @Mock
-    private ChatroomRepository chatRoomRepository;
+    private ChatroomRepository chatroomRepository;
+
+    @Mock
+    private MemberRepository memberRepository;
 
     @Mock
     private MessageRepository messageRepository;
@@ -50,22 +54,25 @@ public class ChatServiceTest {
         Authentication authentication = new UsernamePasswordAuthenticationToken("testUser", "password");
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 가짜 멤버 생성
+        // 가짜 회원 생성 및 MemberRepository 모킹
         Member mockMember = new Member();
-        mockMember.setNickname("TestUser");
         mockMember.setLoginId("testUser");
-        when(memberRepository.findByLoginId(anyString())).thenReturn(Optional.of(mockMember));
+        when(memberRepository.findByLoginId("testUser")).thenReturn(Optional.of(mockMember));
 
         // 가짜 채팅방 생성
-        Chatroom mockChatroom = new Chatroom();
         String roomId = UUID.randomUUID().toString();
-        mockChatroom.setChatroomId(roomId);
-        when(chatRoomRepository.findByChatroomId(roomId)).thenReturn(Optional.of(mockChatroom));
+        Chatroom mockChatroom = new Chatroom(roomId, authentication.getName());
+        chatroomRepository.save(mockChatroom);
+
+        // ChatroomService 모킹
+        when(chatRoomService.findRoomById(roomId)).thenReturn(mockChatroom);
+
 
         // 가짜 메시지 DTO 생성
         MessageDTO messageDTO = MessageDTO.builder()
                 .type(MessageType.TALK)
                 .chatroomId(roomId)
+                .senderId(authentication.getName())
                 .content("Hello, world!")
                 .build();
 
@@ -79,16 +86,48 @@ public class ChatServiceTest {
     @Test
     @DisplayName("메시지 송수신")
     public void testSendMessage() {
+        // 가짜 인증 객체 설정
+        Authentication authentication = new UsernamePasswordAuthenticationToken("testUser", "password");
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         // 가짜 메시지 DTO 생성
         MessageDTO messageDTO = new MessageDTO();
         String roomId = UUID.randomUUID().toString();
         messageDTO.setChatroomId(roomId);
+        messageDTO.setSenderId(authentication.getName());
         messageDTO.setContent("Hello, world!");
 
         // sendMessage 호출
-//        chatService.sendMessage(messageDTO, );
+        chatService.sendMessage(messageDTO, authentication);
 
         // template.convertAndSend() 메서드가 한 번 호출되었는지 검증
         verify(template, times(1)).convertAndSend("/topic/room/" + roomId, messageDTO);
+    }
+
+    @Test
+    @DisplayName("채팅방 입장 메시지 저장 및 전송")
+    public void testEnterRoom() {
+        // 가짜 방 ID와 멤버 ID 생성
+        String roomId = UUID.randomUUID().toString();
+        String memberId = "testUser";
+
+        // 가짜 멤버 생성 및 MemberRepository 모킹
+        Member mockMember = new Member();
+        mockMember.setLoginId(memberId);
+        mockMember.setNickname("testUserNickname");
+        when(memberRepository.findByLoginId(memberId)).thenReturn(Optional.of(mockMember));
+
+        // 가짜 채팅방 생성 및 ChatroomService 모킹
+        Chatroom mockChatroom = new Chatroom(roomId, memberId);
+        when(chatRoomService.findRoomById(roomId)).thenReturn(mockChatroom);
+
+        // 테스트할 메서드 호출
+        chatService.enterRoom(roomId, memberId);
+
+        // 메시지가 저장되었는지 확인
+        verify(messageRepository, times(1)).save(any(Message.class));
+
+        // 메시지가 전송되었는지 확인
+        verify(template, times(1)).convertAndSend(eq("/topic/room/" + roomId), any(MessageDTO.class));
     }
 }

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,7 +22,6 @@ public class ChatController {
     private final ChatService chatService;
     @MessageMapping("/enter-room/{roomId}")
     public void enterMessage(@DestinationVariable String roomId, Principal principal) {
-        System.out.println("Room ID: " + roomId);
         chatService.enterRoom(roomId, principal.getName());
     }
     @MessageMapping("/send-message")
