@@ -3,7 +3,7 @@ package gooroommoon.algofi_core.game.session;
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
 import gooroommoon.algofi_core.chat.entity.MessageType;
-import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
+import gooroommoon.algofi_core.chat.repository.ChatroomRepository;
 import gooroommoon.algofi_core.chat.service.ChatService;
 import gooroommoon.algofi_core.game.session.dto.GameSessionOverResponse;
 import gooroommoon.algofi_core.game.session.dto.GameSessionUpdateRequest;
@@ -29,7 +29,7 @@ public class GameSessionService {
     private final Map<String, GameSession> gameSessions = new ConcurrentHashMap<>();
     private final SimpMessagingTemplate messagingTemplate;
 
-    private final ChatRoomRepository chatRoomRepository;
+    private final ChatroomRepository chatRoomRepository;
 
     private final ChatService chatService;
 

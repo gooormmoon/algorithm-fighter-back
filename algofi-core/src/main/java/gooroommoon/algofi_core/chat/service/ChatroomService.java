@@ -1,19 +1,17 @@
 package gooroommoon.algofi_core.chat.service;
 
 import gooroommoon.algofi_core.chat.entity.Chatroom;
-import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
+import gooroommoon.algofi_core.chat.repository.ChatroomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @RequiredArgsConstructor
 @Slf4j
 @Service
-public class ChatRoomService {
-    private final ChatRoomRepository chatRoomRepository;
+public class ChatroomService {
+    private final ChatroomRepository chatRoomRepository;
 
     @Transactional
     public Chatroom saveChatRoom(String roomName) {

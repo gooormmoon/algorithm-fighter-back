@@ -3,8 +3,7 @@ package gooroommoon.algofi_core.chat.service;
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
 import gooroommoon.algofi_core.chat.entity.MessageType;
-import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
-import gooroommoon.algofi_core.chat.service.ChatService;
+import gooroommoon.algofi_core.chat.repository.ChatroomRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -36,7 +35,7 @@ public class WebSocketDisconnectListenerTest {
     private ChatService chatService;
 
     @MockBean
-    private ChatRoomRepository chatRoomRepository;
+    private ChatroomRepository chatRoomRepository;
 
     @MockBean
     private SimpMessagingTemplate template;

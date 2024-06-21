@@ -26,7 +26,7 @@ public class ChatService {
     private final SimpMessageSendingOperations template;
     private final MemberRepository memberRepository;
     private final MessageRepository messageRepository;
-    private final ChatRoomService chatRoomService;
+    private final ChatroomService chatRoomService;
 
     @Transactional
     public void saveMessage(MessageDTO messageDTO, Principal principal) {
@@ -38,9 +38,8 @@ public class ChatService {
         Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new IllegalArgumentException("현재 인증된 사용자의 정보를 찾을 수 없습니다."));
 
-        System.out.println("saveMessage의 ChatroomId: " + messageDTO.getChatroomId().toString());
         // 채팅방 찾기
-        Chatroom chatroom = chatRoomService.findRoomById(messageDTO.getChatroomId().toString());
+        Chatroom chatroom = chatRoomService.findRoomById(messageDTO.getChatroomId());
 
         // Message 엔티티 생성 및 저장
         Message message = Message.builder()
@@ -56,9 +55,12 @@ public class ChatService {
         messageRepository.save(message);
     }
 
-    public void sendMessage(MessageDTO message) {
+    public void sendMessage(MessageDTO message, Principal principal) {
         log.info("접속 채팅방 ID: {}", message.getChatroomId());
         log.info("접속 채팅방 Content: {}", message.getContent());
+        log.info("접속 채팅방 senderId: {}", message.getSenderId());
+        message.setSenderId(principal.getName());
+        message.setCreatedDate(LocalDateTime.now());
         template.convertAndSend("/topic/room/" + message.getChatroomId(), message);
     }
 
@@ -72,7 +74,6 @@ public class ChatService {
         return messages.stream()
                 .map(message -> MessageDTO.builder()
                         .type(message.getType())
-                        .messageId(message.getId())
                         .chatroomId(message.getChatroomId().getChatroomId())
                         .content(message.getContent())
                         .senderId(message.getSenderId().getLoginId())
@@ -84,7 +85,7 @@ public class ChatService {
     @Transactional
     public void saveAndSendMessage(MessageDTO message, Principal principal) {
         saveMessage(message, principal);
-        sendMessage(message);
+        sendMessage(message, principal);
     }
 
     @Transactional
@@ -111,7 +112,6 @@ public class ChatService {
 
         MessageDTO messageDTO = MessageDTO.builder()
                 .type(message.getType())
-                .messageId(message.getId())
                 .chatroomId(message.getChatroomId().getChatroomId())
                 .senderId(message.getSenderId().getLoginId())
                 .content(message.getContent())

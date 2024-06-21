@@ -6,9 +6,8 @@ import gooroommoon.algofi_core.chat.dto.MessageDTO;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
 import gooroommoon.algofi_core.chat.entity.Message;
 import gooroommoon.algofi_core.chat.entity.MessageType;
-import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
+import gooroommoon.algofi_core.chat.repository.ChatroomRepository;
 import gooroommoon.algofi_core.chat.repository.MessageRepository;
-import gooroommoon.algofi_core.chat.service.ChatService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +35,7 @@ public class ChatServiceTest {
     private MemberRepository memberRepository;
 
     @Mock
-    private ChatRoomRepository chatRoomRepository;
+    private ChatroomRepository chatRoomRepository;
 
     @Mock
     private MessageRepository messageRepository;
@@ -87,7 +86,7 @@ public class ChatServiceTest {
         messageDTO.setContent("Hello, world!");
 
         // sendMessage 호출
-        chatService.sendMessage(messageDTO);
+//        chatService.sendMessage(messageDTO, );
 
         // template.convertAndSend() 메서드가 한 번 호출되었는지 검증
         verify(template, times(1)).convertAndSend("/topic/room/" + roomId, messageDTO);

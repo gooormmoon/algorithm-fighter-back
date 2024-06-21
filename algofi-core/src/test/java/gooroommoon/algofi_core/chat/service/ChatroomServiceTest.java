@@ -1,8 +1,7 @@
 package gooroommoon.algofi_core.chat.service;
 
 import gooroommoon.algofi_core.chat.entity.Chatroom;
-import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
-import gooroommoon.algofi_core.chat.service.ChatRoomService;
+import gooroommoon.algofi_core.chat.repository.ChatroomRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,18 +14,17 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-public class ChatRoomServiceTest {
+public class ChatroomServiceTest {
 
     @Autowired
-    private ChatRoomService chatRoomService;
+    private ChatroomService chatRoomService;
 
     @MockBean
-    private ChatRoomRepository chatRoomRepository;
+    private ChatroomRepository chatRoomRepository;
 
     @Test
     @DisplayName("채팅방 저장하기")
