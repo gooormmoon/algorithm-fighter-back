@@ -6,7 +6,7 @@ import gooroommoon.algofi_core.algorithmproblem.AlgorithmproblemRepository;
 import gooroommoon.algofi_core.auth.member.Member;
 import gooroommoon.algofi_core.auth.member.MemberRepository;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
-import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
+import gooroommoon.algofi_core.chat.repository.ChatroomRepository;
 import gooroommoon.algofi_core.game.session.GameSession;
 import gooroommoon.algofi_core.gameresult.dto.GameresultResponse;
 import gooroommoon.algofi_core.gameresult.dto.GameresultsResponse;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
@@ -30,7 +29,7 @@ public class GameresultService {
     private final GameresultRepository gameresultRepository;
     private final MemberGameresultService memberGameresultService;
     private final AlgorithmproblemRepository algorithmproblemRepository;
-    private final ChatRoomRepository chatRoomRepository;
+    private final ChatroomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
 
     /**
@@ -42,8 +41,7 @@ public class GameresultService {
         Algorithmproblem algorithmproblem = algorithmproblemRepository.findById(1L).orElseThrow(() ->
                 new AlgorithmproblemNotFoundException("문제를 찾을 수 없습니다."));
 
-        UUID chatroomId = UUID.fromString("aasdfasdfasdfasdfasdfasdfsadfsda");
-        Chatroom chatroom = chatRoomRepository.findByChatroomId(chatroomId).orElseThrow();
+        Chatroom chatroom = chatRoomRepository.findByChatroomId(session.getChatroomId()).orElseThrow();
 
         Gameresult gameresult = Gameresult.builder()
                 .hostCodeContent("hostCode")

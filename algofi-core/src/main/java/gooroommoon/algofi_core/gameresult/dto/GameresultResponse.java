@@ -20,5 +20,5 @@ public class GameresultResponse {
 
     private Long algorithmproblemId;
 
-    private UUID chatroomId;
+    private String chatroomId;
 }
