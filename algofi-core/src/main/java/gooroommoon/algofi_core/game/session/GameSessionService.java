@@ -211,23 +211,13 @@ public class GameSessionService {
 
     public GameSessionResponse toResponse(GameSession session) {
         String hostNick = memberService.getMemberNickName(session.getHostId());
-        Set<String> players = new HashSet<>();
-        Set<String> readyPlayers = new HashSet<>();
-
-        session.getPlayersStream().forEach(playerId -> {
-            String playerNick = memberService.getMemberNickName(playerId);
-            players.add(playerNick);
-            if(session.getReadyPlayers().contains(playerId)) {
-                readyPlayers.add(playerNick);
-            }
-        });
 
         return GameSessionResponse.builder()
                 .title(session.getTitle())
                 .host(hostNick)
                 .hostId(session.getHostId())
-                .players(players)
-                .readyPlayers(readyPlayers)
+                .players(session.getPlayers())
+                .readyPlayers(session.getReadyPlayers())
                 .maxPlayer(session.getMaxPlayer())
                 .problemLevel(session.getProblemLevel())
                 .timerTime(session.getTimerTime())
