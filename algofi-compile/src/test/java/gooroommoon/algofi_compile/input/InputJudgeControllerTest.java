@@ -129,6 +129,28 @@ class InputJudgeControllerTest {
                 .hasMessageContaining(JudgeResult.WRONG_ANSWER.getMessage());
     }
 
+    @Test
+    public void anotherClass() throws IOException {
+        File file = new File("src/test/resources/fixture/Napsack.java");
+        String code = fileToString(file);
+        CodeExecutionRequest request = new CodeExecutionRequest(code, "java", "5 20 10 5 25 12 15 8 6 3 7 4", "41");
+
+        ResponseEntity<CodeExecutionResponse> response = inputJudgeController.judgeInput(request);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(response.getBody()).getMessage()).isEqualTo(JudgeResult.ACCEPTED.getMessage());
+    }
+
+    @Test
+    public void withLeftBrace() throws IOException {
+        File file = new File("src/test/resources/fixture/NapsackBrace.java");
+        String code = fileToString(file);
+        CodeExecutionRequest request = new CodeExecutionRequest(code, "java", "5 20 10 5 25 12 15 8 6 3 7 4", "41");
+
+        ResponseEntity<CodeExecutionResponse> response = inputJudgeController.judgeInput(request);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(response.getBody()).getMessage()).isEqualTo(JudgeResult.ACCEPTED.getMessage());
+    }
+
     private String fileToString(File file) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
