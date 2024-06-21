@@ -1,6 +1,6 @@
-package gooroommoon.algofi_compile.dto;
+package gooroommoon.algofi_compile.input.dto;
 
-import gooroommoon.algofi_compile.exception.RequestException;
+import gooroommoon.algofi_compile.judge.exception.RequestException;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.util.StringUtils;

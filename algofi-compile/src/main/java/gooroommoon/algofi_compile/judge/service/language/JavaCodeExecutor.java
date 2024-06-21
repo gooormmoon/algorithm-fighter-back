@@ -1,6 +1,6 @@
-package gooroommoon.algofi_compile.service.language;
+package gooroommoon.algofi_compile.judge.service.language;
 
-import gooroommoon.algofi_compile.exception.ServerException;
+import gooroommoon.algofi_compile.judge.exception.ServerException;
 
 import java.io.IOException;
 import java.nio.file.Files;
