@@ -1,0 +1,26 @@
+#
+# 해당 설정으론 401 응답 오류 발생
+#
+# 빌드 이미지로 OpenJDK 11 & Gradle을 지정
+FROM gradle:jdk17
+
+# 소스코드를 복사할 작업 디렉토리를 생성
+WORKDIR /app
+
+# 호스트 머신의 소스코드를 작업 디렉토리로 복사
+COPY . /app
+
+#RUN mkdir -p /root/.gradle && \
+#    echo "systemProp.http.proxyHost=$HTTP_PROXY\nsystemProp.http.proxyPort=${HTTP_PROXY#*:}\nsystemProp.https.proxyHost=$HTTPS_PROXY\nsystemProp.https.proxyPort=${HTTPS_PROXY##*:}\nsystemProp.http.proxyUser=$HTTP_PROXY_USER\nsystemProp.http.proxyPassword=$HTTP_PROXY_PASSWORD\nsystemProp.https.proxyUser=$HTTPS_PROXY_USER\nsystemProp.https.proxyPassword=$HTTPS_PROXY_PASSWORD" > /root/.gradle/gradle.properties
+#RUN echo "systemProp.http.proxyHost=krmp-proxy.9rum.cc\nsystemProp.http.proxyPort=3128\nsystemProp.https.proxyHost=krmp-proxy.9rum.cc\nsystemProp.https.proxyPort=3128" > /root/.gradle/gradle.properties
+
+
+# Gradle 빌드를 실행하여 JAR 파일 생성
+RUN gradle build -x test --no-daemon
+
+# /app/build/libs/*-SNAPSHOT.jar /app/algofi.jar 파일을 복사
+RUN mv /app/build/libs/algofi-core-0.0.1-SNAPSHOT.jar /app/algofi.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "algofi.jar"]
