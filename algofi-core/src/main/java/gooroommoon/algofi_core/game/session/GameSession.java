@@ -1,6 +1,5 @@
 package gooroommoon.algofi_core.game.session;
 
-import gooroommoon.algofi_core.game.session.dto.GameSessionResponse;
 import gooroommoon.algofi_core.game.session.exception.GameIsFullException;
 import lombok.Getter;
 import lombok.Setter;

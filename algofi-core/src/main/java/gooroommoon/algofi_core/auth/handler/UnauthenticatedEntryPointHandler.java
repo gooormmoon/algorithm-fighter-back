@@ -1,6 +1,5 @@
 package gooroommoon.algofi_core.auth.handler;
 
-import gooroommoon.algofi_core.dto.ExceptionResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
 import java.util.Set;
-import java.util.UUID;
 
 @Getter
 @Builder
