@@ -55,7 +55,7 @@ public class ChatRoomServiceTest {
     @DisplayName("채팅방 존재 여부 확인 후 반환 테스트")
     public void testEnsureChatRoomExists() {
         // 가짜 채팅방 UUID
-        UUID roomId = UUID.randomUUID();
+        String roomId = UUID.randomUUID().toString();
 
         // 존재하지 않는 채팅방을 찾을 때 반환할 가짜 객체 설정
         when(chatRoomRepository.findByChatroomId(roomId)).thenReturn(Optional.empty());
@@ -81,7 +81,7 @@ public class ChatRoomServiceTest {
     @DisplayName("채팅방 ID로 조회 테스트")
     public void testFindRoomById() {
         // 가짜 채팅방 UUID
-        UUID roomId = UUID.randomUUID();
+        String roomId = UUID.randomUUID().toString();
 
         // 가짜 채팅방 객체 생성
         Chatroom mockChatroom = new Chatroom();

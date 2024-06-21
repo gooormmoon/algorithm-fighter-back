@@ -59,14 +59,14 @@ public class ChatServiceTest {
 
         // 가짜 채팅방 생성
         Chatroom mockChatroom = new Chatroom();
-        UUID roomId = UUID.randomUUID();
+        String roomId = UUID.randomUUID().toString();
         mockChatroom.setChatroomId(roomId);
         when(chatRoomRepository.findByChatroomId(roomId)).thenReturn(Optional.of(mockChatroom));
 
         // 가짜 메시지 DTO 생성
         MessageDTO messageDTO = MessageDTO.builder()
                 .type(MessageType.TALK)
-                .chatRoomId(roomId)
+                .chatroomId(roomId)
                 .content("Hello, world!")
                 .build();
 
@@ -82,8 +82,8 @@ public class ChatServiceTest {
     public void testSendMessage() {
         // 가짜 메시지 DTO 생성
         MessageDTO messageDTO = new MessageDTO();
-        UUID roomId = UUID.randomUUID();
-        messageDTO.setChatRoomId(roomId);
+        String roomId = UUID.randomUUID().toString();
+        messageDTO.setChatroomId(roomId);
         messageDTO.setContent("Hello, world!");
 
         // sendMessage 호출

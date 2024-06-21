@@ -70,7 +70,7 @@ public class WebSocketDisconnectListenerTest {
 
         // 가짜 Chatroom 객체 생성
         Chatroom chatRoom = new Chatroom();
-        chatRoom.setChatroomId(UUID.randomUUID());
+        chatRoom.setChatroomId(UUID.randomUUID().toString());
         chatRoom.setChatroomName("user1");
 
         // chatRoomRepository mock 객체 설정
@@ -97,7 +97,7 @@ public class WebSocketDisconnectListenerTest {
         assertEquals("/topic/room/" + chatRoom.getChatroomId(), destinationCaptor.getValue());
         MessageDTO capturedMessageDTO = messageCaptor.getValue();
         assertEquals(MessageType.LEAVE, capturedMessageDTO.getType());
-        assertEquals(chatRoom.getChatroomId(), capturedMessageDTO.getChatRoomId());
+        assertEquals(chatRoom.getChatroomId(), capturedMessageDTO.getChatroomId());
         assertTrue(capturedMessageDTO.getContent().contains("user1"));
     }
 }

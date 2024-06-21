@@ -63,17 +63,17 @@ public class ChatService {
     }
 
     @Transactional
-    public List<MessageDTO> getMessagesInChattingRoom(String chatRoomId) {
+    public List<MessageDTO> getMessagesInChattingRoom(String chatroomId) {
 
         // 채팅방의 메시지 목록을 가져옴
-        List<Message> messages = messageRepository.findByChatroomIdChatroomId(chatRoomId);
+        List<Message> messages = messageRepository.findByChatroomIdChatroomId(chatroomId);
 
         // Message 엔티티를 DTO로 반환
         return messages.stream()
                 .map(message -> MessageDTO.builder()
                         .type(message.getType())
                         .messageId(message.getId())
-                        .chatroomId(UUID.fromString(message.getChatroomId().getChatroomId()))
+                        .chatroomId(message.getChatroomId().getChatroomId())
                         .content(message.getContent())
                         .senderId(message.getSenderId().getLoginId())
                         .createdDate(message.getCreatedDate())
@@ -112,7 +112,7 @@ public class ChatService {
         MessageDTO messageDTO = MessageDTO.builder()
                 .type(message.getType())
                 .messageId(message.getId())
-                .chatroomId(UUID.fromString(message.getChatroomId().getChatroomId()))
+                .chatroomId(message.getChatroomId().getChatroomId())
                 .senderId(message.getSenderId().getLoginId())
                 .content(message.getContent())
                 .createdDate(message.getCreatedDate())

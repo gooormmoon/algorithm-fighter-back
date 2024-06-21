@@ -19,14 +19,14 @@ public class MessageDTO {
 
     private MessageType type;
     private Long messageId;
-    private UUID chatroomId;
+    private String chatroomId;
     private String content;
     private String senderId;
     private LocalDateTime createdDate;
 
     // 엔티티에서 DTO로 변환하는 생성자
     @Builder
-    public MessageDTO(MessageType type, Long messageId, UUID chatroomId, String senderId, String content, LocalDateTime createdDate) {
+    public MessageDTO(MessageType type, Long messageId, String  chatroomId, String senderId, String content, LocalDateTime createdDate) {
         this.type = type;
         this.messageId = messageId;
         this.chatroomId = chatroomId;

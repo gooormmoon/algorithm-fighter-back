@@ -47,9 +47,9 @@ public class GameSessionService {
         checkPlayerInGame(hostId);
         GameSession session = new GameSession(hostId, request.getTitle(), request.getProblemLevel(), request.getTimerTime());
         gameSessions.put(hostId, session);
-        Chatroom chatroom = new Chatroom(session.getChatRoomId().toString(), hostId);
+        Chatroom chatroom = new Chatroom(session.getChatroomId(), hostId);
         chatRoomRepository.save(chatroom);
-        chatService.enterRoom(session.getChatRoomId().toString(), hostId);
+        chatService.enterRoom(session.getChatroomId(), hostId);
 
         sendUpdateToPlayers(session);
     }
@@ -59,7 +59,7 @@ public class GameSessionService {
         GameSession session = getSession(hostId);
         session.addPlayer(playerId);
         gameSessions.put(playerId, session);
-        chatService.enterRoom(session.getChatRoomId().toString(), playerId);
+        chatService.enterRoom(session.getChatroomId(), playerId);
 
         sendUpdateToPlayers(session);
     }
@@ -162,9 +162,9 @@ public class GameSessionService {
         String leaveMessage = playerId + "님이 퇴장하셨습니다.";
         MessageDTO message = MessageDTO.builder()
                 .type(MessageType.LEAVE)
-                .chatroomId(session.getChatRoomId())
+                .chatroomId(session.getChatroomId())
                 .content(leaveMessage)
                 .build();
-        messagingTemplate.convertAndSend("/topic/room/" + session.getChatRoomId(), message);
+        messagingTemplate.convertAndSend("/topic/room/" + session.getChatroomId(), message);
     }
 }

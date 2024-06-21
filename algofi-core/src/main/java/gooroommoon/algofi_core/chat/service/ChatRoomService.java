@@ -18,18 +18,18 @@ public class ChatRoomService {
     @Transactional
     public Chatroom saveChatRoom(String roomName) {
         // 채팅방 엔티티 생성
-        Chatroom chatRoom = new Chatroom(roomName);
+        Chatroom chatroom = new Chatroom(roomName);
         // 채팅방 저장
-        return chatRoomRepository.save(chatRoom);
+        return chatRoomRepository.save(chatroom);
     }
 
     @Transactional
     public Chatroom ensureChatRoomExists(String roomId) {
         return chatRoomRepository.findByChatroomId(roomId)
                 .orElseGet(() -> {
-                    Chatroom chatRoom = new Chatroom();
-                    chatRoom.setChatroomId(roomId);
-                    return chatRoomRepository.save(chatRoom);
+                    Chatroom chatroom = new Chatroom();
+                    chatroom.setChatroomId(roomId);
+                    return chatRoomRepository.save(chatroom);
                 });
     }
 
