@@ -30,11 +30,10 @@ public class ProblemJudgeService {
         List<TestCase> testCases = testCaseRepository.findAllByAlgorithmProblemId(algorithmProblemId);
 
         try {
-            for (TestCase testCase : testCases) {
+            testCases.forEach(testCase -> {
                 Process process = judgeService.executeCode(codeExecutor, path);
-
                 judge(testCase, process);
-            }
+            });
         } finally {
             codeExecutor.deleteFile(path);
         }
