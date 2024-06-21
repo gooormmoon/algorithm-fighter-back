@@ -31,7 +31,7 @@ public class Message {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MEMBER_ID")
+    @JoinColumn(name = "SENDER_ID")
     private Member senderId;
 
 
