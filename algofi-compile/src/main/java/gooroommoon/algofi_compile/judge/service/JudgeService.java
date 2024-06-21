@@ -1,9 +1,9 @@
-package gooroommoon.algofi_compile.service;
+package gooroommoon.algofi_compile.judge.service;
 
-import gooroommoon.algofi_compile.exception.CodeExecutionException;
-import gooroommoon.algofi_compile.exception.ServerException;
-import gooroommoon.algofi_compile.service.language.CodeExecutor;
-import gooroommoon.algofi_compile.service.language.Language;
+import gooroommoon.algofi_compile.judge.exception.CodeExecutionException;
+import gooroommoon.algofi_compile.judge.exception.ServerException;
+import gooroommoon.algofi_compile.judge.service.language.CodeExecutor;
+import gooroommoon.algofi_compile.judge.service.language.Language;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @Service
-public class CompileService {
+public class JudgeService {
     private static final long TIME_OUT_MILLIS = 10000;
 
     public CodeExecutor getCodeExecutor(String language) {
@@ -36,7 +36,6 @@ public class CompileService {
             waitForTerminate(process);
             return output;
         } catch (TimeoutException e) {
-            destroy(process);
             throw new CodeExecutionException(JudgeResult.TIME_LIMIT_EXCEEDED);
         } catch (RuntimeException e) {
             throw new CodeExecutionException(JudgeResult.RUNTIME_ERROR);
@@ -45,7 +44,12 @@ public class CompileService {
         }
     }
 
-    public void waitForTerminate(Process process) {
+    public void destroy(Process process) {
+        destroyChildren(process);
+        process.destroyForcibly();
+    }
+
+    private void waitForTerminate(Process process) {
         int exitCode = waitFor(process);
 
         if (exitCode != 0) {
@@ -93,11 +97,6 @@ public class CompileService {
         }
 
         return output;
-    }
-
-    public void destroy(Process process) {
-        destroyChildren(process);
-        process.destroyForcibly();
     }
 
     private void destroyChildren(Process process) {

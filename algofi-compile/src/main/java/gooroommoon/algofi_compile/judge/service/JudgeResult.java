@@ -1,4 +1,4 @@
-package gooroommoon.algofi_compile.service;
+package gooroommoon.algofi_compile.judge.service;
 
 import lombok.Getter;
 

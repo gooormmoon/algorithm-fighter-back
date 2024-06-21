@@ -1,4 +1,4 @@
-package gooroommoon.algofi_compile.service.language;
+package gooroommoon.algofi_compile.judge.service.language;
 
 import java.nio.file.Path;
 
