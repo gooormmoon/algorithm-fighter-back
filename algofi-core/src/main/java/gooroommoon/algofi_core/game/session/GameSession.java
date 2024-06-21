@@ -1,5 +1,6 @@
 package gooroommoon.algofi_core.game.session;
 
+import gooroommoon.algofi_core.algorithmproblem.dto.AlgorithmproblemResponse;
 import gooroommoon.algofi_core.game.session.exception.GameIsFullException;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,8 +33,7 @@ public class GameSession {
     @Setter
     private String otherGameCode;
 
-    //TODO 알고리즘 문제 세션에 저장
-    // private AlgorithmProblem algorithmProblem;
+    private AlgorithmproblemResponse algorithmProblem;
 
     private boolean isStarted;
 
