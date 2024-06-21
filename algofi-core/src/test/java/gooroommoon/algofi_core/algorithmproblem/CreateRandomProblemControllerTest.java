@@ -7,7 +7,6 @@ import gooroommoon.algofi_core.auth.member.dto.TokenResponse;
 import gooroommoon.algofi_core.auth.util.JwtUtil;
 import gooroommoon.algofi_core.game.session.dto.GameSessionJoinRequest;
 import gooroommoon.algofi_core.game.session.dto.GameSessionUpdateRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Profile("dev")
-@Slf4j
 public class CreateRandomProblemControllerTest {
 
     @Autowired
@@ -132,7 +130,6 @@ public class CreateRandomProblemControllerTest {
         //여기서 인증정보를 넘겨줘야하나?
         StompSession stompSession = stompClient.connect(websocketUri, connectHeaders, new StompSessionHandlerAdapter() {
             public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-                log.info("{} 님이 게임방에 입장하셨습니다.", connectHeaders.get("userName"));
             }
         }).get(1, TimeUnit.SECONDS);
 
@@ -164,7 +161,6 @@ public class CreateRandomProblemControllerTest {
 
         //TODO 게임 생성
         stompSession.send(sendCreateHeaders, gameSessionUpdateRequest);
-        log.info("게임생성");
 
         WebSocketHttpHeaders connectHeadersMember = new WebSocketHttpHeaders();
         connectHeadersMember.add("Authorization", "Bearer " + memberToken);
@@ -173,7 +169,6 @@ public class CreateRandomProblemControllerTest {
         //여기는 "member"의 세션
         StompSession stompSessionMember = stompClient.connect(websocketUri, connectHeadersMember, new StompSessionHandlerAdapter() {
             public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-                log.info("{} 님이 게임방에 입장하셨습니다.", connectHeadersMember.get("userName"));
             }
         }).get(1, TimeUnit.SECONDS);
 
@@ -202,7 +197,6 @@ public class CreateRandomProblemControllerTest {
         // 게임 참가 요청을 서버로 전송합니다.
         //TODO 게임 참가
         stompSessionMember.send(sendJoinHeaders, gameSessionJoinRequest);
-        log.info("게임 참가");
 
         for (int i = 1; i <= 5; i++) {
             Algorithmproblem algorithmproblem = Algorithmproblem.builder()
