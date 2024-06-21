@@ -2,25 +2,26 @@ package gooroommoon.algofi_core.game.session;
 
 
 import gooroommoon.algofi_core.algorithmproblem.AlgorithmproblemService;
+import gooroommoon.algofi_core.auth.member.MemberService;
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
+import gooroommoon.algofi_core.chat.entity.Message;
 import gooroommoon.algofi_core.chat.entity.MessageType;
 import gooroommoon.algofi_core.chat.repository.ChatroomRepository;
 import gooroommoon.algofi_core.chat.service.ChatService;
-import gooroommoon.algofi_core.game.session.dto.GameSessionOverResponse;
-import gooroommoon.algofi_core.game.session.dto.GameSessionUpdateRequest;
-import gooroommoon.algofi_core.game.session.exception.AlreadyInGameSessionException;
-import gooroommoon.algofi_core.game.session.exception.GameSessionNotFoundException;
-import gooroommoon.algofi_core.game.session.exception.NotAHostException;
-import gooroommoon.algofi_core.game.session.exception.PlayersNotReadyException;
+import gooroommoon.algofi_core.game.session.dto.*;
+import gooroommoon.algofi_core.game.session.exception.*;
 import gooroommoon.algofi_core.gameresult.GameresultService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.concurrent.*;
 
 @Service
@@ -31,8 +32,11 @@ public class GameSessionService {
 
     private final Map<String, GameSession> gameSessions = new ConcurrentHashMap<>();
     private final SimpMessagingTemplate messagingTemplate;
+    private final SimpUserRegistry userRegistry;
+    private final WebClient webClient;
 
     private final ChatroomRepository chatRoomRepository;
+    private final MemberService memberService;
 
     private final ChatService chatService;
 
@@ -47,6 +51,38 @@ public class GameSessionService {
             throw new GameSessionNotFoundException("게임을 찾을 수 없습니다.");
         }
         return session;
+    }
+
+    public GameSessionsResponse getSessionsResponse() {
+        GameSessionsResponse response = new GameSessionsResponse(new ArrayList<>());
+        Set<GameSession> sessions = new HashSet<>(gameSessions.values());
+
+        sessions.forEach(session ->
+            response.getRooms().add(GameSessionsResponse.Session.builder()
+                    .host(memberService.getMemberNickName(session.getHostId()))
+                    .hostId(session.getHostId())
+                    .title(session.getTitle())
+                    .maxPlayer(session.getMaxPlayer())
+                    .problemLevel(session.getProblemLevel())
+                    .timerTime(session.getTimerTime())
+                    .isStarted(session.isStarted())
+                    .build()));
+
+        return response;
+    }
+
+    public void sendSessions(String loginId) {
+        messagingTemplate.convertAndSendToUser(loginId, "/queue/game/session", getSessionsResponse());
+    }
+
+    public void sendSessions() {
+        GameSessionsResponse response = getSessionsResponse();
+        userRegistry.getUsers().forEach(user -> {
+            String playerId = user.getPrincipal().getName();
+            if(!gameSessions.containsKey(playerId)) {
+                messagingTemplate.convertAndSendToUser(playerId, "/queue/game/session", response);
+            }
+        });
     }
 
     public void createSession(String hostId, GameSessionUpdateRequest request) {
@@ -72,7 +108,7 @@ public class GameSessionService {
 
     public void updateSetting(String hostId, GameSessionUpdateRequest request) {
         GameSession session = getSession(hostId);
-        if(session.getHost().equals(hostId)) {
+        if(session.getHostId().equals(hostId)) {
             session.updateSettings(request.getTitle(), request.getProblemLevel(), request.getTimerTime());
 
             sendUpdateToPlayers(session);
@@ -93,7 +129,7 @@ public class GameSessionService {
         if(!session.allReady()) {
             throw new PlayersNotReadyException("준비되지 않은 플레이어가 있습니다.");
         }
-        if(!session.getHost().equals(hostId)) {
+        if(!session.getHostId().equals(hostId)) {
             throw new NotAHostException("방장만 게임을 시작할 수 있습니다.");
         }
         //TODO 문제 가져와서 넣기
@@ -102,14 +138,34 @@ public class GameSessionService {
         session.start();
         //TODO 알고리즘 문제 가져와서 메시지 발행
         GameSessionService gameSessionService = this;
-        ScheduledFuture<?> timeOverTask = executorService.schedule(() -> {
-            gameSessionService.closeGame(session,null, session.getTimerTime());
-        }, session.getTimerTime(), TimeUnit.SECONDS);
+        ScheduledFuture<?> timeOverTask = executorService.schedule(() ->
+            gameSessionService.closeGame(session,null, session.getTimerTime())
+        , session.getTimerTime(), TimeUnit.SECONDS);
         session.setTimeOverTask(timeOverTask);
     }
 
-    public void submitCode(String playerId) {
-        //TODO 제출된 코드 실행 및 결과 받기
+    public void submitCode(String playerId, GameCodeRequest request) {
+        GameSession session = getSession(playerId);
+        if(!session.isStarted()) {
+            throw new GameIsNotStartedException("게임이 아직 시작되지 않았습니다.");
+        }
+        //TODO 실제 알고리즘 ID로 변경
+
+        sendChat(session.getChatroomId(), playerId, "코드를 제출했습니다!");
+        SubmitCodeRequest submitRequest = new SubmitCodeRequest(1L, request.getLanguage(), request.getCode());
+        webClient.post()
+                .uri("/api/judge-problem")
+                .body(submitRequest, SubmitCodeRequest.class)
+                .retrieve()
+                .toEntity(SubmitResultResponse.class)
+                .subscribe(response -> {
+                    String message = response.getBody().getMessage();
+                    if(message.equals("맞았습니다.")) {
+                        closeGame(session, playerId, (int)(System.currentTimeMillis() - session.getStartTime()));
+                    } else {
+                        sendChat(session.getChatroomId(), playerId, "틀렸습니다!");
+                    }
+                });
     }
 
     public void closeGame(GameSession session, String winnerId, int runningTime) {
@@ -126,14 +182,32 @@ public class GameSessionService {
             session.getTimeOverTask().cancel(true);
         } else {
             GameSessionOverResponse timeOverResponse = new GameSessionOverResponse(GameOverType.TIME_OVER, runningTime);
-            session.getPlayersStream().forEach(id -> {
-                messagingTemplate.convertAndSendToUser(id, "/queue/game/session", timeOverResponse);
-            });
+            session.getPlayersStream().forEach(id ->
+                messagingTemplate.convertAndSendToUser(id, "/queue/game/session", timeOverResponse));
         }
+    }
+    //게임이 종료된 후 클라이언트의 요청을 받아 코드를 저장
+    public void savePlayerCode(String playerId, GameCodeRequest request) {
+
+        GameSession session = getSession(playerId);
+        if(!session.isStarted()) {
+            throw new GameIsNotStartedException("게임이 아직 시작되지 않았습니다.");
+        }
+            if (playerId.equals(session.getHostId())) {
+                session.setHostGameCode(request.getCode());
+            } else {
+                session.setOtherGameCode(request.getCode());
+            }
+            //양 측의 코드가 저장됐으면 DB에 저장
+            if (session.getHostGameCode() != null && session.getOtherGameCode() != null) {
+                saveResult(session);
+            }
+
+    }
+
+    private void saveResult(GameSession session) {
         //TODO 게임 결과 저장
-        //TODO gameSession에서 필요한 것 다 가져오기
-        gameresultService.save(session, runningTime);
-        removeSession(session);
+        //TODO 게임 세션 삭제
     }
 
     public void removeSession(GameSession session) {
@@ -147,11 +221,38 @@ public class GameSessionService {
     }
 
     private void sendUpdateToPlayers(GameSession session) {
-        session.getPlayersStream().forEach(id -> {
+        session.getPlayersStream().forEach(id ->
             messagingTemplate.convertAndSendToUser(
-                    id, "/queue/game/session", session.toResponse()
-            );
-        });
+                    id, "/queue/game/session", toResponse(session)
+            )
+        );
+    }
+
+    private void sendChat(String chatroomId, String senderId, String content) {
+        MessageDTO chat = MessageDTO.builder()
+                .type(MessageType.TALK)
+                .chatroomId(chatroomId)
+                .content(content)
+                .senderId(senderId)
+                .createdDate(LocalDateTime.now())
+                .build();
+        messagingTemplate.convertAndSend("/topic/room/" + chatroomId, chat);
+    }
+
+    public GameSessionResponse toResponse(GameSession session) {
+        String hostNick = memberService.getMemberNickName(session.getHostId());
+
+        return GameSessionResponse.builder()
+                .title(session.getTitle())
+                .host(hostNick)
+                .hostId(session.getHostId())
+                .players(session.getPlayers())
+                .readyPlayers(session.getReadyPlayers())
+                .maxPlayer(session.getMaxPlayer())
+                .problemLevel(session.getProblemLevel())
+                .timerTime(session.getTimerTime())
+                .chatroomId(session.getChatroomId())
+                .build();
     }
 
     @EventListener
@@ -163,10 +264,10 @@ public class GameSessionService {
         String playerId = event.getUser().getName();
         GameSession session = getSession(playerId);
         session.removePlayer(playerId);
-        if(playerId.equals(session.getHost())) {
+        if(playerId.equals(session.getHostId())) {
             removeSession(session);
+            //TODO 참가중인 모든 플레이어에게 방 삭제 메시지 발행
         }
-        //TODO 방 삭제 메시지 발행
 
         // 퇴장 메시지 발행
         String leaveMessage = playerId + "님이 퇴장하셨습니다.";
