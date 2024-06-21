@@ -1,10 +1,12 @@
 package gooroommoon.algofi_compile.judge.exception;
 
+import gooroommoon.algofi_compile.db.presentation.ProblemJudgeController;
 import gooroommoon.algofi_compile.input.InputJudgeController;
 
 /**
  * 이 예외가 발생했다는 것은 파일 시스템이나 동시성 문제가 발생했을 수 있으므로 501 Server Error 반환
  * @see InputJudgeController
+ * @see ProblemJudgeController
  */
 public class ServerException extends RuntimeException {
     public ServerException() {

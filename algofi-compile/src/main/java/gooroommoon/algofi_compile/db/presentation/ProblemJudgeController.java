@@ -20,6 +20,9 @@ public class ProblemJudgeController {
 
     private final ProblemJudgeService problemJudgeService;
 
+    /**
+     * 이 요청은 core 서버에서 보내는 요청입니다.
+     */
     @PostMapping("/api/judge-problem")
     public ResponseEntity<ProblemJudgeResponse> judgeProblem(@RequestBody ProblemJudgeRequest request) {
         ProblemJudgeResponse result = problemJudgeService.judgeProblem(request.getLanguage(), request.getAlgorithmProblemId(), request.getCode());
