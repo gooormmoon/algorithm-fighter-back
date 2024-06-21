@@ -1,16 +1,17 @@
 package gooroommoon.algofi_core.algorithmproblem;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Algorithmproblem {
@@ -18,8 +19,6 @@ public class Algorithmproblem {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long AlgorithmproblemId;
     private String title;
-
-    @JsonProperty("level")
     private String level;
     private String content;
     private int recommend_time;

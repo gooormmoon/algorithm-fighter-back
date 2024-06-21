@@ -14,5 +14,4 @@ public class AlgorithmproblemResponse {
     private String title;
     private String level;
     private String content;
-    private int recommend_time;
 }
