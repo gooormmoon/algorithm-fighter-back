@@ -33,24 +33,28 @@ public class ProblemJudgeService {
             for (TestCase testCase : testCases) {
                 Process process = judgeService.executeCode(codeExecutor, path);
 
-                try {
-                    String input = testCase.getTestInput();
-                    String expected = testCase.getTestOutput();
-
-                    StringBuilder output = judgeService.insertInputAndGetOutput(process, input);
-
-                    if (!isCorrect(output.toString(), expected)) {
-                        throw new CodeExecutionException(JudgeResult.WRONG_ANSWER);
-                    }
-                } finally {
-                    judgeService.destroy(process);
-                }
+                judge(testCase, process);
             }
         } finally {
             codeExecutor.deleteFile(path);
         }
 
         return new ProblemJudgeResponse(JudgeResult.ACCEPTED.getMessage());
+    }
+
+    private void judge(TestCase testCase, Process process) {
+        try {
+            String input = testCase.getTestInput();
+            String expected = testCase.getTestOutput();
+
+            StringBuilder output = judgeService.insertInputAndGetOutput(process, input);
+
+            if (!isCorrect(output.toString(), expected)) {
+                throw new CodeExecutionException(JudgeResult.WRONG_ANSWER);
+            }
+        } finally {
+            judgeService.destroy(process);
+        }
     }
 
     private boolean isCorrect(String output, String expected) {
