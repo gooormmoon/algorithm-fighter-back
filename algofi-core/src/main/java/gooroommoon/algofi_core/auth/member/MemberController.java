@@ -3,7 +3,6 @@ package gooroommoon.algofi_core.auth.member;
 import gooroommoon.algofi_core.auth.member.dto.MemberRequest;
 import gooroommoon.algofi_core.auth.member.dto.MemberResponse;
 import gooroommoon.algofi_core.auth.member.dto.TokenResponse;
-import gooroommoon.algofi_core.auth.util.JwtUtil;
 import gooroommoon.algofi_core.dto.ExceptionResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

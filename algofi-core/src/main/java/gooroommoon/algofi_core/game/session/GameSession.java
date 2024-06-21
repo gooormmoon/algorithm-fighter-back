@@ -1,6 +1,6 @@
 package gooroommoon.algofi_core.game.session;
 
-import gooroommoon.algofi_core.game.session.dto.GameSessionResponse;
+import gooroommoon.algofi_core.algorithmproblem.dto.AlgorithmproblemResponse;
 import gooroommoon.algofi_core.game.session.exception.GameIsFullException;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +16,7 @@ public class GameSession {
 
     private String title;
 
-    private final String host;
+    private final String hostId;
 
     private final Set<String> players;
 
@@ -28,21 +28,27 @@ public class GameSession {
 
     private int timerTime;
 
-    //TODO 알고리즘 문제 세션에 저장
-    // private AlgorithmProblem algorithmProblem;
+    @Setter
+    private String hostGameCode;
+    @Setter
+    private String otherGameCode;
+
+    private AlgorithmproblemResponse algorithmProblem;
 
     private boolean isStarted;
+
+    private long startTime;
 
     private final String chatroomId;
 
     @Setter
     private ScheduledFuture<?> timeOverTask;
 
-    protected GameSession(String host, String title, String problemLevel, Integer timerTime) {
-        this.host = host;
+    protected GameSession(String hostId, String title, String problemLevel, Integer timerTime) {
+        this.hostId = hostId;
         this.maxPlayer = 2;
         this.players = new CopyOnWriteArraySet<>();
-        players.add(host);
+        players.add(hostId);
         this.readyPlayers = new CopyOnWriteArraySet<>();
         this.problemLevel = "1";
         this.timerTime = 1200;
@@ -99,18 +105,6 @@ public class GameSession {
     protected void start() {
         //TODO 알고리즘 문제 받아오기
         isStarted = true;
-    }
-
-    public GameSessionResponse toResponse() {
-        return GameSessionResponse.builder()
-                .title(title)
-                .host(host)
-                .players(players)
-                .readyPlayers(readyPlayers)
-                .maxPlayer(maxPlayer)
-                .problemLevel(problemLevel)
-                .timerTime(timerTime)
-                .chatroomId(chatroomId)
-                .build();
+        startTime = System.currentTimeMillis();
     }
 }

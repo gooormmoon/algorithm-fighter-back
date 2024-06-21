@@ -4,29 +4,13 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
-import java.util.Set;
-
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class GameSessionResponse {
-    private String title;
-
-    private String host;
-
-    private String hostId;
-
-    private Set<String> players;
-
-    private Set<String> readyPlayers;
-
-    private int maxPlayer;
-
-    private String problemLevel;
-
-    private int timerTime;
-
-    private String chatroomId;
+public class SubmitCodeRequest {
+    private Long algorithmProblemId;
+    private String language;
+    private String code;
 }

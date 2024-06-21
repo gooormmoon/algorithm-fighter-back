@@ -111,6 +111,12 @@ public class MemberService {
         }
     }
 
+    public String getMemberNickName(String loginId) {
+        Optional<Member> optionalMember = memberRepository.findByLoginId(loginId);
+        optionalMember.orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 아이디입니다."));
+        return optionalMember.get().getNickname();
+    }
+
     private MemberResponse fromMember(Member member) {
         return MemberResponse.builder()
                 .id(member.getLoginId())
