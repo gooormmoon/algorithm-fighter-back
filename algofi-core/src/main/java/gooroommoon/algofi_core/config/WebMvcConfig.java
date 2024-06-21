@@ -23,7 +23,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public WebClient compileServerWebClient(@Value("${compile-server-url}")String url) {
+    public WebClient compileServerWebClient(@Value("${compile-server.url}")String url) {
         HttpClient httpClient = HttpClient.create()
                 .responseTimeout(Duration.ofSeconds(20));
 
