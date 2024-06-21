@@ -17,6 +17,8 @@ public class GameSessionResponse {
 
     private String host;
 
+    private String hostId;
+
     private Set<String> players;
 
     private Set<String> readyPlayers;

@@ -47,8 +47,13 @@ public class GameSessionController {
     }
 
     @MessageMapping("/submit")
-    public void submitCode(Principal principal) {
-        gameSessionService.submitCode(principal.getName());
+    public void submitCode(Principal principal, @Payload GameCodeRequest request) {
+        gameSessionService.submitCode(principal.getName(), request);
+    }
+
+    @MessageMapping("/sessions")
+    public void getSessions(Principal principal) {
+        gameSessionService.sendSessions(principal.getName());
     }
 
     @MessageMapping("/save")

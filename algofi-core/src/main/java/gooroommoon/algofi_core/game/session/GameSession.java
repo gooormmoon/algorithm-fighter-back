@@ -16,7 +16,7 @@ public class GameSession {
 
     private String title;
 
-    private final String host;
+    private final String hostId;
 
     private final Set<String> players;
 
@@ -43,11 +43,11 @@ public class GameSession {
     @Setter
     private ScheduledFuture<?> timeOverTask;
 
-    protected GameSession(String host, String title, String problemLevel, Integer timerTime) {
-        this.host = host;
+    protected GameSession(String hostId, String title, String problemLevel, Integer timerTime) {
+        this.hostId = hostId;
         this.maxPlayer = 2;
         this.players = new CopyOnWriteArraySet<>();
-        players.add(host);
+        players.add(hostId);
         this.readyPlayers = new CopyOnWriteArraySet<>();
         this.problemLevel = "1";
         this.timerTime = 1200;
@@ -104,18 +104,5 @@ public class GameSession {
     protected void start() {
         //TODO 알고리즘 문제 받아오기
         isStarted = true;
-    }
-
-    public GameSessionResponse toResponse() {
-        return GameSessionResponse.builder()
-                .title(title)
-                .host(host)
-                .players(players)
-                .readyPlayers(readyPlayers)
-                .maxPlayer(maxPlayer)
-                .problemLevel(problemLevel)
-                .timerTime(timerTime)
-                .chatroomId(chatroomId)
-                .build();
     }
 }

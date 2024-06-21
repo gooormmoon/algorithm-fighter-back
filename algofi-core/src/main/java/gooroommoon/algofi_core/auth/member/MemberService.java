@@ -9,6 +9,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -109,6 +110,12 @@ public class MemberService {
         } else {
             throw new UsernameNotFoundException("아이디나 비밀번호가 틀립니다.");
         }
+    }
+
+    public String getMemberNickName(String loginId) {
+        Optional<Member> optionalMember = memberRepository.findByLoginId(loginId);
+        optionalMember.orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 아이디입니다."));
+        return optionalMember.get().getNickname();
     }
 
     private MemberResponse fromMember(Member member) {
