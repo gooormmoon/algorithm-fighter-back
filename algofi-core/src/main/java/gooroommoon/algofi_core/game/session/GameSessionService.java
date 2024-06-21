@@ -1,7 +1,10 @@
 package gooroommoon.algofi_core.game.session;
 
 
+import gooroommoon.algofi_core.algorithmproblem.Algorithmproblem;
 import gooroommoon.algofi_core.algorithmproblem.AlgorithmproblemService;
+import gooroommoon.algofi_core.algorithmproblem.dto.AlgorithmproblemResponse;
+import gooroommoon.algofi_core.algorithmproblem.exception.AlgorithmproblemNotFoundException;
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
 import gooroommoon.algofi_core.chat.entity.MessageType;
@@ -15,16 +18,19 @@ import gooroommoon.algofi_core.game.session.exception.NotAHostException;
 import gooroommoon.algofi_core.game.session.exception.PlayersNotReadyException;
 import gooroommoon.algofi_core.gameresult.GameresultService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GameSessionService {
 
     //유저가 채팅방에 새로 들어올 때 입장 메시지 보내는 메서드 호출하기
@@ -96,11 +102,39 @@ public class GameSessionService {
         if(!session.getHost().equals(hostId)) {
             throw new NotAHostException("방장만 게임을 시작할 수 있습니다.");
         }
+        String problemLevel = session.getProblemLevel();
         //TODO 문제 가져와서 넣기
         //랜덤 알고리즘문제
-        algorithmproblemService.getRandom(session.getProblemLevel());
+        try {
+            int attempts = 0;
+            int maxAttempts = 5; // 최대 재시도 횟수 설정
+            boolean success = false;
+
+            while (attempts < maxAttempts && !success) {
+                try {
+                    AlgorithmproblemResponse randomProblem = algorithmproblemService.getRandom(problemLevel);
+                    log.info("randomProblem.title = {}", randomProblem.getTitle());
+                    log.info("randomProblem.level = {}", randomProblem.getLevel());
+                    success = true; // 성공적으로 문제를 찾음
+                } catch (AlgorithmproblemNotFoundException e) {
+                    attempts++;
+                    log.warn("문제를 찾을 수 없습니다. 재시도 중... ({}/{})", attempts, maxAttempts);
+                }
+            }
+
+            if (!success) {
+                log.error("문제를 찾을 수 없습니다. 재시도 횟수 초과");
+                // 클라이언트에게 실패 응답을 보냄 (선택사항)
+                throw new AlgorithmproblemNotFoundException("문제를 찾을 수 없습니다. 재시도 횟수 초과");
+            }
+        } catch (Exception e) {
+            log.error("예상치 못한 오류 발생", e);
+            // 클라이언트에게 오류 응답을 보냄 (선택사항)
+        }
+
         session.start();
         //TODO 알고리즘 문제 가져와서 메시지 발행
+
         GameSessionService gameSessionService = this;
         ScheduledFuture<?> timeOverTask = executorService.schedule(() -> {
             gameSessionService.closeGame(session,null, session.getTimerTime());
@@ -131,8 +165,13 @@ public class GameSessionService {
             });
         }
         //TODO 게임 결과 저장
-        //TODO gameSession에서 필요한 것 다 가져오기
-        gameresultService.save(session, runningTime);
+        //TODO hostCode, guestCode,
+        String chatroomId = session.getChatroomId();
+        Set<String> players = session.getPlayers();
+        String hostCode = "hostCode";
+        String guestCode = "guestCode";
+        Algorithmproblem algorithmproblem = new Algorithmproblem();
+        gameresultService.save(chatroomId,players,hostCode,guestCode,algorithmproblem,runningTime);
         removeSession(session);
     }
 
