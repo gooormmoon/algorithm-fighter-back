@@ -4,7 +4,7 @@ import gooroommoon.algofi_core.auth.member.dto.MemberRequest;
 import gooroommoon.algofi_core.auth.member.dto.MemberResponse;
 import gooroommoon.algofi_core.auth.member.dto.TokenResponse;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
-import gooroommoon.algofi_core.chat.service.ChatRoomService;
+import gooroommoon.algofi_core.chat.service.ChatroomService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ public class ChatroomApiControllerTest {
     private TestRestTemplate testRestTemplate;
 
     @Autowired
-    ChatRoomService chatRoomService;
+    ChatroomService chatRoomService;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

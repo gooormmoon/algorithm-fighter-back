@@ -36,31 +36,31 @@ public class GetMessagesInChattingRoomTest {
     @WithMockUser(username = "user1", roles = {"USER"})
     @DisplayName("채팅방의 메시지 가져오기")
     public void testGetMessagesInChattingRoom() throws Exception {
-        UUID chatRoomId = UUID.randomUUID(); // 랜덤 UUID 생성
+        String chatroomId = UUID.randomUUID().toString(); // 랜덤 UUID 생성
 
         List<MessageDTO> messages = Arrays.asList(
                 MessageDTO.builder()
                         .type(MessageType.TALK)
                         .messageId(1L)
-                        .chatRoomId(chatRoomId)
-                        .senderId(1L) // Mock senderId
+                        .chatroomId(chatroomId)
+                        .senderId("user") // Mock senderId
                         .content("Hello!")
                         .createdDate(LocalDateTime.now().minusHours(1)) // Mock createdDate
                         .build(),
                 MessageDTO.builder()
                         .type(MessageType.TALK)
                         .messageId(2L)
-                        .chatRoomId(chatRoomId)
-                        .senderId(1L) // Mock senderId
+                        .chatroomId(chatroomId)
+                        .senderId("user") // Mock senderId
                         .content("Hi!")
                         .createdDate(LocalDateTime.now())
                         .build()
         );
 
-        given(chatService.getMessagesInChattingRoom(chatRoomId)).willReturn(messages);
+        given(chatService.getMessagesInChattingRoom(chatroomId)).willReturn(messages);
 
 
-        mockMvc.perform(get("/chat/{chatRoomId}/messages", chatRoomId))
+        mockMvc.perform(get("/chat/{chatroomId}/messages", chatroomId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].content").value("Hello!"))

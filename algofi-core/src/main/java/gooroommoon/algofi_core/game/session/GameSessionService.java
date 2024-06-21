@@ -5,7 +5,7 @@ import gooroommoon.algofi_core.algorithmproblem.AlgorithmproblemService;
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
 import gooroommoon.algofi_core.chat.entity.MessageType;
-import gooroommoon.algofi_core.chat.repository.ChatRoomRepository;
+import gooroommoon.algofi_core.chat.repository.ChatroomRepository;
 import gooroommoon.algofi_core.chat.service.ChatService;
 import gooroommoon.algofi_core.game.session.dto.GameSessionOverResponse;
 import gooroommoon.algofi_core.game.session.dto.GameSessionUpdateRequest;
@@ -32,7 +32,7 @@ public class GameSessionService {
     private final Map<String, GameSession> gameSessions = new ConcurrentHashMap<>();
     private final SimpMessagingTemplate messagingTemplate;
 
-    private final ChatRoomRepository chatRoomRepository;
+    private final ChatroomRepository chatRoomRepository;
 
     private final ChatService chatService;
 
@@ -53,9 +53,9 @@ public class GameSessionService {
         checkPlayerInGame(hostId);
         GameSession session = new GameSession(hostId, request.getTitle(), request.getProblemLevel(), request.getTimerTime());
         gameSessions.put(hostId, session);
-        Chatroom chatroom = new Chatroom(session.getChatRoomId(), hostId);
+        Chatroom chatroom = new Chatroom(session.getChatroomId(), hostId);
         chatRoomRepository.save(chatroom);
-        chatService.enterRoom(session.getChatRoomId(), hostId);
+        chatService.enterRoom(session.getChatroomId(), hostId);
 
         sendUpdateToPlayers(session);
     }
@@ -65,7 +65,7 @@ public class GameSessionService {
         GameSession session = getSession(hostId);
         session.addPlayer(playerId);
         gameSessions.put(playerId, session);
-        chatService.enterRoom(session.getChatRoomId(), playerId);
+        chatService.enterRoom(session.getChatroomId(), playerId);
 
         sendUpdateToPlayers(session);
     }
@@ -172,9 +172,9 @@ public class GameSessionService {
         String leaveMessage = playerId + "님이 퇴장하셨습니다.";
         MessageDTO message = MessageDTO.builder()
                 .type(MessageType.LEAVE)
-                .chatroomId(session.getChatRoomId())
+                .chatroomId(session.getChatroomId())
                 .content(leaveMessage)
                 .build();
-        messagingTemplate.convertAndSend("/topic/room/" + session.getChatRoomId(), message);
+        messagingTemplate.convertAndSend("/topic/room/" + session.getChatroomId(), message);
     }
 }

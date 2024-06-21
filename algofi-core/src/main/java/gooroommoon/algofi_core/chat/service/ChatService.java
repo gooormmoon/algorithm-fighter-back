@@ -26,7 +26,7 @@ public class ChatService {
     private final SimpMessageSendingOperations template;
     private final MemberRepository memberRepository;
     private final MessageRepository messageRepository;
-    private final ChatRoomService chatRoomService;
+    private final ChatroomService chatRoomService;
 
     @Transactional
     public void saveMessage(MessageDTO messageDTO, Principal principal) {
@@ -55,23 +55,25 @@ public class ChatService {
         messageRepository.save(message);
     }
 
-    public void sendMessage(MessageDTO message) {
+    public void sendMessage(MessageDTO message, Principal principal) {
         log.info("접속 채팅방 ID: {}", message.getChatroomId());
         log.info("접속 채팅방 Content: {}", message.getContent());
+        log.info("접속 채팅방 senderId: {}", message.getSenderId());
+        message.setSenderId(principal.getName());
+        message.setCreatedDate(LocalDateTime.now());
         template.convertAndSend("/topic/room/" + message.getChatroomId(), message);
     }
 
     @Transactional
-    public List<MessageDTO> getMessagesInChattingRoom(UUID chatRoomId) {
+    public List<MessageDTO> getMessagesInChattingRoom(String chatroomId) {
 
         // 채팅방의 메시지 목록을 가져옴
-        List<Message> messages = messageRepository.findByChatroomIdChatroomId(chatRoomId);
+        List<Message> messages = messageRepository.findByChatroomIdChatroomId(chatroomId);
 
         // Message 엔티티를 DTO로 반환
         return messages.stream()
                 .map(message -> MessageDTO.builder()
                         .type(message.getType())
-                        .messageId(message.getId())
                         .chatroomId(message.getChatroomId().getChatroomId())
                         .content(message.getContent())
                         .senderId(message.getSenderId().getLoginId())
@@ -83,11 +85,11 @@ public class ChatService {
     @Transactional
     public void saveAndSendMessage(MessageDTO message, Principal principal) {
         saveMessage(message, principal);
-        sendMessage(message);
+        sendMessage(message, principal);
     }
 
     @Transactional
-    public void enterRoom(UUID roomId, String memberId) {
+    public void enterRoom(String roomId, String memberId) {
         log.info("방 ID: {}로 입장 메시지 보내기", roomId);
 
         // 입장한 멤버의 엔티티 조회
@@ -110,7 +112,6 @@ public class ChatService {
 
         MessageDTO messageDTO = MessageDTO.builder()
                 .type(message.getType())
-                .messageId(message.getId())
                 .chatroomId(message.getChatroomId().getChatroomId())
                 .senderId(message.getSenderId().getLoginId())
                 .content(message.getContent())

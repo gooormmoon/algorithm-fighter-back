@@ -1,7 +1,7 @@
 package gooroommoon.algofi_core.chat.controller;
 
 import gooroommoon.algofi_core.chat.entity.Chatroom;
-import gooroommoon.algofi_core.chat.service.ChatRoomService;
+import gooroommoon.algofi_core.chat.service.ChatroomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,11 +13,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatRoomController {
 
-    private final ChatRoomService chatRoomService;
+    private final ChatroomService chatroomService;
 
     @GetMapping("/api/chat/list")
     public ResponseEntity<List<Chatroom>> findAllChatroom() {
-        List<Chatroom> allChatroom = chatRoomService.findAllChatroom();
+        List<Chatroom> allChatroom = chatroomService.findAllChatroom();
 
         return ResponseEntity.ok().body(allChatroom);
     }

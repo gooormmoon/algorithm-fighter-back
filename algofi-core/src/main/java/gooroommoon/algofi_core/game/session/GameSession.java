@@ -33,7 +33,7 @@ public class GameSession {
 
     private boolean isStarted;
 
-    private final UUID chatRoomId;
+    private final String chatroomId;
 
     @Setter
     private ScheduledFuture<?> timeOverTask;
@@ -47,7 +47,7 @@ public class GameSession {
         this.problemLevel = "1";
         this.timerTime = 1200;
         this.isStarted = false;
-        this.chatRoomId = UUID.randomUUID();
+        this.chatroomId = UUID.randomUUID().toString();
         updateSettings(title, problemLevel, timerTime);
     }
 
@@ -110,7 +110,7 @@ public class GameSession {
                 .maxPlayer(maxPlayer)
                 .problemLevel(problemLevel)
                 .timerTime(timerTime)
-                .chatRoomId(chatRoomId)
+                .chatroomId(chatroomId)
                 .build();
     }
 }
