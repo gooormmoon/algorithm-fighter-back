@@ -32,7 +32,7 @@ public class InputJudgeController {
         StringBuilder output = insertInputAndGetOutput(request.getInput(), process, codeExecutor, path);
 
         String result = output.toString();
-        CodeExecutionResponse response = generateResponse(request, result);
+        CodeExecutionResponse response = generateResponse(request.getExpected(), result);
         return ResponseEntity.ok(response);
     }
 
@@ -63,11 +63,15 @@ public class InputJudgeController {
         }
     }
 
-    private CodeExecutionResponse generateResponse(CodeExecutionRequest request, String result) {
-        if (!result.equals(request.getExpected())) {
+    private CodeExecutionResponse generateResponse(String expected, String result) {
+        if (!isCorrect(expected, result)) {
             throw new CodeExecutionException(JudgeResult.WRONG_ANSWER);
         }
 
         return new CodeExecutionResponse(result, JudgeResult.ACCEPTED.getMessage());
+    }
+
+    private boolean isCorrect(String output, String expected) {
+        return output.equals(expected) || output.stripTrailing().equals(expected.stripTrailing());
     }
 }
