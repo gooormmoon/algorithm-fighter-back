@@ -2,7 +2,6 @@ package gooroommoon.algofi_core.game.session;
 
 
 import gooroommoon.algofi_core.algorithmproblem.AlgorithmproblemService;
-import gooroommoon.algofi_core.auth.member.MemberRepository;
 import gooroommoon.algofi_core.auth.member.MemberService;
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
@@ -57,7 +56,7 @@ public class GameSessionService {
         GameSessionsResponse response = new GameSessionsResponse(new ArrayList<>());
         Set<GameSession> sessions = new HashSet<>(gameSessions.values());
 
-        sessions.stream().forEach(session -> {
+        sessions.stream().forEach(session ->
             response.getRooms().add(GameSessionsResponse.Session.builder()
                     .host(memberService.getMemberNickName(session.getHostId()))
                     .hostId(session.getHostId())
@@ -66,8 +65,7 @@ public class GameSessionService {
                     .problemLevel(session.getProblemLevel())
                     .timerTime(session.getTimerTime())
                     .isStarted(session.isStarted())
-                    .build());
-        });
+                    .build()));
 
         return response;
     }
@@ -140,9 +138,9 @@ public class GameSessionService {
         //TODO 알고리즘 문제 가져와서 메시지 발행
         //TODO 러닝타임 기록
         GameSessionService gameSessionService = this;
-        ScheduledFuture<?> timeOverTask = executorService.schedule(() -> {
-            gameSessionService.closeGame(session,null, session.getTimerTime());
-        }, session.getTimerTime(), TimeUnit.SECONDS);
+        ScheduledFuture<?> timeOverTask = executorService.schedule(() ->
+            gameSessionService.closeGame(session,null, session.getTimerTime())
+        , session.getTimerTime(), TimeUnit.SECONDS);
         session.setTimeOverTask(timeOverTask);
     }
 
@@ -167,22 +165,24 @@ public class GameSessionService {
             session.getTimeOverTask().cancel(true);
         } else {
             GameSessionOverResponse timeOverResponse = new GameSessionOverResponse(GameOverType.TIME_OVER, runningTime);
-            session.getPlayersStream().forEach(id -> {
-                messagingTemplate.convertAndSendToUser(id, "/queue/game/session", timeOverResponse);
-            });
+            session.getPlayersStream().forEach(id ->
+                messagingTemplate.convertAndSendToUser(id, "/queue/game/session", timeOverResponse));
         }
     }
-
+    //게임이 종료된 후 클라이언트의 요청을 받아 코드를 저장
     public void savePlayerCode(String playerId, GameCodeRequest request) {
-        GameSession session = getSession(playerId);
-        if(playerId.equals(session.getHostId())) {
-            session.setHostGameCode(request.getCode());
-        } else {
-            session.setOtherGameCode(request.getCode());
-        }
 
-        if(session.getHostGameCode() != null && session.getOtherGameCode() != null) {
-            saveResult(session);
+        GameSession session = getSession(playerId);
+        if(session.isStarted()) {
+            if (playerId.equals(session.getHostId())) {
+                session.setHostGameCode(request.getCode());
+            } else {
+                session.setOtherGameCode(request.getCode());
+            }
+            //양 측의 코드가 저장됐으면 DB에 저장
+            if (session.getHostGameCode() != null && session.getOtherGameCode() != null) {
+                saveResult(session);
+            }
         }
     }
 
@@ -202,11 +202,11 @@ public class GameSessionService {
     }
 
     private void sendUpdateToPlayers(GameSession session) {
-        session.getPlayersStream().forEach(id -> {
+        session.getPlayersStream().forEach(id ->
             messagingTemplate.convertAndSendToUser(
                     id, "/queue/game/session", toResponse(session)
-            );
-        });
+            )
+        );
     }
 
     public GameSessionResponse toResponse(GameSession session) {
