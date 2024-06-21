@@ -22,7 +22,6 @@ public class ChatController {
     private final ChatService chatService;
     @MessageMapping("/enter-room/{roomId}")
     public void enterMessage(@DestinationVariable String roomId, Principal principal) {
-        System.out.println("Room ID: " + roomId);
         chatService.enterRoom(roomId, principal.getName());
     }
     @MessageMapping("/send-message")
