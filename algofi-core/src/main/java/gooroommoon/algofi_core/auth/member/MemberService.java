@@ -32,7 +32,7 @@ public class MemberService {
                 .build();
 
         if(registerRequest.getNickname() == null)
-            member.setNickname("user%s".formatted(Math.random()*100));
+            member.setNickname("user%s".formatted((int)(Math.random()*100)));
         else
             member.setNickname(registerRequest.getNickname());
 
@@ -109,6 +109,12 @@ public class MemberService {
         } else {
             throw new UsernameNotFoundException("아이디나 비밀번호가 틀립니다.");
         }
+    }
+
+    public String getMemberNickName(String loginId) {
+        Optional<Member> optionalMember = memberRepository.findByLoginId(loginId);
+        optionalMember.orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 아이디입니다."));
+        return optionalMember.get().getNickname();
     }
 
     private MemberResponse fromMember(Member member) {

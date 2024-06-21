@@ -2,7 +2,6 @@ package gooroommoon.algofi_core.auth.member.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import gooroommoon.algofi_core.auth.member.Member;
 import lombok.*;
 
 import java.time.LocalDateTime;

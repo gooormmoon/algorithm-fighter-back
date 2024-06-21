@@ -41,17 +41,15 @@ public class GetMessagesInChattingRoomTest {
         List<MessageDTO> messages = Arrays.asList(
                 MessageDTO.builder()
                         .type(MessageType.TALK)
-//                        .messageId(1L)
                         .chatroomId(chatroomId)
-                        .senderId("user") // Mock senderId
+                        .senderId("user1") // Mock senderId
                         .content("Hello!")
                         .createdDate(LocalDateTime.now().minusHours(1)) // Mock createdDate
                         .build(),
                 MessageDTO.builder()
                         .type(MessageType.TALK)
-//                        .messageId(2L)
                         .chatroomId(chatroomId)
-                        .senderId("user") // Mock senderId
+                        .senderId("user2") // Mock senderId
                         .content("Hi!")
                         .createdDate(LocalDateTime.now())
                         .build()
