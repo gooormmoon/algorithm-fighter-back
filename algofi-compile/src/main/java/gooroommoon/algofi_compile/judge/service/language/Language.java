@@ -1,6 +1,6 @@
-package gooroommoon.algofi_compile.service.language;
+package gooroommoon.algofi_compile.judge.service.language;
 
-import gooroommoon.algofi_compile.exception.RequestException;
+import gooroommoon.algofi_compile.judge.exception.RequestException;
 
 import java.util.Arrays;
 
