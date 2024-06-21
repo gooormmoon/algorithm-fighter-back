@@ -28,6 +28,11 @@ public class GameSession {
 
     private int timerTime;
 
+    @Setter
+    private String hostGameCode;
+    @Setter
+    private String otherGameCode;
+
     //TODO 알고리즘 문제 세션에 저장
     // private AlgorithmProblem algorithmProblem;
 

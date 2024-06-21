@@ -7,6 +7,7 @@ import gooroommoon.algofi_core.chat.entity.Chatroom;
 import gooroommoon.algofi_core.chat.entity.MessageType;
 import gooroommoon.algofi_core.chat.repository.ChatroomRepository;
 import gooroommoon.algofi_core.chat.service.ChatService;
+import gooroommoon.algofi_core.game.session.dto.GameCodeRequest;
 import gooroommoon.algofi_core.game.session.dto.GameSessionOverResponse;
 import gooroommoon.algofi_core.game.session.dto.GameSessionUpdateRequest;
 import gooroommoon.algofi_core.game.session.exception.AlreadyInGameSessionException;
@@ -130,10 +131,24 @@ public class GameSessionService {
                 messagingTemplate.convertAndSendToUser(id, "/queue/game/session", timeOverResponse);
             });
         }
+    }
+
+    public void savePlayerCode(String playerId, GameCodeRequest request) {
+        GameSession session = getSession(playerId);
+        if(playerId.equals(session.getHost())) {
+            session.setHostGameCode(request.getCode());
+        } else {
+            session.setOtherGameCode(request.getCode());
+        }
+
+        if(session.getHostGameCode() != null && session.getOtherGameCode() != null) {
+            saveResult(session);
+        }
+    }
+
+    private void saveResult(GameSession session) {
         //TODO 게임 결과 저장
-        //TODO gameSession에서 필요한 것 다 가져오기
-        gameresultService.save(session, runningTime);
-        removeSession(session);
+        //TODO 게임 세션 삭제
     }
 
     public void removeSession(GameSession session) {
@@ -165,8 +180,8 @@ public class GameSessionService {
         session.removePlayer(playerId);
         if(playerId.equals(session.getHost())) {
             removeSession(session);
+            //TODO 참가중인 모든 플레이어에게 방 삭제 메시지 발행
         }
-        //TODO 방 삭제 메시지 발행
 
         // 퇴장 메시지 발행
         String leaveMessage = playerId + "님이 퇴장하셨습니다.";

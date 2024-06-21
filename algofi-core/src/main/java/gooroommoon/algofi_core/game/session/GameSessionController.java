@@ -1,6 +1,7 @@
 package gooroommoon.algofi_core.game.session;
 
 import gooroommoon.algofi_core.dto.ExceptionResponse;
+import gooroommoon.algofi_core.game.session.dto.GameCodeRequest;
 import gooroommoon.algofi_core.game.session.dto.GameSessionJoinRequest;
 import gooroommoon.algofi_core.game.session.dto.GameSessionUpdateRequest;
 import gooroommoon.algofi_core.game.session.exception.*;
@@ -48,6 +49,11 @@ public class GameSessionController {
     @MessageMapping("/submit")
     public void submitCode(Principal principal) {
         gameSessionService.submitCode(principal.getName());
+    }
+
+    @MessageMapping("/save")
+    public void saveCode(Principal principal, @Payload GameCodeRequest request) {
+        gameSessionService.savePlayerCode(principal.getName(), request);
     }
 
     @MessageExceptionHandler({
