@@ -38,8 +38,9 @@ public class ChatService {
         Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new IllegalArgumentException("현재 인증된 사용자의 정보를 찾을 수 없습니다."));
 
+        System.out.println("saveMessage의 ChatroomId: " + messageDTO.getChatroomId().toString());
         // 채팅방 찾기
-        Chatroom chatroom = chatRoomService.findRoomById(messageDTO.getChatroomId());
+        Chatroom chatroom = chatRoomService.findRoomById(messageDTO.getChatroomId().toString());
 
         // Message 엔티티 생성 및 저장
         Message message = Message.builder()
@@ -62,7 +63,7 @@ public class ChatService {
     }
 
     @Transactional
-    public List<MessageDTO> getMessagesInChattingRoom(UUID chatRoomId) {
+    public List<MessageDTO> getMessagesInChattingRoom(String chatRoomId) {
 
         // 채팅방의 메시지 목록을 가져옴
         List<Message> messages = messageRepository.findByChatroomIdChatroomId(chatRoomId);
@@ -72,7 +73,7 @@ public class ChatService {
                 .map(message -> MessageDTO.builder()
                         .type(message.getType())
                         .messageId(message.getId())
-                        .chatroomId(message.getChatroomId().getChatroomId())
+                        .chatroomId(UUID.fromString(message.getChatroomId().getChatroomId()))
                         .content(message.getContent())
                         .senderId(message.getSenderId().getLoginId())
                         .createdDate(message.getCreatedDate())
@@ -87,7 +88,7 @@ public class ChatService {
     }
 
     @Transactional
-    public void enterRoom(UUID roomId, String memberId) {
+    public void enterRoom(String roomId, String memberId) {
         log.info("방 ID: {}로 입장 메시지 보내기", roomId);
 
         // 입장한 멤버의 엔티티 조회
@@ -111,7 +112,7 @@ public class ChatService {
         MessageDTO messageDTO = MessageDTO.builder()
                 .type(message.getType())
                 .messageId(message.getId())
-                .chatroomId(message.getChatroomId().getChatroomId())
+                .chatroomId(UUID.fromString(message.getChatroomId().getChatroomId()))
                 .senderId(message.getSenderId().getLoginId())
                 .content(message.getContent())
                 .createdDate(message.getCreatedDate())

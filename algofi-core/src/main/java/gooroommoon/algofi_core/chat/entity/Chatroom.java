@@ -13,7 +13,7 @@ public class Chatroom {
 
     @Id
     @Column(name = "CHATROOM_ID", updatable = false, nullable = false)
-    private UUID chatroomId;
+    private String chatroomId;
 
     private String chatroomName;
 

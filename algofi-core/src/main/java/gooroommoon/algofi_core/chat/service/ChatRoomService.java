@@ -24,7 +24,7 @@ public class ChatRoomService {
     }
 
     @Transactional
-    public Chatroom ensureChatRoomExists(UUID roomId) {
+    public Chatroom ensureChatRoomExists(String roomId) {
         return chatRoomRepository.findByChatroomId(roomId)
                 .orElseGet(() -> {
                     Chatroom chatRoom = new Chatroom();
@@ -34,15 +34,9 @@ public class ChatRoomService {
     }
 
     @Transactional(readOnly = true)
-    public Chatroom findRoomById(UUID roomId) {
-        try {
-            return chatRoomRepository.findByChatroomId(roomId)
-                    .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다. roomId: " + roomId));
-        } catch (IllegalArgumentException e) {
-            log.info("Error: {}", e.getMessage());
-            System.err.println("Error: " + e.getMessage());
-            e.printStackTrace();
-            throw e;
-        }
+    public Chatroom findRoomById(String roomId) {
+        System.out.println("ROOMID : "+roomId);
+        return chatRoomRepository.findByChatroomId(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다. roomId: " + roomId));
     }
 }

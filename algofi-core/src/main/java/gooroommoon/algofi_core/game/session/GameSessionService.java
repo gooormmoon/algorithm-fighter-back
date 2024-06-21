@@ -47,9 +47,9 @@ public class GameSessionService {
         checkPlayerInGame(hostId);
         GameSession session = new GameSession(hostId, request.getTitle(), request.getProblemLevel(), request.getTimerTime());
         gameSessions.put(hostId, session);
-        Chatroom chatroom = new Chatroom(session.getChatRoomId(), hostId);
+        Chatroom chatroom = new Chatroom(session.getChatRoomId().toString(), hostId);
         chatRoomRepository.save(chatroom);
-        chatService.enterRoom(session.getChatRoomId(), hostId);
+        chatService.enterRoom(session.getChatRoomId().toString(), hostId);
 
         sendUpdateToPlayers(session);
     }
@@ -59,7 +59,7 @@ public class GameSessionService {
         GameSession session = getSession(hostId);
         session.addPlayer(playerId);
         gameSessions.put(playerId, session);
-        chatService.enterRoom(session.getChatRoomId(), playerId);
+        chatService.enterRoom(session.getChatRoomId().toString(), playerId);
 
         sendUpdateToPlayers(session);
     }

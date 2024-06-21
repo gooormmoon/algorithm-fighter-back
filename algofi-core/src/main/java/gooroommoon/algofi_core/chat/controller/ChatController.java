@@ -24,8 +24,7 @@ public class ChatController {
     @MessageMapping("/enter-room/{roomId}")
     public void enterMessage(@DestinationVariable String roomId, Principal principal) {
         System.out.println("Room ID: " + roomId);
-        UUID chatRoomId = UUID.fromString(roomId);
-        chatService.enterRoom(chatRoomId, principal.getName());
+        chatService.enterRoom(roomId, principal.getName());
     }
     @MessageMapping("/send-message")
     public void sendMessage(@Payload MessageDTO message, Principal principal) {
@@ -33,7 +32,7 @@ public class ChatController {
     }
 
     @GetMapping("/chat/{roomId}/messages")
-    public List<MessageDTO> getMessagesInChattingRoom(@PathVariable UUID roomId) {
+    public List<MessageDTO> getMessagesInChattingRoom(@PathVariable String roomId) {
         return chatService.getMessagesInChattingRoom(roomId);
     }
 }
