@@ -80,6 +80,10 @@ public class GameresultService {
         return fromGameresult(GameresultByMemberIdAndGameresultId);
     }
 
+    public List<Gameresult> findAllGameresult() {
+        return gameresultRepository.findAll();
+    }
+
     private GameresultResponse fromGameresult(Gameresult Gameresult) {
         return GameresultResponse.builder()
                 .runningTime(Gameresult.getRunningTime())
