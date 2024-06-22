@@ -1,6 +1,6 @@
 package gooroommoon.algofi_core.game.session;
 
-import gooroommoon.algofi_core.algorithmproblem.dto.AlgorithmproblemResponse;
+import gooroommoon.algofi_core.algorithmproblem.Algorithmproblem;
 import gooroommoon.algofi_core.game.session.exception.GameIsFullException;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,11 +33,13 @@ public class GameSession {
     @Setter
     private String otherGameCode;
 
-    private AlgorithmproblemResponse algorithmProblem;
+    private Algorithmproblem algorithmProblem;
 
     private boolean isStarted;
 
     private long startTime;
+    @Setter
+    private int runningTime;
 
     private final String chatroomId;
 
@@ -102,9 +104,9 @@ public class GameSession {
 
     }
 
-    protected void start() {
-        //TODO 알고리즘 문제 받아오기
+    protected void start(Algorithmproblem algorithmproblem) {
         isStarted = true;
         startTime = System.currentTimeMillis();
+        this.algorithmProblem = algorithmproblem;
     }
 }
