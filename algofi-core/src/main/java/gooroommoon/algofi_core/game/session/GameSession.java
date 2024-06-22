@@ -50,7 +50,7 @@ public class GameSession {
         this.hostId = hostId;
         this.maxPlayer = 2;
         this.players = new CopyOnWriteArraySet<>();
-        players.add(hostId);
+        this.players.add(hostId);
         this.readyPlayers = new CopyOnWriteArraySet<>();
         this.problemLevel = "1";
         this.timerTime = 1200;
