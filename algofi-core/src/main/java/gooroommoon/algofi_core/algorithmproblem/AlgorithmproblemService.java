@@ -1,5 +1,6 @@
 package gooroommoon.algofi_core.algorithmproblem;
 
+import gooroommoon.algofi_core.algorithmproblem.dto.AlgorithmproblemResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,14 @@ public class AlgorithmproblemService {
         int size = findAllProblems.size();
 
         return findAllProblems.get(random.nextInt(size));
+    }
+
+    public AlgorithmproblemResponse toResponse(Algorithmproblem algorithmproblem) {
+        return AlgorithmproblemResponse.builder()
+                .title(algorithmproblem.getTitle())
+                .content(algorithmproblem.getContent())
+                .level(algorithmproblem.getLevel())
+                .build();
     }
 
 //    private List<AlgorithmproblemResponse> fromAlgorithmproblems(List<Algorithmproblem> Algorithmproblems) {
