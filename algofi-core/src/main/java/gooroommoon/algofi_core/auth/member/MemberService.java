@@ -32,7 +32,7 @@ public class MemberService {
                 .build();
 
         if(registerRequest.getNickname() == null)
-            member.setNickname("user%s".formatted(Math.random()*100));
+            member.setNickname("user%s".formatted((int)(Math.random()*100)));
         else
             member.setNickname(registerRequest.getNickname());
 
