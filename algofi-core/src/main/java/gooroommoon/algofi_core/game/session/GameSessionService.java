@@ -62,6 +62,7 @@ public class GameSessionService {
                     .host(memberService.getMemberNickName(session.getHostId()))
                     .hostId(session.getHostId())
                     .title(session.getTitle())
+                    .players(session.getPlayers())
                     .maxPlayer(session.getMaxPlayer())
                     .problemLevel(session.getProblemLevel())
                     .timerTime(session.getTimerTime())
@@ -94,6 +95,7 @@ public class GameSessionService {
         chatService.enterRoom(session.getChatroomId(), hostId);
 
         sendUpdateToPlayers(session);
+        sendSessions();
     }
 
     public void addPlayer(String hostId, String playerId) {
@@ -104,6 +106,7 @@ public class GameSessionService {
         chatService.enterRoom(session.getChatroomId(), playerId);
 
         sendUpdateToPlayers(session);
+        sendSessions();
     }
 
     public void updateSetting(String hostId, GameSessionUpdateRequest request) {
@@ -212,6 +215,7 @@ public class GameSessionService {
 
     public void removeSession(GameSession session) {
         session.getPlayersStream().forEach(gameSessions::remove);
+        sendSessions();
     }
 
     private void checkPlayerInGame(String playerId) {

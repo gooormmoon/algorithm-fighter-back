@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @AllArgsConstructor
@@ -23,6 +24,7 @@ public class GameSessionsResponse {
         private String host;
         private String hostId;
         private String title;
+        private Set<String> players;
         private int maxPlayer;
         private String problemLevel;
         private int timerTime;
