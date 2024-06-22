@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
 import java.util.Set;
-import java.util.UUID;
 
 @Getter
 @Builder
@@ -16,6 +15,8 @@ public class GameSessionResponse {
     private String title;
 
     private String host;
+
+    private String hostId;
 
     private Set<String> players;
 
