@@ -105,6 +105,7 @@ public class GameSessionService {
         chatService.enterRoom(session.getChatroomId(), playerId);
 
         sendUpdateToPlayers(session, "join");
+        sendUpdateToPlayers(session, "session");
         sendSessions();
     }
 
