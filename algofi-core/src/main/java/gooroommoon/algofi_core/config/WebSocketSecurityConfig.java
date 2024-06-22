@@ -12,7 +12,12 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
     protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
         messages
                 .nullDestMatcher().permitAll()
-                .simpSubscribeDestMatchers("/user/queue/game/session").authenticated()
+                .simpSubscribeDestMatchers("/user/queue/game/session",
+                        "/user/queue/game/sessions",
+                        "/user/queue/game/join",
+                        "/user/queue/game/start",
+                        "/user/queue/game/result",
+                        "/user/queue/game/over").authenticated()
                 .simpSubscribeDestMatchers("/topic/room/*").permitAll()
                 .simpDestMatchers("/app/**").authenticated()
                 .anyMessage().denyAll();
