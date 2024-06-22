@@ -5,11 +5,11 @@ import gooroommoon.algofi_core.gameresult.dto.GameresultsResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.security.Principal;
 import java.util.List;
 
 @Slf4j
@@ -24,8 +24,8 @@ public class GameresultController {
      */
     //TODO uri 정해야함
     @GetMapping("/api/game/member/{GameresultId}")
-    public ResponseEntity findGameresult(@PathVariable Long GameresultId, Principal principal) {
-        GameresultResponse gameresult = gameresultService.findGameresult(principal.getName(), GameresultId);
+    public ResponseEntity findGameresult(@PathVariable Long GameresultId, Authentication auth) {
+        GameresultResponse gameresult = gameresultService.findGameresult(auth.getName(), GameresultId);
 
         //TODO 상태코드랑, 메세지같이 보내야함
         return ResponseEntity.ok().body(gameresult);
@@ -36,8 +36,8 @@ public class GameresultController {
      */
     //TODO uri 정해야함
     @GetMapping("/api/game/member/gameresults")
-    public ResponseEntity<List<GameresultsResponse>> findAllGameresults(Principal principal) {
-        List<GameresultsResponse> gameresultList = gameresultService.findGameresultList(principal.getName());
+    public ResponseEntity<List<GameresultsResponse>> findAllGameresults(Authentication auth) {
+        List<GameresultsResponse> gameresultList = gameresultService.findGameresultList(auth.getName());
 
         return ResponseEntity.ok().body(gameresultList);
     }

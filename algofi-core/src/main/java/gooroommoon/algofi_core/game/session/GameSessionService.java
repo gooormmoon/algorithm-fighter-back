@@ -1,11 +1,13 @@
 package gooroommoon.algofi_core.game.session;
 
 
+import gooroommoon.algofi_core.algorithmproblem.Algorithmproblem;
 import gooroommoon.algofi_core.algorithmproblem.AlgorithmproblemService;
+import gooroommoon.algofi_core.algorithmproblem.dto.AlgorithmproblemResponse;
+import gooroommoon.algofi_core.algorithmproblem.exception.AlgorithmproblemNotFoundException;
 import gooroommoon.algofi_core.auth.member.MemberService;
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
-import gooroommoon.algofi_core.chat.entity.Message;
 import gooroommoon.algofi_core.chat.entity.MessageType;
 import gooroommoon.algofi_core.chat.repository.ChatroomRepository;
 import gooroommoon.algofi_core.chat.service.ChatService;
@@ -13,6 +15,7 @@ import gooroommoon.algofi_core.game.session.dto.*;
 import gooroommoon.algofi_core.game.session.exception.*;
 import gooroommoon.algofi_core.gameresult.GameresultService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
@@ -20,12 +23,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import java.util.Map;
+import java.util.Set;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GameSessionService {
 
     //유저가 채팅방에 새로 들어올 때 입장 메시지 보내는 메서드 호출하기
@@ -62,6 +68,7 @@ public class GameSessionService {
                     .host(memberService.getMemberNickName(session.getHostId()))
                     .hostId(session.getHostId())
                     .title(session.getTitle())
+                    .players(session.getPlayers())
                     .maxPlayer(session.getMaxPlayer())
                     .problemLevel(session.getProblemLevel())
                     .timerTime(session.getTimerTime())
@@ -72,7 +79,7 @@ public class GameSessionService {
     }
 
     public void sendSessions(String loginId) {
-        messagingTemplate.convertAndSendToUser(loginId, "/queue/game/session", getSessionsResponse());
+        messagingTemplate.convertAndSendToUser(loginId, "/queue/game/sessions", getSessionsResponse());
     }
 
     public void sendSessions() {
@@ -80,7 +87,7 @@ public class GameSessionService {
         userRegistry.getUsers().forEach(user -> {
             String playerId = user.getPrincipal().getName();
             if(!gameSessions.containsKey(playerId)) {
-                messagingTemplate.convertAndSendToUser(playerId, "/queue/game/session", response);
+                messagingTemplate.convertAndSendToUser(playerId, "/queue/game/sessions", response);
             }
         });
     }
@@ -93,7 +100,8 @@ public class GameSessionService {
         chatRoomRepository.save(chatroom);
         chatService.enterRoom(session.getChatroomId(), hostId);
 
-        sendUpdateToPlayers(session);
+        sendUpdateToPlayers(session, "join");
+        sendSessions();
     }
 
     public void addPlayer(String hostId, String playerId) {
@@ -103,7 +111,8 @@ public class GameSessionService {
         gameSessions.put(playerId, session);
         chatService.enterRoom(session.getChatroomId(), playerId);
 
-        sendUpdateToPlayers(session);
+        sendUpdateToPlayers(session, "join");
+        sendSessions();
     }
 
     public void updateSetting(String hostId, GameSessionUpdateRequest request) {
@@ -111,7 +120,7 @@ public class GameSessionService {
         if(session.getHostId().equals(hostId)) {
             session.updateSettings(request.getTitle(), request.getProblemLevel(), request.getTimerTime());
 
-            sendUpdateToPlayers(session);
+            sendUpdateToPlayers(session, "session");
         } else {
             throw new NotAHostException("방장만 게임 설정을 변경할 수 있습니다.");
         }
@@ -121,7 +130,7 @@ public class GameSessionService {
         GameSession session = getSession(playerId);
         session.addReadyPlayer(playerId);
 
-        sendUpdateToPlayers(session);
+        sendUpdateToPlayers(session, "session");
     }
 
     public void startGame(String hostId) {
@@ -132,11 +141,39 @@ public class GameSessionService {
         if(!session.getHostId().equals(hostId)) {
             throw new NotAHostException("방장만 게임을 시작할 수 있습니다.");
         }
+        String problemLevel = session.getProblemLevel();
         //TODO 문제 가져와서 넣기
         //랜덤 알고리즘문제
-        algorithmproblemService.getRandom(session.getProblemLevel());
+        try {
+            int attempts = 0;
+            int maxAttempts = 5; // 최대 재시도 횟수 설정
+            boolean success = false;
+
+            while (attempts < maxAttempts && !success) {
+                try {
+                    AlgorithmproblemResponse randomProblem = algorithmproblemService.getRandom(problemLevel);
+                    log.info("randomProblem.title = {}", randomProblem.getTitle());
+                    log.info("randomProblem.level = {}", randomProblem.getLevel());
+                    success = true; // 성공적으로 문제를 찾음
+                } catch (AlgorithmproblemNotFoundException e) {
+                    attempts++;
+                    log.warn("문제를 찾을 수 없습니다. 재시도 중... ({}/{})", attempts, maxAttempts);
+                }
+            }
+
+            if (!success) {
+                log.error("문제를 찾을 수 없습니다. 재시도 횟수 초과");
+                // 클라이언트에게 실패 응답을 보냄 (선택사항)
+                throw new AlgorithmproblemNotFoundException("문제를 찾을 수 없습니다. 재시도 횟수 초과");
+            }
+        } catch (Exception e) {
+            log.error("예상치 못한 오류 발생", e);
+            // 클라이언트에게 오류 응답을 보냄 (선택사항)
+        }
+
         session.start();
         //TODO 알고리즘 문제 가져와서 메시지 발행
+
         GameSessionService gameSessionService = this;
         ScheduledFuture<?> timeOverTask = executorService.schedule(() ->
             gameSessionService.closeGame(session,null, session.getTimerTime())
@@ -160,6 +197,7 @@ public class GameSessionService {
                 .toEntity(SubmitResultResponse.class)
                 .subscribe(response -> {
                     String message = response.getBody().getMessage();
+                    messagingTemplate.convertAndSendToUser(playerId, "/queue/game/result", message);
                     if(message.equals("맞았습니다.")) {
                         closeGame(session, playerId, (int)(System.currentTimeMillis() - session.getStartTime()));
                     } else {
@@ -173,17 +211,17 @@ public class GameSessionService {
             GameSessionOverResponse winnerResponse = new GameSessionOverResponse(GameOverType.WIN, runningTime);
             GameSessionOverResponse loserResponse = new GameSessionOverResponse(GameOverType.LOSE, runningTime);
             messagingTemplate.convertAndSendToUser(
-                    winnerId, "/queue/game/session", winnerResponse
+                    winnerId, "/queue/game/over", winnerResponse
             );
             session.getPlayersStream().forEach(id -> {
                 if(!id.equals(winnerId))
-                    messagingTemplate.convertAndSendToUser(id, "/queue/game/session", loserResponse);
+                    messagingTemplate.convertAndSendToUser(id, "/queue/game/over", loserResponse);
             });
             session.getTimeOverTask().cancel(true);
         } else {
             GameSessionOverResponse timeOverResponse = new GameSessionOverResponse(GameOverType.TIME_OVER, runningTime);
             session.getPlayersStream().forEach(id ->
-                messagingTemplate.convertAndSendToUser(id, "/queue/game/session", timeOverResponse));
+                messagingTemplate.convertAndSendToUser(id, "/queue/game/over", timeOverResponse));
         }
     }
     //게임이 종료된 후 클라이언트의 요청을 받아 코드를 저장
@@ -207,11 +245,20 @@ public class GameSessionService {
 
     private void saveResult(GameSession session) {
         //TODO 게임 결과 저장
+        //TODO hostCode, guestCode,
+        String chatroomId = session.getChatroomId();
+        Set<String> players = session.getPlayers();
+        String hostCode = "hostCode";
+        String guestCode = "guestCode";
+        Algorithmproblem algorithmproblem = new Algorithmproblem();
+        gameresultService.save(chatroomId,players,hostCode,guestCode,algorithmproblem,runningTime);
+        removeSession(session);
         //TODO 게임 세션 삭제
     }
 
     public void removeSession(GameSession session) {
         session.getPlayersStream().forEach(gameSessions::remove);
+        sendSessions();
     }
 
     private void checkPlayerInGame(String playerId) {
@@ -220,10 +267,10 @@ public class GameSessionService {
         }
     }
 
-    private void sendUpdateToPlayers(GameSession session) {
+    private void sendUpdateToPlayers(GameSession session, String destination) {
         session.getPlayersStream().forEach(id ->
             messagingTemplate.convertAndSendToUser(
-                    id, "/queue/game/session", toResponse(session)
+                    id, "/queue/game/" + destination, toResponse(session)
             )
         );
     }

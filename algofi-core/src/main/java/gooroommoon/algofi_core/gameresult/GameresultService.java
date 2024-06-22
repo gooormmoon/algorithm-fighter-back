@@ -1,13 +1,10 @@
 package gooroommoon.algofi_core.gameresult;
 
-import gooroommoon.algofi_core.Algorithmproblem.exception.AlgorithmproblemNotFoundException;
 import gooroommoon.algofi_core.algorithmproblem.Algorithmproblem;
-import gooroommoon.algofi_core.algorithmproblem.AlgorithmproblemRepository;
 import gooroommoon.algofi_core.auth.member.Member;
 import gooroommoon.algofi_core.auth.member.MemberRepository;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
 import gooroommoon.algofi_core.chat.repository.ChatroomRepository;
-import gooroommoon.algofi_core.game.session.GameSession;
 import gooroommoon.algofi_core.gameresult.dto.GameresultResponse;
 import gooroommoon.algofi_core.gameresult.dto.GameresultsResponse;
 import gooroommoon.algofi_core.gameresult.membergameresult.MemberGameresult;
@@ -28,7 +25,6 @@ public class GameresultService {
 
     private final GameresultRepository gameresultRepository;
     private final MemberGameresultService memberGameresultService;
-    private final AlgorithmproblemRepository algorithmproblemRepository;
     private final ChatroomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
 
@@ -36,16 +32,14 @@ public class GameresultService {
      * 멤버의 게임결과 저장하기
      */
     //TODO gameSession에서 문제정보와 chatroom정보, 코드 가져오기
-    public Gameresult save(GameSession session,int runningTime) {
+    public Gameresult save(String chatroomId, Set<String> players ,String hostCode, String guestCode, Algorithmproblem algorithmproblem,int runningTime) {
 
-        Algorithmproblem algorithmproblem = algorithmproblemRepository.findById(1L).orElseThrow(() ->
-                new AlgorithmproblemNotFoundException("문제를 찾을 수 없습니다."));
-
-        Chatroom chatroom = chatRoomRepository.findByChatroomId(session.getChatroomId()).orElseThrow();
+        Chatroom chatroom = chatRoomRepository.findByChatroomId(chatroomId).orElseThrow(()->
+                new IllegalStateException("채팅방을 찾을 수 없습니다."));
 
         Gameresult gameresult = Gameresult.builder()
-                .hostCodeContent("hostCode")
-                .guestCodeContent("guestCode")
+                .hostCodeContent(hostCode)
+                .guestCodeContent(guestCode)
                 .algorithmproblemId(algorithmproblem)
                 .chatroomId(chatroom)
                 .runningTime(runningTime)
@@ -53,7 +47,7 @@ public class GameresultService {
 
         Gameresult saveGameresult = gameresultRepository.save(gameresult);
 
-        Set<String> players = session.getPlayers();
+        //각 멤버별 gameresult 저장
         for (String playerId : players) {
             Member member = memberRepository.findByLoginId(playerId).orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다."));
 
