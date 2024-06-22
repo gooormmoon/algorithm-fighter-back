@@ -286,6 +286,8 @@ public class GameSessionService {
             //TODO 참가중인 모든 플레이어에게 방 삭제 메시지 발행
         } else {
             session.removePlayer(playerId);
+            sendUpdateToPlayers(session, "session");
+            sendSessions();
         }
 
         // 퇴장 메시지 발행
