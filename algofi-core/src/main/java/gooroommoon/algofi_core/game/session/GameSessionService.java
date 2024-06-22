@@ -5,7 +5,6 @@ import gooroommoon.algofi_core.algorithmproblem.AlgorithmproblemService;
 import gooroommoon.algofi_core.auth.member.MemberService;
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
-import gooroommoon.algofi_core.chat.entity.Message;
 import gooroommoon.algofi_core.chat.entity.MessageType;
 import gooroommoon.algofi_core.chat.repository.ChatroomRepository;
 import gooroommoon.algofi_core.chat.service.ChatService;
@@ -73,7 +72,7 @@ public class GameSessionService {
     }
 
     public void sendSessions(String loginId) {
-        messagingTemplate.convertAndSendToUser(loginId, "/queue/game/session", getSessionsResponse());
+        messagingTemplate.convertAndSendToUser(loginId, "/queue/game/sessions", getSessionsResponse());
     }
 
     public void sendSessions() {
@@ -81,7 +80,7 @@ public class GameSessionService {
         userRegistry.getUsers().forEach(user -> {
             String playerId = user.getPrincipal().getName();
             if(!gameSessions.containsKey(playerId)) {
-                messagingTemplate.convertAndSendToUser(playerId, "/queue/game/session", response);
+                messagingTemplate.convertAndSendToUser(playerId, "/queue/game/sessions", response);
             }
         });
     }
@@ -94,7 +93,7 @@ public class GameSessionService {
         chatRoomRepository.save(chatroom);
         chatService.enterRoom(session.getChatroomId(), hostId);
 
-        sendUpdateToPlayers(session);
+        sendUpdateToPlayers(session, "join");
         sendSessions();
     }
 
@@ -105,7 +104,7 @@ public class GameSessionService {
         gameSessions.put(playerId, session);
         chatService.enterRoom(session.getChatroomId(), playerId);
 
-        sendUpdateToPlayers(session);
+        sendUpdateToPlayers(session, "join");
         sendSessions();
     }
 
@@ -114,7 +113,7 @@ public class GameSessionService {
         if(session.getHostId().equals(hostId)) {
             session.updateSettings(request.getTitle(), request.getProblemLevel(), request.getTimerTime());
 
-            sendUpdateToPlayers(session);
+            sendUpdateToPlayers(session, "session");
         } else {
             throw new NotAHostException("방장만 게임 설정을 변경할 수 있습니다.");
         }
@@ -124,7 +123,7 @@ public class GameSessionService {
         GameSession session = getSession(playerId);
         session.addReadyPlayer(playerId);
 
-        sendUpdateToPlayers(session);
+        sendUpdateToPlayers(session, "session");
     }
 
     public void startGame(String hostId) {
@@ -163,6 +162,7 @@ public class GameSessionService {
                 .toEntity(SubmitResultResponse.class)
                 .subscribe(response -> {
                     String message = response.getBody().getMessage();
+                    messagingTemplate.convertAndSendToUser(playerId, "/queue/game/result", message);
                     if(message.equals("맞았습니다.")) {
                         closeGame(session, playerId, (int)(System.currentTimeMillis() - session.getStartTime()));
                     } else {
@@ -176,17 +176,17 @@ public class GameSessionService {
             GameSessionOverResponse winnerResponse = new GameSessionOverResponse(GameOverType.WIN, runningTime);
             GameSessionOverResponse loserResponse = new GameSessionOverResponse(GameOverType.LOSE, runningTime);
             messagingTemplate.convertAndSendToUser(
-                    winnerId, "/queue/game/session", winnerResponse
+                    winnerId, "/queue/game/over", winnerResponse
             );
             session.getPlayersStream().forEach(id -> {
                 if(!id.equals(winnerId))
-                    messagingTemplate.convertAndSendToUser(id, "/queue/game/session", loserResponse);
+                    messagingTemplate.convertAndSendToUser(id, "/queue/game/over", loserResponse);
             });
             session.getTimeOverTask().cancel(true);
         } else {
             GameSessionOverResponse timeOverResponse = new GameSessionOverResponse(GameOverType.TIME_OVER, runningTime);
             session.getPlayersStream().forEach(id ->
-                messagingTemplate.convertAndSendToUser(id, "/queue/game/session", timeOverResponse));
+                messagingTemplate.convertAndSendToUser(id, "/queue/game/over", timeOverResponse));
         }
     }
     //게임이 종료된 후 클라이언트의 요청을 받아 코드를 저장
@@ -224,10 +224,10 @@ public class GameSessionService {
         }
     }
 
-    private void sendUpdateToPlayers(GameSession session) {
+    private void sendUpdateToPlayers(GameSession session, String destination) {
         session.getPlayersStream().forEach(id ->
             messagingTemplate.convertAndSendToUser(
-                    id, "/queue/game/session", toResponse(session)
+                    id, "/queue/game/" + destination, toResponse(session)
             )
         );
     }
