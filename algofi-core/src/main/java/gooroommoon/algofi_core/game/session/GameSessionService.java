@@ -1,10 +1,7 @@
 package gooroommoon.algofi_core.game.session;
 
 
-import gooroommoon.algofi_core.algorithmproblem.Algorithmproblem;
 import gooroommoon.algofi_core.algorithmproblem.AlgorithmproblemService;
-import gooroommoon.algofi_core.algorithmproblem.dto.AlgorithmproblemResponse;
-import gooroommoon.algofi_core.algorithmproblem.exception.AlgorithmproblemNotFoundException;
 import gooroommoon.algofi_core.auth.member.MemberService;
 import gooroommoon.algofi_core.chat.dto.MessageDTO;
 import gooroommoon.algofi_core.chat.entity.Chatroom;
@@ -15,7 +12,6 @@ import gooroommoon.algofi_core.game.session.dto.*;
 import gooroommoon.algofi_core.game.session.exception.*;
 import gooroommoon.algofi_core.gameresult.GameresultService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
@@ -23,15 +19,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import java.util.Map;
-import java.util.Set;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.*;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class GameSessionService {
 
     //유저가 채팅방에 새로 들어올 때 입장 메시지 보내는 메서드 호출하기
@@ -141,42 +134,20 @@ public class GameSessionService {
         if(!session.getHostId().equals(hostId)) {
             throw new NotAHostException("방장만 게임을 시작할 수 있습니다.");
         }
-        String problemLevel = session.getProblemLevel();
-        //TODO 문제 가져와서 넣기
-        //랜덤 알고리즘문제
-        try {
-            int attempts = 0;
-            int maxAttempts = 5; // 최대 재시도 횟수 설정
-            boolean success = false;
 
-            while (attempts < maxAttempts && !success) {
-                try {
-                    AlgorithmproblemResponse randomProblem = algorithmproblemService.getRandom(problemLevel);
-                    log.info("randomProblem.title = {}", randomProblem.getTitle());
-                    log.info("randomProblem.level = {}", randomProblem.getLevel());
-                    success = true; // 성공적으로 문제를 찾음
-                } catch (AlgorithmproblemNotFoundException e) {
-                    attempts++;
-                    log.warn("문제를 찾을 수 없습니다. 재시도 중... ({}/{})", attempts, maxAttempts);
-                }
-            }
+        session.start(algorithmproblemService.getRandom(session.getProblemLevel()));
+        GameSessionStartResponse startResponse = new GameSessionStartResponse(session.getTimerTime(),
+                algorithmproblemService.toResponse(session.getAlgorithmProblem()));
+        session.getPlayersStream().forEach(id -> {
+            messagingTemplate.convertAndSendToUser(id, "/queue/game/start", startResponse);
+        });
 
-            if (!success) {
-                log.error("문제를 찾을 수 없습니다. 재시도 횟수 초과");
-                // 클라이언트에게 실패 응답을 보냄 (선택사항)
-                throw new AlgorithmproblemNotFoundException("문제를 찾을 수 없습니다. 재시도 횟수 초과");
-            }
-        } catch (Exception e) {
-            log.error("예상치 못한 오류 발생", e);
-            // 클라이언트에게 오류 응답을 보냄 (선택사항)
-        }
+        sendSessions();
 
-        session.start();
-        //TODO 알고리즘 문제 가져와서 메시지 발행
-
+        //타이머 태스크 등록
         GameSessionService gameSessionService = this;
         ScheduledFuture<?> timeOverTask = executorService.schedule(() ->
-            gameSessionService.closeGame(session,null, session.getTimerTime())
+            gameSessionService.closeGame(session,null)
         , session.getTimerTime(), TimeUnit.SECONDS);
         session.setTimeOverTask(timeOverTask);
     }
@@ -186,10 +157,9 @@ public class GameSessionService {
         if(!session.isStarted()) {
             throw new GameIsNotStartedException("게임이 아직 시작되지 않았습니다.");
         }
-        //TODO 실제 알고리즘 ID로 변경
 
         sendChat(session.getChatroomId(), playerId, "코드를 제출했습니다!");
-        SubmitCodeRequest submitRequest = new SubmitCodeRequest(1L, request.getLanguage(), request.getCode());
+        SubmitCodeRequest submitRequest = new SubmitCodeRequest(session.getAlgorithmProblem().getAlgorithmproblemId(), request.getLanguage(), request.getCode());
         webClient.post()
                 .uri("/api/judge-problem")
                 .body(submitRequest, SubmitCodeRequest.class)
@@ -199,14 +169,16 @@ public class GameSessionService {
                     String message = response.getBody().getMessage();
                     messagingTemplate.convertAndSendToUser(playerId, "/queue/game/result", message);
                     if(message.equals("맞았습니다.")) {
-                        closeGame(session, playerId, (int)(System.currentTimeMillis() - session.getStartTime()));
+                        closeGame(session, playerId);
                     } else {
                         sendChat(session.getChatroomId(), playerId, "틀렸습니다!");
                     }
                 });
     }
 
-    public void closeGame(GameSession session, String winnerId, int runningTime) {
+    public void closeGame(GameSession session, String winnerId) {
+        int runningTime = (int) (System.currentTimeMillis() - session.getStartTime());
+        session.setRunningTime(runningTime);
         if(winnerId != null) {
             GameSessionOverResponse winnerResponse = new GameSessionOverResponse(GameOverType.WIN, runningTime);
             GameSessionOverResponse loserResponse = new GameSessionOverResponse(GameOverType.LOSE, runningTime);
@@ -244,16 +216,14 @@ public class GameSessionService {
     }
 
     private void saveResult(GameSession session) {
-        //TODO 게임 결과 저장
-        //TODO hostCode, guestCode,
-        String chatroomId = session.getChatroomId();
-        Set<String> players = session.getPlayers();
-        String hostCode = "hostCode";
-        String guestCode = "guestCode";
-        Algorithmproblem algorithmproblem = new Algorithmproblem();
-        gameresultService.save(chatroomId,players,hostCode,guestCode,algorithmproblem,runningTime);
+        gameresultService.save(session.getChatroomId(),
+                session.getPlayers(),
+                session.getHostGameCode(),
+                session.getOtherGameCode(),
+                session.getAlgorithmProblem(),
+                session.getRunningTime());
+
         removeSession(session);
-        //TODO 게임 세션 삭제
     }
 
     public void removeSession(GameSession session) {

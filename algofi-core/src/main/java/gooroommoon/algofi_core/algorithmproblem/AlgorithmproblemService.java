@@ -1,10 +1,12 @@
 package gooroommoon.algofi_core.algorithmproblem;
 
 import gooroommoon.algofi_core.algorithmproblem.dto.AlgorithmproblemResponse;
-import gooroommoon.algofi_core.algorithmproblem.exception.AlgorithmproblemNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Random;
 
 @Slf4j
 @Service
@@ -16,18 +18,34 @@ public class AlgorithmproblemService {
     /**
      * 랜덤으로 가져오는 서비스 작성 -> repository에서 해결
      */
-    public AlgorithmproblemResponse getRandom(String level) {
-        Algorithmproblem randomAlgorithmproblem = algorithmproblemRepository.getRandomAlgorithmproblem(level)
-                .orElseThrow(() -> new AlgorithmproblemNotFoundException("문제를 찾을 수 없습니다."));
+    public Algorithmproblem getRandom(String level) {
+        List<Algorithmproblem> findAllProblems = algorithmproblemRepository.findAllByLevel(level);
 
-        return fromAlgorithmproblem(randomAlgorithmproblem);
+        //random으로 값을
+        Random random = new Random();
+        int size = findAllProblems.size();
+
+        return findAllProblems.get(random.nextInt(size));
     }
 
-    private AlgorithmproblemResponse fromAlgorithmproblem(Algorithmproblem Algorithmproblem) {
+    public AlgorithmproblemResponse toResponse(Algorithmproblem algorithmproblem) {
         return AlgorithmproblemResponse.builder()
-                .title(Algorithmproblem.getTitle())
-                .content(Algorithmproblem.getContent())
-                .level(Algorithmproblem.getLevel())
+                .title(algorithmproblem.getTitle())
+                .content(algorithmproblem.getContent())
+                .level(algorithmproblem.getLevel())
                 .build();
     }
+
+//    private List<AlgorithmproblemResponse> fromAlgorithmproblems(List<Algorithmproblem> Algorithmproblems) {
+//        List<AlgorithmproblemResponse> results = new ArrayList<>();
+//        for (Algorithmproblem algorithmproblem : Algorithmproblems) {
+//            algorithmproblem.builder()
+//                    .title(algorithmproblem.getTitle())
+//                    .level(algorithmproblem.getLevel())
+//                    .content(algorithmproblem.getContent())
+//                    .build();
+//        }
+//
+//        return results;
+//    }
 }
