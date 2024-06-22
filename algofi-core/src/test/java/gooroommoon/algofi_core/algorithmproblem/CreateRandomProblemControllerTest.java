@@ -61,6 +61,25 @@ public class CreateRandomProblemControllerTest {
     public void setup() {
         stompClient = new WebSocketStompClient(new StandardWebSocketClient());
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+
+        for (int i = 1; i <= 5; i++) {
+            Algorithmproblem algorithmproblem = Algorithmproblem.builder()
+                    .title("title" + i)
+                    .level("3")
+                    .content("content" + i)
+                    .recommend_time(30 + i)
+                    .build();
+            algorithmproblemRepository.save(algorithmproblem);
+        }
+
+        Algorithmproblem algorithmproblem = Algorithmproblem.builder()
+                .title("title" + 6)
+                .level("1")
+                .content("content" + 6)
+                .recommend_time(30 + 6)
+                .build();
+
+        algorithmproblemRepository.save(algorithmproblem);
     }
 
     @AfterEach
@@ -80,31 +99,13 @@ public class CreateRandomProblemControllerTest {
 
     @Test
     @DisplayName("레벨에 맞는 문제 random select 테스트")
-    void createRandomProblem() {
-        //given
-        for (int i = 1; i <= 5; i++) {
-            Algorithmproblem algorithmproblem = Algorithmproblem.builder()
-                    .title("title" + i)
-                    .level("3")
-                    .content("content" + i)
-                    .recommend_time(30 + i)
-                    .build();
-
-            algorithmproblemRepository.save(algorithmproblem);
-        }
-
-        Algorithmproblem algorithmproblem = Algorithmproblem.builder()
-                .title("title" + 6)
-                .level("1")
-                .content("content" + 6)
-                .recommend_time(30 + 6)
-                .build();
-
+    void createRandomProblem() throws InterruptedException {
         //when
-        AlgorithmproblemResponse randomProblem = algorithmproblemService.getRandom("3");
 
         //then
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 50; i++) {
+            Algorithmproblem randomProblem = algorithmproblemService.getRandom("3");
+            Thread.sleep(1000);
             Assertions.assertNotEquals(randomProblem.getTitle(), "title6");
         }
     }
@@ -123,8 +124,6 @@ public class CreateRandomProblemControllerTest {
         WebSocketHttpHeaders connectHeaders = new WebSocketHttpHeaders();
         connectHeaders.add("Authorization", "Bearer " + token);
         connectHeaders.add("userName", "user");
-
-//        StompHeaders connectStompHeaders =
 
         //여기는 "user의 세션"
         //여기서 인증정보를 넘겨줘야하나?
@@ -198,22 +197,13 @@ public class CreateRandomProblemControllerTest {
         //TODO 게임 참가
         stompSessionMember.send(sendJoinHeaders, gameSessionJoinRequest);
 
-        for (int i = 1; i <= 5; i++) {
-            Algorithmproblem algorithmproblem = Algorithmproblem.builder()
-                    .title("title" + i)
-                    .level("3")
-                    .content("content" + i)
-                    .recommend_time(30 + i)
-                    .build();
-            algorithmproblemRepository.save(algorithmproblem);
-        }
 
-        //TODO 게임 준비
         StompHeaders sendReadyHeaders = new StompHeaders();
         sendReadyHeaders.setDestination("/app/game/ready");
         sendReadyHeaders.add("Authorization", "Bearer " + memberToken);
         sendReadyHeaders.setLogin("user");
 
+        //TODO 게임 준비 User
         stompSession.send(sendReadyHeaders, null);
 
         StompHeaders sendReadyHeaders2 = new StompHeaders();
@@ -221,6 +211,7 @@ public class CreateRandomProblemControllerTest {
         sendReadyHeaders2.add("Authorization", "Bearer " + token);
         sendReadyHeaders.setLogin("member");
 
+        //TODO 게임 준비 Member
         stompSessionMember.send(sendReadyHeaders2, null);
 
         StompHeaders sendHeaders = new StompHeaders();
@@ -228,7 +219,7 @@ public class CreateRandomProblemControllerTest {
         sendHeaders.add("Authorization", "Bearer " + token);
         sendHeaders.setLogin("user");
 
-        //TODO 게임 시작
+        //TODO 게임 시작 User
         stompSession.send(sendHeaders,null);
 
     }
