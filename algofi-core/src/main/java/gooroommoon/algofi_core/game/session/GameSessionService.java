@@ -18,6 +18,7 @@ import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -163,7 +164,7 @@ public class GameSessionService {
         SubmitCodeRequest submitRequest = new SubmitCodeRequest(session.getAlgorithmProblem().getAlgorithmproblemId(), request.getLanguage(), request.getCode());
         webClient.post()
                 .uri("/api/judge-problem")
-                .body(submitRequest, SubmitCodeRequest.class)
+                .body(Mono.just(submitRequest), SubmitCodeRequest.class)
                 .retrieve()
                 .toEntity(SubmitResultResponse.class)
                 .subscribe(response -> {
