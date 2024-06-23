@@ -18,6 +18,6 @@ public class TestCase {
     private String testOutput;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "algorithm_problem_id")
+    @JoinColumn(name = "algorithmproblem_id")
     private AlgorithmProblem algorithmProblem;
 }
