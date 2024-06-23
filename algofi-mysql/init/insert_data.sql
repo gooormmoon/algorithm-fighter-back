@@ -116,14 +116,14 @@ INSERT INTO chatroom(chatroom_id, chatroom_name) VALUES('global','GLOBAL');
 -- INSERT INTO member_chatroom(chatroom_id, member_id) VALUES (1,1);
 
 -- insert gameresult
--- INSERT INTO gameresult(running_time, member_code_content, other_member_code_content, algorithm_problem_id, chatroom_id)
+-- INSERT INTO gameresult(running_time, member_code_content, other_member_code_content, algorithmproblem_id, chatroom_id)
 -- VALUES('20:30', 'code1' , 'code2', 1 , 1);
 
 -- insert member_gameresult
 -- INSERT INTO member_gameresult(game_result_id, member_id) VALUES (1, 1);
 
 -- insert testcase
-INSERT INTO testcase(test_input, test_output, algorithm_problem_id)
+INSERT INTO testcase(test_input, test_output, algorithmproblem_id)
 VALUES
     ('computerprogramming r','3',1),
     ('Computercooler c','2',1),
@@ -198,7 +198,7 @@ VALUES
 -- INSERT INTO member_chatroom(chatroom_id, member_id) VALUES (1,1);
 --
 -- insert gameresult
--- INSERT INTO gameresult(running_time, member_code_content, other_member_code_content, algorithm_problem_id, chatroom_id)
+-- INSERT INTO gameresult(running_time, member_code_content, other_member_code_content, algorithmproblem_id, chatroom_id)
 -- VALUES('20:30', 'code1' , 'code2', 1 , 1);
 --
 -- insert member_gameresult
