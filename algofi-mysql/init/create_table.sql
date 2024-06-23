@@ -25,6 +25,7 @@ CREATE TABLE filestorage (
                              FOREIGN KEY(member_id) REFERENCES member(member_id)
 ) character set utf8mb4 collate utf8mb4_general_ci;
 
+
 /* file table 생성 */
 CREATE TABLE file (
                       file_id INT(11) AUTO_INCREMENT PRIMARY KEY,
