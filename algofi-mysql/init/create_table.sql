@@ -1,3 +1,4 @@
+ALTER DATABASE mydb DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 /* member table 생성 */
 CREATE TABLE member (
                         member_id INT(11) AUTO_INCREMENT PRIMARY KEY,
@@ -12,7 +13,7 @@ CREATE TABLE member (
                         login_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                         created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                         updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-)CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+) character set utf8mb4 collate utf8mb4_general_ci;
 
 /* filestorage table 생성 */
 CREATE TABLE filestorage (
@@ -22,7 +23,7 @@ CREATE TABLE filestorage (
                              created_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                              updated_time TIMESTAMP,
                              FOREIGN KEY(member_id) REFERENCES member(member_id)
-)CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+) character set utf8mb4 collate utf8mb4_general_ci;
 
 /* file table 생성 */
 CREATE TABLE file (
@@ -36,7 +37,7 @@ CREATE TABLE file (
                       parent_id INT NULL,
                       FOREIGN KEY(file_storage_id) REFERENCES filestorage(file_storage_id),
                       FOREIGN KEY(parent_id) REFERENCES file(file_id) ON DELETE CASCADE
-)CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+) character set utf8mb4 collate utf8mb4_general_ci;
 
 /* algorithmproblem table 생성 */
 CREATE TABLE algorithmproblem (
@@ -45,13 +46,13 @@ CREATE TABLE algorithmproblem (
                                   level VARCHAR(10) NOT NULL,
                                   content TEXT,
                                   recommend_time INT
-)CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+) character set utf8mb4 collate utf8mb4_general_ci;
 
 /* chatroom table 생성 */
 CREATE TABLE chatroom (
                           chatroom_id VARCHAR(36) PRIMARY KEY,
                           chatroom_name VARCHAR(100)
-)CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+) character set utf8mb4 collate utf8mb4_general_ci;
 
 /* message table 생성 */
 CREATE TABLE message (
@@ -63,15 +64,15 @@ CREATE TABLE message (
                          chatroom_id VARCHAR(36) NOT NULL,
                          FOREIGN KEY(sender_id) REFERENCES member(member_id),
                          FOREIGN KEY(chatroom_id) REFERENCES chatroom(chatroom_id)
-)CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+) character set utf8mb4 collate utf8mb4_general_ci;
 
 /* member_chatroom table 생성 */
 CREATE TABLE member_chatroom (
                                  chatroom_id VARCHAR(36) NOT NULL,
                                  member_id INT NULL,
                                  FOREIGN KEY(chatroom_id) REFERENCES chatroom(chatroom_id),
-                                 FOREIGN KEY(member_id) REFERENCES  member(member_id)
-);
+                                 FOREIGN KEY(member_id) REFERENCES member(member_id)
+) character set utf8mb4 collate utf8mb4_general_ci;
 
 /* gameresult table 생성 */
 CREATE TABLE gameresult (
@@ -84,7 +85,7 @@ CREATE TABLE gameresult (
                             chatroom_id VARCHAR(36) NOT NULL,
                             FOREIGN KEY (algorithmproblem_id) REFERENCES algorithmproblem(algorithmproblem_id),
                             FOREIGN KEY (chatroom_id) REFERENCES chatroom(chatroom_id)
-)CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+) character set utf8mb4 collate utf8mb4_general_ci;
 
 /* member_gameresult table 생성 */
 CREATE TABLE member_gameresult (
@@ -92,7 +93,7 @@ CREATE TABLE member_gameresult (
                                    member_id INT NOT NULL,
                                    FOREIGN KEY(game_result_id) REFERENCES gameresult(game_result_id),
                                    FOREIGN KEY(member_id) REFERENCES member(member_id)
-);
+) character set utf8mb4 collate utf8mb4_general_ci;
 
 /* testcase table 생성 */
 CREATE TABLE testcase (
@@ -101,4 +102,4 @@ CREATE TABLE testcase (
                           test_output VARCHAR(500),
                           algorithmproblem_id INT NOT NULL,
                           FOREIGN KEY(algorithmproblem_id) REFERENCES algorithmproblem(algorithmproblem_id)
-)CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+) character set utf8mb4 collate utf8mb4_general_ci;

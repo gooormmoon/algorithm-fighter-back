@@ -6,8 +6,8 @@ FROM mysql:oraclelinux9
 # 이 디렉토리에 파일을 넣으면 MySQL이 자동으로 이 설정 파일을 읽게 됩니다.
 #COPY ./config/mysql.cnf /etc/my.cnf
 #RUN chmod 644 /etc/my.cnf
-COPY ./config/mysql.cnf /etc/my.cnf.d/my.cnf
-RUN chmod 644 /etc/my.cnf.d/my.cnf
+COPY ./config/mysql.cnf /etc/my.cnf
+RUN chmod 644 /etc/my.cnf
 
 # init 파일을 /docker-entrypoint-initdb.d/로 복사
 # 이 디렉토리에 있는 SQL 스크립트는 컨테이너가 처음 실행 시 자동 실행됨
