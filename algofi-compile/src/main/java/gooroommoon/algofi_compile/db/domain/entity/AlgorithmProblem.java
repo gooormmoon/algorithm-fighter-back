@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class AlgorithmProblem {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ALGORITHM_PROBLEM_ID")
+    @Column(name = "ALGORITHMPROBLEM_ID")
     private Long id;
 
     private String title;
