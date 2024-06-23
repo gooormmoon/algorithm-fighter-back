@@ -1,0 +1,17 @@
+package gooroommoon.algofi_core.algorithmproblem.dto;
+
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.*;
+
+@Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class AlgorithmproblemResponse {
+
+    private String title;
+    private String level;
+    private String content;
+}
