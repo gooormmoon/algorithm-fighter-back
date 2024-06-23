@@ -40,7 +40,7 @@ CREATE TABLE file (
 
 /* algorithmproblem table 생성 */
 CREATE TABLE algorithmproblem (
-                                  algorithm_problem_id INT(11) AUTO_INCREMENT PRIMARY KEY,
+                                  algorithmproblem_id INT(11) AUTO_INCREMENT PRIMARY KEY,
                                   title VARCHAR(100) NOT NULL,
                                   level VARCHAR(10) NOT NULL,
                                   content TEXT,
