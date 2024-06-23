@@ -40,7 +40,7 @@ CREATE TABLE file (
 
 /* algorithmproblem table 생성 */
 CREATE TABLE algorithmproblem (
-                                  algorithm_problem_id INT(11) AUTO_INCREMENT PRIMARY KEY,
+                                  algorithmproblem_id INT(11) AUTO_INCREMENT PRIMARY KEY,
                                   title VARCHAR(100) NOT NULL,
                                   level VARCHAR(10) NOT NULL,
                                   content TEXT,
@@ -80,9 +80,9 @@ CREATE TABLE gameresult (
                             host_code_content VARCHAR(5500),
                             guest_code_content VARCHAR(5500),
                             created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                            algorithm_problem_id INT NOT NULL,
+                            algorithmproblem_id INT NOT NULL,
                             chatroom_id VARCHAR(36) NOT NULL,
-                            FOREIGN KEY (algorithm_problem_id) REFERENCES algorithmproblem(algorithm_problem_id),
+                            FOREIGN KEY (algorithmproblem_id) REFERENCES algorithmproblem(algorithmproblem_id),
                             FOREIGN KEY (chatroom_id) REFERENCES chatroom(chatroom_id)
 );
 
@@ -99,6 +99,6 @@ CREATE TABLE testcase (
                           test_case_id INT(11) AUTO_INCREMENT PRIMARY KEY,
                           test_input VARCHAR(500),
                           test_output VARCHAR(500),
-                          algorithm_problem_id INT NOT NULL,
-                          FOREIGN KEY(algorithm_problem_id) REFERENCES algorithmproblem(algorithm_problem_id)
+                          algorithmproblem_id INT NOT NULL,
+                          FOREIGN KEY(algorithmproblem_id) REFERENCES algorithmproblem(algorithmproblem_id)
 );
