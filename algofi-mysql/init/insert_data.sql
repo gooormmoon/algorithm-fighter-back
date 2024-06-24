@@ -116,11 +116,11 @@ INSERT INTO chatroom(chatroom_id, chatroom_name) VALUES('global','GLOBAL');
 -- INSERT INTO member_chatroom(chatroom_id, member_id) VALUES (1,1);
 
 -- insert gameresult
--- INSERT INTO gameresult(running_time, member_code_content, other_member_code_content, algorithmproblem_id, chatroom_id)
--- VALUES('20:30', 'code1' , 'code2', 1 , 1);
+-- INSERT INTO gameresult(running_time, host_code_content, guest_code_content, algorithmproblem_id, chatroom_id, guest_id, host_id, host_code_language, guest_code_language,game_over_type)
+-- VALUES('20:30', 'code1' , 'code2', 1 , 'global', 'guest','host','java','java','WIN');
 
 -- insert member_gameresult
--- INSERT INTO member_gameresult(game_result_id, member_id) VALUES (1, 1);
+-- INSERT INTO member_gameresult(gameresult_id, member_id,game_over_type) VALUES (1, 1,'WIN');
 
 -- insert testcase
 INSERT INTO testcase(test_input, test_output, algorithmproblem_id)
@@ -202,4 +202,4 @@ VALUES
 -- VALUES('20:30', 'code1' , 'code2', 1 , 1);
 --
 -- insert member_gameresult
--- INSERT INTO member_gameresult(game_result_id, member_id) VALUES (1, 1);
+-- INSERT INTO member_gameresult(gameresult_id, member_id) VALUES (1, 1);

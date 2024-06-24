@@ -31,8 +31,9 @@ public class GameresultService {
     /**
      * 멤버의 게임결과 저장하기
      */
-    //TODO gameSession에서 문제정보와 chatroom정보, 코드 가져오기
-    public Gameresult save(String chatroomId, Set<String> players ,String hostCode, String guestCode, Algorithmproblem algorithmproblem,int runningTime) {
+    //TODO hostId,guestId,game_over_type,language
+    public void save(String chatroomId, Set<String> players ,String hostCode, String guestCode, Algorithmproblem algorithmproblem,
+                     int runningTime,String hostId,String hostCodeLanguage, String guestCodeLanguage,String winnerId) {
 
         Chatroom chatroom = chatRoomRepository.findByChatroomId(chatroomId).orElseThrow(()->
                 new IllegalStateException("채팅방을 찾을 수 없습니다."));
@@ -43,23 +44,48 @@ public class GameresultService {
                 .algorithmproblemId(algorithmproblem)
                 .chatroomId(chatroom)
                 .runningTime(runningTime)
+                .hostCodeLanguage(hostCodeLanguage)
+                .guestCodeLanguage(guestCodeLanguage)
                 .build();
 
-        Gameresult saveGameresult = gameresultRepository.save(gameresult);
+        Gameresult saveGameresult = null;
 
         //각 멤버별 gameresult 저장
-        for (String playerId : players) {
-            Member member = memberRepository.findByLoginId(playerId).orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다."));
+        for (String player : players) {
+            Member member = memberRepository.findByLoginId(player)
+                    .orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다."));
 
+            // Host와 Guest ID 설정
+            if (member.getLoginId().equals(hostId)) {
+                gameresult.setHostId(member.getLoginId());
+            } else {
+                gameresult.setGuestId(member.getLoginId());
+            }
+
+            // gameresult를 한 번만 저장
+            if (saveGameresult == null) {
+                saveGameresult = gameresultRepository.save(gameresult);
+            }
+
+            // Game over type 결정
+            String gameOverType;
+            if (winnerId == null) {
+                gameOverType = "TimeOver";
+            } else if (winnerId.equals(member.getLoginId())) {
+                gameOverType = "WIN";
+            } else {
+                gameOverType = "LOSE";
+            }
+
+            // MemberGameresult 생성 및 저장
             MemberGameresult memberGameresult = MemberGameresult.builder()
                     .member(member)
-                    .gameresult(gameresult)
+                    .gameresult(saveGameresult) // saveGameresult 사용
+                    .gameOverType(gameOverType)
                     .build();
 
             memberGameresultService.save(memberGameresult);
         }
-
-        return saveGameresult;
     }
 
     /**
@@ -68,7 +94,7 @@ public class GameresultService {
      */
     public List<GameresultsResponse> findGameresultList(String loginId) {
         List<Gameresult> GameresultsByMemberId = gameresultRepository.findGameresultsByMemberId(loginId);
-        return fromGameresults(GameresultsByMemberId);
+        return toGameresults(GameresultsByMemberId);
     }
 
     /**
@@ -77,29 +103,35 @@ public class GameresultService {
      */
     public GameresultResponse findGameresult(String loginId, Long GameresultId) {
         Gameresult GameresultByMemberIdAndGameresultId = gameresultRepository.findGameresultByMemberIdAndGameresultId(loginId, GameresultId);
-        return fromGameresult(GameresultByMemberIdAndGameresultId);
+        return toGameresult(GameresultByMemberIdAndGameresultId);
     }
 
     public List<Gameresult> findAllGameresult() {
         return gameresultRepository.findAll();
     }
 
-    private GameresultResponse fromGameresult(Gameresult Gameresult) {
+    //hostId,guestId,hostCodeLanguage,guestCodeLanguage,game_over_type
+    private GameresultResponse toGameresult(Gameresult Gameresult) {
         return GameresultResponse.builder()
                 .runningTime(Gameresult.getRunningTime())
                 .guestCodeContent(Gameresult.getGuestCodeContent())
                 .hostCodeContent(Gameresult.getHostCodeContent())
-                .algorithmproblemId(Gameresult.getAlgorithmproblemId().getAlgorithmproblemId())
-                .chatroomId(Gameresult.getChatroomId().getChatroomId())
+                .hostId(Gameresult.getHostId())
+                .guestId(Gameresult.getGuestId())
+                .hostCodeLanguage(Gameresult.getHostCodeLanguage())
+                .guestCodeLanguage(Gameresult.getGuestCodeLanguage())
+                .title(Gameresult.getAlgorithmproblemId().getTitle())
+                .gameOverType(Gameresult.getGameOverType())
                 .build();
     }
 
-    private List<GameresultsResponse> fromGameresults(List<Gameresult> Gameresults) {
+    private List<GameresultsResponse> toGameresults(List<Gameresult> Gameresults) {
         List<GameresultsResponse> results = new CopyOnWriteArrayList<>();
         for (Gameresult Gameresult : Gameresults) {
             GameresultsResponse gameresultsResponse = GameresultsResponse.builder()
                     .title(Gameresult.getAlgorithmproblemId().getTitle())
                     .runningTime(Gameresult.getRunningTime())
+                    .gameresultId(Gameresult.getGameresultId())
                     .build();
 
             results.add(gameresultsResponse);

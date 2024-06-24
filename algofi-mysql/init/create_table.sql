@@ -69,6 +69,7 @@ CREATE TABLE message (
 
 /* member_chatroom table 생성 */
 CREATE TABLE member_chatroom (
+                                 member_chatroom_id INT AUTO_INCREMENT PRIMARY KEY,
                                  chatroom_id VARCHAR(36) NOT NULL,
                                  member_id INT NULL,
                                  FOREIGN KEY(chatroom_id) REFERENCES chatroom(chatroom_id),
@@ -77,10 +78,15 @@ CREATE TABLE member_chatroom (
 
 /* gameresult table 생성 */
 CREATE TABLE gameresult (
-                            game_result_id INT(11) AUTO_INCREMENT PRIMARY KEY,
+                            gameresult_id INT(11) AUTO_INCREMENT PRIMARY KEY,
                             running_time VARCHAR(100),
                             host_code_content VARCHAR(5500),
                             guest_code_content VARCHAR(5500),
+                            host_id VARCHAR(50),
+                            guest_id VARCHAR(50),
+                            host_code_language VARCHAR(20),
+                            guest_code_language VARCHAR(20),
+                            game_over_type VARCHAR(10),
                             created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                             algorithmproblem_id INT NOT NULL,
                             chatroom_id VARCHAR(36) NOT NULL,
@@ -90,9 +96,11 @@ CREATE TABLE gameresult (
 
 /* member_gameresult table 생성 */
 CREATE TABLE member_gameresult (
-                                   game_result_id INT NOT NULL,
+                                   member_gameresult_id INT AUTO_INCREMENT PRIMARY KEY,
+                                   gameresult_id INT NOT NULL,
                                    member_id INT NOT NULL,
-                                   FOREIGN KEY(game_result_id) REFERENCES gameresult(game_result_id),
+                                   game_over_type VARCHAR(10) NOT NULL,
+                                   FOREIGN KEY(gameresult_id) REFERENCES gameresult(gameresult_id),
                                    FOREIGN KEY(member_id) REFERENCES member(member_id)
 ) character set utf8mb4 collate utf8mb4_general_ci;
 
