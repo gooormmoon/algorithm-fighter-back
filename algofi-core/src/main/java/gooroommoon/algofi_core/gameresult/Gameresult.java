@@ -20,7 +20,7 @@ public class Gameresult {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long GameresultId;
+    private Long gameresultId;
 
     private int runningTime;
 
