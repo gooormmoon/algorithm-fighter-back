@@ -169,7 +169,7 @@ public class GameSessionService {
                 .toEntity(SubmitResultResponse.class)
                 .subscribe(response -> {
                     String message = response.getBody().getMessage();
-                    messagingTemplate.convertAndSendToUser(playerId, "/queue/game/result", message);
+                    messagingTemplate.convertAndSendToUser(playerId, "/queue/game/result", new SubmitResultResponse(message));
                     if(message.equals("맞았습니다.")) {
                         closeGame(session, playerId);
                     } else {
