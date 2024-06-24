@@ -131,6 +131,7 @@ public class GameresultService {
             GameresultsResponse gameresultsResponse = GameresultsResponse.builder()
                     .title(Gameresult.getAlgorithmproblemId().getTitle())
                     .runningTime(Gameresult.getRunningTime())
+                    .gameresultId(Gameresult.getGameresultId())
                     .build();
 
             results.add(gameresultsResponse);

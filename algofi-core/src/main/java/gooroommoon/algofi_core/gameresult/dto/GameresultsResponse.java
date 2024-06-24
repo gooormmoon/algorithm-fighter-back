@@ -14,4 +14,6 @@ public class GameresultsResponse {
     private String title;
 
     private int runningTime;
+
+    private Long gameresultId;
 }
