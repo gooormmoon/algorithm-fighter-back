@@ -67,20 +67,20 @@ public class GameResultSaveIntegrateTest {
         sequence += 1L;
     }
 
-    @AfterEach
-    void afterEach() {
-        //매 테스트마다 테이블 초기화
-        //H2 Database
-        List<String> truncateQueries = jdbcTemplate.queryForList(
-                "SELECT CONCAT('TRUNCATE TABLE ', TABLE_NAME, ';') AS q FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'PUBLIC'", String.class);
-        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
-        truncateQueries.forEach(jdbcTemplate::execute);
-        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
-        //MySQL
-//        jdbcTemplate.execute("SET foreign_key_checks = 0;");
-//        jdbcTemplate.execute("TRUNCATE TABLE member");
-//        jdbcTemplate.execute("SET foreign_key_checks = 1;");
-    }
+//    @AfterEach
+//    void afterEach() {
+//        //매 테스트마다 테이블 초기화
+//        //H2 Database
+//        List<String> truncateQueries = jdbcTemplate.queryForList(
+//                "SELECT CONCAT('TRUNCATE TABLE ', TABLE_NAME, ';') AS q FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'PUBLIC'", String.class);
+//        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
+//        truncateQueries.forEach(jdbcTemplate::execute);
+//        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
+//        //MySQL
+////        jdbcTemplate.execute("SET foreign_key_checks = 0;");
+////        jdbcTemplate.execute("TRUNCATE TABLE member");
+////        jdbcTemplate.execute("SET foreign_key_checks = 1;");
+//    }
 
 
     @Test
@@ -180,11 +180,10 @@ public class GameResultSaveIntegrateTest {
         gameSessionService.savePlayerCode(user4info.getId(),gameCodeRequestUser2);
 
 
-        long gameNumber = ++sequence;
         //유저3 게임결과
-        GameresultResponse gameresultByUser3 = gameresultService.findGameresult(user3info.getId(), gameNumber);
+        GameresultResponse gameresultByUser3 = gameresultService.findGameresult(user3info.getId(), 1L);
         //유저4 게임결과
-        GameresultResponse gameresultByUser4 = gameresultService.findGameresult(user4info.getId(), gameNumber);
+        GameresultResponse gameresultByUser4 = gameresultService.findGameresult(user4info.getId(), 1L);
 
         assertEquals(gameresultByUser3.getHostCodeContent(), gameresultByUser4.getHostCodeContent());
         assertEquals(gameresultByUser3.getGuestCodeContent(), gameresultByUser4.getGuestCodeContent());
