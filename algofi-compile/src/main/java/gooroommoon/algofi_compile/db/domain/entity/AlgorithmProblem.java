@@ -1,7 +1,9 @@
 package gooroommoon.algofi_compile.db.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Entity
 @Table(name = "algorithmproblem")
 public class AlgorithmProblem {
@@ -18,4 +20,11 @@ public class AlgorithmProblem {
 
     private Integer recommend_time;
 
+    public AlgorithmProblem(Long id, String title, String level, String content, Integer recommend_time) {
+        this.id = id;
+        this.title = title;
+        this.level = level;
+        this.content = content;
+        this.recommend_time = recommend_time;
+    }
 }

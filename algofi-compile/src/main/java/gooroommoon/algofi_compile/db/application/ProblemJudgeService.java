@@ -21,7 +21,7 @@ public class ProblemJudgeService {
     private final JudgeService judgeService;
 
     @Transactional(readOnly = true)
-    public ProblemJudgeResponse judgeProblem(String language, Long algorithmProblemId, String code) {
+    public synchronized ProblemJudgeResponse judgeProblem(String language, Long algorithmProblemId, String code) {
 
         CodeExecutor codeExecutor = judgeService.getCodeExecutor(language);
 

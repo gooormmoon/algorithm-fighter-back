@@ -2,7 +2,9 @@ package gooroommoon.algofi_compile.db.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Entity
 @Table(name = "testcase")
 public class TestCase {
@@ -20,4 +22,11 @@ public class TestCase {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "algorithmproblem_id")
     private AlgorithmProblem algorithmProblem;
+
+    public TestCase(Long id, String testInput, String testOutput, AlgorithmProblem algorithmProblem) {
+        this.id = id;
+        this.testInput = testInput;
+        this.testOutput = testOutput;
+        this.algorithmProblem = algorithmProblem;
+    }
 }
