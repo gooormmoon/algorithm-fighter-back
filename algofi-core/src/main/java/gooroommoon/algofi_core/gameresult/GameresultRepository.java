@@ -11,9 +11,9 @@ public interface GameresultRepository extends JpaRepository<Gameresult, Long> {
     /*
     member의 모든 게임 결과 조회
      */
-    @Query("select mg.gameresult from MemberGameresult mg " +
-            "join fetch mg.gameresult gr " +
-            "join fetch mg.member m " +
+    @Query("select gr from MemberGameresult mg " +
+            "join mg.gameresult gr " +
+            "join mg.member m " +
             "where m.loginId = :loginId")
     List<Gameresult> findGameresultsByMemberId(@Param("loginId") String loginId);
 

@@ -119,9 +119,14 @@ public class GameresultControllerIntegrateTest {
 
 //        assertNotNull(response.getBody());
         assertEquals(response.getBody().getData().getGameOverType(), "WIN");
+        assertEquals(response.getBody().getData().getTitle(), "title");
+        assertEquals(response.getBody().getData().getGuestCodeContent(), GUEST_CODE);
+        assertEquals(response.getBody().getData().getGuestId(), "user2");
         assertEquals(response.getBody().getData().getHostCodeContent(), HOST_CODE);
         assertEquals(response.getBody().getData().getHostId(), "test");
         assertEquals(response.getBody().getData().getGuestCodeLanguage(),"java");
+        assertEquals(response.getBody().getData().getHostCodeLanguage(),"java");
+
     }
 
 //    @Test

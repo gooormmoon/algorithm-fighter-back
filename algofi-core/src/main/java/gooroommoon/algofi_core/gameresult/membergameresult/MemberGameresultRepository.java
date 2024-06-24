@@ -9,6 +9,6 @@ public interface MemberGameresultRepository extends JpaRepository<MemberGameresu
     @Query("select mg.gameOverType from MemberGameresult mg " +
             "inner join mg.member m " +
             "inner join mg.gameresult g " +
-            "where m.loginId = :loginId and g.GameresultId = :gameresultId")
+            "where m.loginId = :loginId and g.gameresultId = :gameresultId")
     String findMemberGameOverType(@Param("loginId") String loginId, @Param("gameresultId") Long gameresultId);
 }
