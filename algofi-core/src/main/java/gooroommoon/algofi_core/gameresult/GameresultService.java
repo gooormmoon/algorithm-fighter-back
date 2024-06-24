@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -21,6 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class GameresultService {
 
     private final GameresultRepository gameresultRepository;
@@ -50,7 +52,7 @@ public class GameresultService {
 
         Gameresult saveGameresult = null;
 
-        //각 멤버별 gameresult 저장
+        //각 멤버 gameresult에 저장
         for (String player : players) {
             Member member = memberRepository.findByLoginId(player)
                     .orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다."));
@@ -61,8 +63,13 @@ public class GameresultService {
             } else {
                 gameresult.setGuestId(member.getLoginId());
             }
+        }
 
-            // gameresult를 한 번만 저장
+        //멤버별로 gameresult에 저장
+        for (String player : players) {
+            Member member = memberRepository.findByLoginId(player)
+                    .orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다."));
+
             if (saveGameresult == null) {
                 saveGameresult = gameresultRepository.save(gameresult);
             }
@@ -103,7 +110,11 @@ public class GameresultService {
      */
     public GameresultResponse findGameresult(String loginId, Long GameresultId) {
         Gameresult GameresultByMemberIdAndGameresultId = gameresultRepository.findGameresultByMemberIdAndGameresultId(loginId, GameresultId);
-        return toGameresult(GameresultByMemberIdAndGameresultId);
+        if(GameresultByMemberIdAndGameresultId == null){
+            throw new IllegalStateException("게임결과가 없습니다.");
+        }else {
+            return toGameresult(GameresultByMemberIdAndGameresultId);
+        }
     }
 
     public List<Gameresult> findAllGameresult() {
@@ -121,7 +132,6 @@ public class GameresultService {
                 .hostCodeLanguage(Gameresult.getHostCodeLanguage())
                 .guestCodeLanguage(Gameresult.getGuestCodeLanguage())
                 .title(Gameresult.getAlgorithmproblemId().getTitle())
-                .gameOverType(Gameresult.getGameOverType())
                 .build();
     }
 
