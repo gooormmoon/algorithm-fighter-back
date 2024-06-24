@@ -131,6 +131,7 @@ public class GameresultService {
                 .guestId(Gameresult.getGuestId())
                 .hostCodeLanguage(Gameresult.getHostCodeLanguage())
                 .guestCodeLanguage(Gameresult.getGuestCodeLanguage())
+                .gameOverType(Gameresult.getGameOverType())
                 .title(Gameresult.getAlgorithmproblemId().getTitle())
                 .build();
     }
