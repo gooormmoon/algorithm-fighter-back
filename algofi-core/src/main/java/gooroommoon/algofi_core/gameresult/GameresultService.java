@@ -52,22 +52,23 @@ public class GameresultService {
 
         //각 멤버별 gameresult 저장
         for (String player : players) {
-            Member member = memberRepository.findByLoginId(player).orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다."));
+            Member member = memberRepository.findByLoginId(player)
+                    .orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다."));
 
-            if(member.getLoginId().equals(hostId)){
-                gameresult.builder()
-                        .hostId(member.getLoginId());
-            }else{
-                gameresult.builder()
-                        .guestId(member.getLoginId());
+            // Host와 Guest ID 설정
+            if (member.getLoginId().equals(hostId)) {
+                gameresult.setHostId(member.getLoginId());
+            } else {
+                gameresult.setGuestId(member.getLoginId());
             }
 
+            // gameresult를 한 번만 저장
             if (saveGameresult == null) {
                 saveGameresult = gameresultRepository.save(gameresult);
             }
 
+            // Game over type 결정
             String gameOverType;
-
             if (winnerId == null) {
                 gameOverType = "TimeOver";
             } else if (winnerId.equals(member.getLoginId())) {
@@ -76,9 +77,10 @@ public class GameresultService {
                 gameOverType = "LOSE";
             }
 
+            // MemberGameresult 생성 및 저장
             MemberGameresult memberGameresult = MemberGameresult.builder()
                     .member(member)
-                    .gameresult(gameresult)
+                    .gameresult(saveGameresult) // saveGameresult 사용
                     .gameOverType(gameOverType)
                     .build();
 

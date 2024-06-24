@@ -31,8 +31,10 @@ public class Gameresult {
     private String guestCodeContent;
 
     //DB table에 더 들어가야함
+    @Setter
     private String hostId;
 
+    @Setter
     private String guestId;
 
     private String hostCodeLanguage;

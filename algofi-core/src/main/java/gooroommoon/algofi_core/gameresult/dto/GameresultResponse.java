@@ -23,7 +23,8 @@ public class GameresultResponse {
     private String hostId;
     
     private String guestId;
-    
+
+    @Setter
     private String gameOverType;
     
     private String hostCodeLanguage;

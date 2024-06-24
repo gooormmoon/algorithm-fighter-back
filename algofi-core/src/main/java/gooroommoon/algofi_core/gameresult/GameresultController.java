@@ -30,15 +30,15 @@ public class GameresultController {
     public ResponseEntity<StateResponse<GameresultResponse>> findGameresult(@PathVariable("gameresultId") Long gameresultId, Authentication auth) {
         GameresultResponse gameresult = gameresultService.findGameresult(auth.getName(), gameresultId);
         String memberGameOverType = memberGameresultRepository.findMemberGameOverType(auth.getName(), gameresultId);
-        gameresult.builder().gameOverType(memberGameOverType);
+        gameresult.setGameOverType(memberGameOverType);
 
-        StateResponse stateResponse = StateResponse.builder()
+        StateResponse<GameresultResponse> stateResponse = StateResponse.<GameresultResponse>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("success")
                 .data(gameresult)
                 .build();
 
-        return ResponseEntity.ok().body(stateResponse);
+        return ResponseEntity.ok(stateResponse);
     }
 
     /**
@@ -48,7 +48,7 @@ public class GameresultController {
     public ResponseEntity<StateResponse<List<GameresultsResponse>>> findAllGameresults(Authentication auth) {
         List<GameresultsResponse> gameresultList = gameresultService.findGameresultList(auth.getName());
 
-        StateResponse stateResponse = StateResponse.builder()
+        StateResponse<List<GameresultsResponse>> stateResponse = StateResponse.<List<GameresultsResponse>>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Success")
                 .data(gameresultList)
