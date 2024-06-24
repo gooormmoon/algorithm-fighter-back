@@ -9,11 +9,9 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class GameresultsResponse {
+public class StateResponse<T> {
 
-    private String title;
-
-    private int runningTime;
-
-    private Long gameresultId;
+    private int statusCode;
+    private String message;
+    private T data;
 }

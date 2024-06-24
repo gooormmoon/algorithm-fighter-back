@@ -184,6 +184,7 @@ public class GameSessionService {
         if(winnerId != null) {
             GameSessionOverResponse winnerResponse = new GameSessionOverResponse(GameOverType.WIN, runningTime);
             GameSessionOverResponse loserResponse = new GameSessionOverResponse(GameOverType.LOSE, runningTime);
+            session.setWinnerId(winnerId);
             messagingTemplate.convertAndSendToUser(
                     winnerId, "/queue/game/over", winnerResponse
             );
@@ -207,8 +208,10 @@ public class GameSessionService {
         }
             if (playerId.equals(session.getHostId())) {
                 session.setHostGameCode(request.getCode());
+                session.setHostCodeLanguage(request.getLanguage());
             } else {
                 session.setOtherGameCode(request.getCode());
+                session.setGuestCodeLanguage(request.getLanguage());
             }
             //양 측의 코드가 저장됐으면 DB에 저장
             if (session.getHostGameCode() != null && session.getOtherGameCode() != null) {
@@ -223,7 +226,11 @@ public class GameSessionService {
                 session.getHostGameCode(),
                 session.getOtherGameCode(),
                 session.getAlgorithmProblem(),
-                session.getRunningTime());
+                session.getRunningTime(),
+                session.getHostId(),
+                session.getHostCodeLanguage(),
+                session.getGuestCodeLanguage(),
+                session.getWinnerId());
 
         removeSession(session);
     }

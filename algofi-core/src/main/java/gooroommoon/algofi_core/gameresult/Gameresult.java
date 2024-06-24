@@ -30,6 +30,19 @@ public class Gameresult {
     @NotNull
     private String guestCodeContent;
 
+    //DB table에 더 들어가야함
+    @Setter
+    private String hostId;
+
+    @Setter
+    private String guestId;
+
+    private String hostCodeLanguage;
+
+    private String guestCodeLanguage;
+
+    private String gameOverType;
+
     @CreatedDate
     @NotNull
     @Setter
@@ -43,10 +56,15 @@ public class Gameresult {
     @JoinColumn(name = "chatroom_id", nullable = false)
     private Chatroom chatroomId;
 
-    public Gameresult(int runningTime, String hostCodeContent, String guestCodeContent, Algorithmproblem algorithmproblemId, Chatroom chatroomId) {
+    public Gameresult(int runningTime, String hostCodeContent, String guestCodeContent, String hostId, String guestId, String hostCodeLanguage, String guestCodeLanguage, String gameOverType, Algorithmproblem algorithmproblemId, Chatroom chatroomId) {
         this.runningTime = runningTime;
         this.hostCodeContent = hostCodeContent;
         this.guestCodeContent = guestCodeContent;
+        this.hostId = hostId;
+        this.guestId = guestId;
+        this.hostCodeLanguage = hostCodeLanguage;
+        this.guestCodeLanguage = guestCodeLanguage;
+        this.gameOverType = gameOverType;
         this.algorithmproblemId = algorithmproblemId;
         this.chatroomId = chatroomId;
     }
