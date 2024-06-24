@@ -12,7 +12,7 @@ import java.nio.file.Path;
 public class InputJudgeService {
     private final JudgeService judgeService;
 
-    public String judgeInput(String language, String code, String input){
+    public synchronized String judgeInput(String language, String code, String input){
         CodeExecutor codeExecutor = judgeService.getCodeExecutor(language);
 
         Path path = codeExecutor.makeFileFromCode(code);
