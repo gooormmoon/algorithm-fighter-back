@@ -32,6 +32,12 @@ public class GameSession {
     private String hostGameCode;
     @Setter
     private String otherGameCode;
+    @Setter
+    private String hostCodeLanguage;
+    @Setter
+    private String guestCodeLanguage;
+    @Setter
+    private String winnerId;
 
     private Algorithmproblem algorithmProblem;
 

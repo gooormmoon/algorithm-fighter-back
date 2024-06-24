@@ -2,6 +2,8 @@ package gooroommoon.algofi_core.gameresult.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import gooroommoon.algofi_core.algorithmproblem.Algorithmproblem;
+import gooroommoon.algofi_core.game.session.GameOverType;
 import lombok.*;
 
 @Getter
@@ -16,7 +18,15 @@ public class GameresultResponse {
 
     private String guestCodeContent;
 
-    private Long algorithmproblemId;
-
-    private String chatroomId;
+    private String title;
+    
+    private String hostId;
+    
+    private String guestId;
+    
+    private String gameOverType;
+    
+    private String hostCodeLanguage;
+    
+    private String guestCodeLanguage;
 }

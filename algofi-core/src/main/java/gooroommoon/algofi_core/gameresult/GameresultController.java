@@ -1,9 +1,12 @@
 package gooroommoon.algofi_core.gameresult;
 
 import gooroommoon.algofi_core.gameresult.dto.GameresultResponse;
+import gooroommoon.algofi_core.gameresult.dto.StateResponse;
 import gooroommoon.algofi_core.gameresult.dto.GameresultsResponse;
+import gooroommoon.algofi_core.gameresult.membergameresult.MemberGameresultRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -18,27 +21,39 @@ import java.util.List;
 public class GameresultController {
 
     private final GameresultService gameresultService;
+    private final MemberGameresultRepository memberGameresultRepository;
 
     /**
      * 멤버의 특정 게임결과 조회
      */
-    //TODO uri 정해야함
-    @GetMapping("/api/game/member/{GameresultId}")
-    public ResponseEntity findGameresult(@PathVariable Long GameresultId, Authentication auth) {
-        GameresultResponse gameresult = gameresultService.findGameresult(auth.getName(), GameresultId);
+    @GetMapping("/app/game/result/{gameresultId}")
+    public ResponseEntity<StateResponse<GameresultResponse>> findGameresult(@PathVariable("gameresultId") Long gameresultId, Authentication auth) {
+        GameresultResponse gameresult = gameresultService.findGameresult(auth.getName(), gameresultId);
+        String memberGameOverType = memberGameresultRepository.findMemberGameOverType(auth.getName(), gameresultId);
+        gameresult.builder().gameOverType(memberGameOverType);
 
-        //TODO 상태코드랑, 메세지같이 보내야함
-        return ResponseEntity.ok().body(gameresult);
+        StateResponse stateResponse = StateResponse.builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("success")
+                .data(gameresult)
+                .build();
+
+        return ResponseEntity.ok().body(stateResponse);
     }
 
     /**
      * 멤버의 모든 게임결과 조회
      */
-    //TODO uri 정해야함
-    @GetMapping("/api/game/member/gameresults")
-    public ResponseEntity<List<GameresultsResponse>> findAllGameresults(Authentication auth) {
+    @GetMapping("/app/game/results")
+    public ResponseEntity<StateResponse<List<GameresultsResponse>>> findAllGameresults(Authentication auth) {
         List<GameresultsResponse> gameresultList = gameresultService.findGameresultList(auth.getName());
 
-        return ResponseEntity.ok().body(gameresultList);
+        StateResponse stateResponse = StateResponse.builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Success")
+                .data(gameresultList)
+                .build();
+
+        return ResponseEntity.ok(stateResponse);
     }
 }
