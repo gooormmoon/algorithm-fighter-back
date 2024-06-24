@@ -78,7 +78,7 @@ CREATE TABLE member_chatroom (
 
 /* gameresult table 생성 */
 CREATE TABLE gameresult (
-                            game_result_id INT(11) AUTO_INCREMENT PRIMARY KEY,
+                            gameresult_id INT(11) AUTO_INCREMENT PRIMARY KEY,
                             running_time VARCHAR(100),
                             host_code_content VARCHAR(5500),
                             guest_code_content VARCHAR(5500),
@@ -97,10 +97,10 @@ CREATE TABLE gameresult (
 /* member_gameresult table 생성 */
 CREATE TABLE member_gameresult (
                                    member_gameresult_id INT AUTO_INCREMENT PRIMARY KEY,
-                                   game_result_id INT NOT NULL,
+                                   gameresult_id INT NOT NULL,
                                    member_id INT NOT NULL,
                                    game_over_type VARCHAR(10) NOT NULL,
-                                   FOREIGN KEY(game_result_id) REFERENCES gameresult(game_result_id),
+                                   FOREIGN KEY(gameresult_id) REFERENCES gameresult(gameresult_id),
                                    FOREIGN KEY(member_id) REFERENCES member(member_id)
 ) character set utf8mb4 collate utf8mb4_general_ci;
 
