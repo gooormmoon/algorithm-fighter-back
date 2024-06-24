@@ -36,7 +36,7 @@ public class Gameresult {
     private LocalDateTime created_date;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "algorithm_problem_id", nullable = false)
+    @JoinColumn(name = "algorithmproblem_id", nullable = false)
     private Algorithmproblem algorithmproblemId;
 
     @ManyToOne(fetch = FetchType.LAZY)
