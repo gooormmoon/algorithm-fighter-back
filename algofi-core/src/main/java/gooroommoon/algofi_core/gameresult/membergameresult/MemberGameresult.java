@@ -24,7 +24,7 @@ public class MemberGameresult {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "game_result_id")
+    @JoinColumn(name = "gameresult_id")
     private Gameresult gameresult;
 
     private String gameOverType;
