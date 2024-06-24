@@ -27,8 +27,11 @@ public class MemberGameresult {
     @JoinColumn(name = "game_result_id")
     private Gameresult gameresult;
 
-    public MemberGameresult(Member member, Gameresult gameresult) {
+    private String gameOverType;
+
+    public MemberGameresult(Member member, Gameresult gameresult,String gameOverType) {
         this.member = member;
         this.gameresult = gameresult;
+        this.gameOverType = gameOverType;
     }
 }
