@@ -2,7 +2,7 @@
 
 - **`Team name` :** 구름달
 - **`Project` :** Algorithm Fighter
-- **`Project duration` :** 2023.03.13 - 2023.04.28
+- **`Project duration` :** 2024.06
 - **`Team members` :** 예진희(팀장), 황희태, 구본헌, 서진주, 이주원, 김하은, 양윤수, 임명철, 홍석호
 - **`Functional Requirement`:** [요구사항 명세서](https://www.notion.so/d4ec7f6e28984b46a3ff43d9c95bf5fd?pvs=4)
 - **`API Specification`:** [API 명세서](https://www.notion.so/API-208b11ce8fba4483b8d1fa8bc940d347?pvs=4)
